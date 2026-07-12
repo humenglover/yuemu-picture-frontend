@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://www.yuemutuku.com/src/assets/logo.png" alt="悦木图库" width="120" height="120" />
+  <img src="https://raw.githubusercontent.com/humenglover/yuemu-picture-frontend/main/public/logo.png" alt="悦木图库" width="120" height="120" />
 </p>
 
 <h1 align="center">🌳 悦木图库 · Yuemu Gallery</h1>
