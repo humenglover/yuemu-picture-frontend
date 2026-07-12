@@ -37,7 +37,13 @@ Yuemu Gallery is a **creative community platform** where users can share artwork
 
 This repository is the **frontend codebase**, built with Vue 3 + TypeScript + Vite, covering both desktop and mobile experiences.
 
-> 🔗 Backend repository: _coming soon_
+> 🔗 **Related Repositories**:
+> | Repo | Description |
+> |------|-------------|
+> | [yuemu-picture-backend](https://github.com/humenglover/yuemu-picture-backend) | Backend API — Spring Boot + MySQL + Redis + Meilisearch |
+> | [yuemu-picture-frontend](https://github.com/humenglover/yuemu-picture-frontend) | Web client — Vue 3 + TypeScript + Vite |
+> | [yuemu-picture-ai-service](https://github.com/humenglover/yuemu-picture-ai-service) | AI service — Python + RAG + Embeddings |
+> | [yuemu-picture-official-docs](https://github.com/humenglover/yuemu-picture-official-docs) | Official documentation & website
 
 ## 🧰 Features
 
@@ -171,7 +177,13 @@ Static SPA, deploy anywhere:
 
 本仓库为**前端代码库**，基于 Vue 3 + TypeScript + Vite 构建，覆盖 PC 端与移动端。
 
-> 🔗 后端代码库：_待补充_
+> 🔗 **相关仓库**：
+> | 仓库 | 说明 |
+> |------|------|
+> | [yuemu-picture-backend](https://github.com/humenglover/yuemu-picture-backend) | 后端 API — Spring Boot + MySQL + Redis + Meilisearch |
+> | [yuemu-picture-frontend](https://github.com/humenglover/yuemu-picture-frontend) | Web 客户端 — Vue 3 + TypeScript + Vite |
+> | [yuemu-picture-ai-service](https://github.com/humenglover/yuemu-picture-ai-service) | AI 服务 — Python + RAG + Embeddings |
+> | [yuemu-picture-official-docs](https://github.com/humenglover/yuemu-picture-official-docs) | 官方文档 & 官网
 
 ## 🧰 功能一览
 
