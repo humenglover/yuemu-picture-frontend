@@ -1,0 +1,20 @@
+export default {
+    title: 'AI 智能扩图',
+    originalImage: '原始图片',
+    noOriginalImage: '暂无原图',
+    resultImage: '扩图结果',
+    generating: '生成中...',
+    aiGenerating: 'AI 正在努力拓展画幅...',
+    clickToStart: '点击下方按钮开始扩图',
+    aiGeneratingBtn: 'AI 正在生成...',
+    startOutPainting: '开始智能扩图',
+    applying: '应用并保存中...',
+    applyResult: '应用此结果',
+    taskSubmitted: '扩图任务已提交，请耐心等待...',
+    taskFailed: '图片任务失败：',
+    outPaintingSuccess: 'AI 扩图完成！',
+    outPaintingFailedRetry: '扩图任务执行失败，请重试',
+    pollingFailed: '扩图任务轮询失败：',
+    applySuccess: '结果已成功应用！',
+    applyFailed: '应用失败：'
+};

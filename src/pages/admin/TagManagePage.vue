@@ -1,214 +1,217 @@
 <template>
-  <div id="tagManagePage">
-    <!-- PC端展示 -->
+  <div id="yuemu-tag-manage-page">
     <template v-if="device === DEVICE_TYPE_ENUM.PC">
-      <!-- 搜索与添加按钮容器，使其在同一行显示 -->
-      <div class="search-and-add-container">
-        <a-form layout="inline" :model="searchParams" @finish="doSearch">
-          <a-form-item label="标签名称">
-            <a-input v-model:value="searchParams.tagName" placeholder="输入标签名称" allow-clear />
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" html-type="submit" class="action-button search-button">
-              <SearchOutlined />搜索
+      <div class="yuemu-pc-dashboard">
+        <header class="yuemu-dashboard-header">
+          <div class="yuemu-header-left">
+            <h1 class="yuemu-page-title"> {{ t('pages.admin.tagManagePage.title') }} </h1>
+            <p class="yuemu-page-desc"> {{ t('pages.admin.tagManagePage.desc') }} </p>
+          </div>
+          <div class="yuemu-header-right">
+            <a-button type="primary" class="yuemu-btn-primary" @click="showAddModal">
+              <PlusOutlined /> {{ t('pages.admin.tagManagePage.createTagBtn') }}
             </a-button>
-          </a-form-item>
-        </a-form>
-        <div class="add-button-wrapper">
-          <a-button type="primary" class="action-button create-button" @click="showAddModal">
-            <PlusOutlined />添加标签
-          </a-button>
-        </div>
-      </div>
-      <div style="margin-bottom: 16px" />
-      <!-- 表格 -->
-      <a-table
-        :columns="columns"
-        :data-source="tagList"
-        :pagination="false"
-        @change="handleTableChange"
-        class="tag-table"
-      >
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.dataIndex === 'createTime'">
-            <div
-              :style="{
-                maxWidth: '250px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }"
-            >
-              {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-            </div>
-          </template>
-          <template v-else-if="column.key === 'action'">
-            <a-button 
-              class="table-button delete-button" 
-              @click="showDeleteConfirm(record)"
-            >
-              <DeleteOutlined />删除
-            </a-button>
-          </template>
-        </template>
-      </a-table>
-      <div class="pagination-container">
-        <a-pagination
-          v-model:current="searchParams.current"
-          :page-size-options="pcPageSizeOptions"
-          :total="total"
-          show-size-changer
-          :page-size="searchParams.pageSize"
-          @change="onPageChange"
-          @showSizeChange="onShowSizeChange"
-        >
-          <template #buildOptionText="props">
-            <span>{{ props.value }}条/页</span>
-          </template>
-        </a-pagination>
-      </div>
-    </template>
-
-    <!-- 移动端展示 -->
-    <template v-else>
-      <div class="mobile-container">
-        <div class="mobile-content">
-          <!-- 搜索区域 -->
-          <div class="search-section">
-            <van-search
-              v-model="searchParams.tagName"
-              placeholder="搜索标签名称"
-              @search="doSearch"
-            />
           </div>
+        </header>
 
-          <!-- 添加按钮 -->
-          <div class="action-bar">
-            <van-button type="primary" block @click="showAddModal" class="add-button">
-              <template #icon><PlusOutlined /></template>
-              添加标签
-            </van-button>
-          </div>
-
-          <!-- 标签列表 -->
-          <div class="tag-list">
-            <van-cell-group v-for="tag in tagList" :key="tag.id" class="tag-group">
-              <van-card class="tag-card">
-                <template #title>
-                  <div class="card-title">{{ tag.tagName }}</div>
-                </template>
-
-                <template #desc>
-                  <div class="card-info">
-                    <div class="info-item">
-                      <span class="label">标签ID：</span>
-                      <span class="value">{{ tag.id }}</span>
-                    </div>
-                    <div class="info-item">
-                      <span class="label">创建时间：</span>
-                      <span class="value">{{
-                        dayjs(tag.createTime).format('YYYY-MM-DD HH:mm:ss')
-                      }}</span>
-                    </div>
-                  </div>
-                </template>
-
-                <template #footer>
-                  <div class="card-footer">
-                    <van-button
-                      type="danger"
-                      size="small"
-                      @click="showDeleteConfirm(tag)"
-                      class="mobile-button delete-button"
-                    >
-                      <template #icon><DeleteOutlined /></template>
-                      删除
-                    </van-button>
-                  </div>
-                </template>
-              </van-card>
-            </van-cell-group>
-          </div>
-
-          <!-- 移动端分页 -->
-          <div class="mobile-pagination">
-            <div class="pagination-info">
-              <span>共 {{ total }} 条</span>
-              <div class="page-size-selector" @click="showPageSizeSheet = true">
-                <span>{{ searchParams.pageSize }}条/页</span>
-                <van-icon name="arrow-down" />
-              </div>
-            </div>
-            <div class="pagination-wrapper">
-              <van-pagination
-                v-model="searchParams.current"
-                :total-items="total"
-                :items-per-page="searchParams.pageSize"
-                @change="onMobilePageChange"
-                :show-prev-text="false"
-                :show-next-text="false"
-                :show-page-size="3"
-                class="custom-pagination"
-                force-ellipses
+        <div class="yuemu-filter-bar">
+          <a-form layout="inline" :model="searchParams" class="yuemu-filter-form" @finish="doSearch">
+            <a-form-item>
+              <a-input
+                v-model:value="searchParams.tagName"
+                :placeholder="t('pages.admin.tagManagePage.searchTagName')"
+                allow-clear
+                class="yuemu-input-base"
+                style="width: 280px"
               >
-                <template #prev-text>
-                  <van-icon name="arrow-left" />
-                </template>
-                <template #next-text>
-                  <van-icon name="arrow" />
-                </template>
-              </van-pagination>
-              <div class="jump-page">
-                <span>跳至</span>
-                <van-field v-model="jumpPage" type="number" @keypress.enter="handleJumpPage" />
-                <span>页</span>
-              </div>
-            </div>
-          </div>
+                <template #prefix><SearchOutlined class="yuemu-text-secondary" /></template>
+              </a-input>
+            </a-form-item>
+            <a-form-item>
+              <a-button type="primary" html-type="submit" class="yuemu-btn-primary">
+                {{ t('pages.admin.tagManagePage.searchBtn') }}
+              </a-button>
+            </a-form-item>
+          </a-form>
+        </div>
 
-          <!-- 每页条数选择器 -->
-          <van-action-sheet
-            v-model:show="showPageSizeSheet"
-            :actions="pageSizeOptions"
-            cancel-text="取消"
-            close-on-click-action
-            @select="handlePageSizeChange"
+        <div class="yuemu-table-container">
+          <a-spin :tip="t('pages.admin.tagManagePage.loadingText')" :spinning="loading">
+            <a-table
+              rowKey="id"
+              :columns="columns"
+              :data-source="tagList"
+              :pagination="false"
+              @change="handleTableChange"
+              class="yuemu-seamless-table"
+              :scroll="{ x: 800 }"
+            >
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.dataIndex === 'id'">
+                  <span class="yuemu-text-mono yuemu-text-secondary">#{{ record.id }}</span>
+                </template>
+
+                <template v-if="column.dataIndex === 'tagName'">
+                  <span class="yuemu-badge yuemu-bg-blue">
+                    <TagOutlined style="margin-right: 4px;" />
+                    {{ record.tagName }}
+                  </span>
+                </template>
+
+                <template v-if="column.dataIndex === 'createTime'">
+                  <span class="yuemu-text-secondary">
+                    {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+                  </span>
+                </template>
+
+                <template v-if="column.key === 'action'">
+                  <div class="yuemu-action-cell">
+                    <button class="yuemu-icon-text-btn yuemu-color-danger" @click="showDeleteConfirm(record)">{{ t('pages.admin.tagManagePage.deleteBtn') }}</button>
+                  </div>
+                </template>
+              </template>
+            </a-table>
+          </a-spin>
+        </div>
+
+        <div class="yuemu-pagination-bar">
+          <a-pagination
+            v-model:current="searchParams.current"
+            :page-size-options="pcPageSizeOptions"
+            :total="total"
+            :show-total="(total) => t('pages.admin.tagManagePage.totalTagText', { total })"
+            show-size-changer
+            :page-size="searchParams.pageSize"
+            @change="onPageChange"
+            @showSizeChange="onShowSizeChange"
           />
         </div>
       </div>
     </template>
 
-    <!-- 添加标签模态框 -->
-    <a-modal v-model:open="addModalVisible" title="添加标签" @ok="handleAdd">
-      <a-form ref="addFormRef">
-        <a-form-item label="标签名称" name="tagName">
-          <a-input v-model:value="addForm.tagName" />
-        </a-form-item>
-      </a-form>
+    <template v-else>
+      <div class="yuemu-m-container">
+        <div class="yuemu-m-sticky-header">
+          <div class="yuemu-m-header-main">
+            <h1 class="yuemu-m-title"> {{ t('pages.admin.tagManagePage.title') }} </h1>
+            <div class="yuemu-m-actions">
+              <van-button icon="plus" size="small" type="primary" round class="yuemu-m-primary-btn" @click="showAddModal" />
+            </div>
+          </div>
+
+          <div class="yuemu-m-search-row">
+            <van-search
+              v-model="searchParams.tagName"
+              :placeholder="t('pages.admin.tagManagePage.searchTagName')"
+              shape="round"
+              class="yuemu-m-search"
+              @search="doSearch"
+              clearable
+            />
+          </div>
+        </div>
+
+        <div class="yuemu-m-scroll-view">
+          <div class="yuemu-m-card-list">
+            <div v-for="tag in tagList" :key="tag.id" class="yuemu-m-card">
+              <div class="yuemu-m-card-header">
+                <div class="yuemu-m-icon-square yuemu-bg-blue">
+                  <TagOutlined />
+                </div>
+                <div class="yuemu-m-main-info">
+                  <span class="yuemu-m-card-title">{{ tag.tagName }}</span>
+                  <span class="yuemu-text-secondary yuemu-text-mono" style="font-size: 12px; margin-top: 2px;">ID: {{ tag.id }}</span>
+                </div>
+              </div>
+
+              <div class="yuemu-m-card-body">
+                <div class="yuemu-text-secondary" style="font-size: 13px;">
+                  <div class="yuemu-tag-time">{{ t('pages.admin.tagManagePage.createdAt') }}{{ dayjs(tag.createTime).format('YYYY-MM-DD HH:mm') }}</div>
+                </div>
+              </div>
+
+              <div class="yuemu-m-card-actions">
+                <button class="yuemu-m-action-btn yuemu-danger" @click="showDeleteConfirm(tag)"> {{ t('pages.admin.tagManagePage.deleteTag') }} </button>
+              </div>
+            </div>
+          </div>
+
+          <van-empty v-if="tagList.length === 0 && !loading" :description="t('pages.admin.tagManagePage.noTagData')" />
+
+          <div class="yuemu-m-pagination" v-if="total > 0">
+            <div class="yuemu-m-page-info yuemu-text-secondary">
+              <span>{{ t('pages.admin.tagManagePage.totalRecordsText2', { total }) }}</span>
+              <span class="yuemu-m-page-size-trigger" @click="showPageSizeSheet = true">
+                {{ searchParams.pageSize }} {{ t('pages.admin.tagManagePage.recordsPerPage') }}
+                <van-icon name="arrow-down" />
+              </span>
+            </div>
+            <van-pagination :prev-text="t('pages.admin.tagManagePage.prevPage')" :next-text="t('pages.admin.tagManagePage.nextPage')"
+              v-model="searchParams.current"
+              :total-items="total"
+              :items-per-page="searchParams.pageSize"
+              @change="onMobilePageChange"
+              :show-page-size="3"
+              force-ellipses
+              class="yuemu-dark-van-pagination"
+            />
+          </div>
+        </div>
+
+        <van-action-sheet
+          v-model:show="showPageSizeSheet"
+          :actions="pageSizeOptions"
+          :cancel-text="t('pages.admin.tagManagePage.cancelBtn')"
+          close-on-click-action
+          @select="handlePageSizeChange"
+          class="yuemu-dark-action-sheet"
+          teleport="body"
+        />
+      </div>
+    </template>
+
+    <a-modal
+      v-model:open="addModalVisible"
+      :title="t('pages.admin.tagManagePage.addContentTag')"
+      :footer="null"
+      class="yuemu-apple-modal"
+      centered
+      width="400px"
+    >
+      <div class="yuemu-modal-form">
+        <div class="yuemu-form-item">
+          <label> {{ t('pages.admin.tagManagePage.tagName') }} <span class="yuemu-required">*</span></label>
+          <a-input
+            v-model:value="addForm.tagName"
+            :placeholder="t('pages.admin.tagManagePage.tagNamePlaceholder')"
+            class="yuemu-input-base"
+            @keyup.enter="handleAdd"
+          />
+        </div>
+        <div class="yuemu-modal-footer">
+          <button class="yuemu-btn-secondary" @click="addModalVisible = false">{{ t('pages.admin.tagManagePage.cancelBtn') }}</button>
+          <button class="yuemu-btn-primary-gradient" :disabled="!addForm.tagName.trim() || addLoading" @click="handleAdd">
+            {{ addLoading ? t('pages.admin.tagManagePage.adding') : t('pages.admin.tagManagePage.confirmAddBtn') }}
+          </button>
+        </div>
+      </div>
     </a-modal>
 
-    <!-- 删除确认弹框 -->
     <a-modal
       v-model:open="deleteConfirmVisible"
       :title="null"
       :footer="null"
-      :width="400"
-      class="delete-confirm-modal"
+      :width="360"
+      class="yuemu-apple-modal"
+      centered
     >
-      <div class="delete-confirm-content">
-        <div class="warning-icon">
-          <ExclamationCircleFilled style="color: #ff6b6b;" />
-        </div>
-        <h3 class="confirm-title">确认删除该标签？</h3>
-        <p class="confirm-desc">
-          标签名称：{{ selectedTag?.tagName }}<br>
-          标签ID：{{ selectedTag?.id }}
-        </p>
-        <div class="confirm-actions">
-          <a-button class="cancel-button" @click="deleteConfirmVisible = false">取消</a-button>
-          <a-button class="confirm-button" danger @click="confirmDelete">
-            确认删除
-          </a-button>
+      <div class="yuemu-confirm-content">
+        <div class="yuemu-icon-warning"><ExclamationCircleFilled /></div>
+        <h3 class="yuemu-confirm-title"> {{ t('pages.admin.tagManagePage.permanentDelete') }} </h3>
+        <p class="yuemu-confirm-desc">「{{ selectedTag?.tagName }}」<br> {{ t('pages.admin.tagManagePage.deleteWarning') }} </p>
+        <div class="yuemu-confirm-actions">
+          <button class="yuemu-action-cancel" @click="deleteConfirmVisible = false">{{ t('pages.admin.tagManagePage.cancelBtn') }}</button>
+          <button class="yuemu-action-danger" @click="confirmDelete">{{ t('pages.admin.tagManagePage.deleteBtn') }}</button>
         </div>
       </div>
     </a-modal>
@@ -216,20 +219,20 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   addTagUsingPost,
   deleteTagUsingPost,
   listTagVoByPageUsingPost,
-  searchTagUsingPost,
 } from '@/api/tagController.ts'
 import dayjs from 'dayjs'
-import { PlusOutlined, DeleteOutlined, SearchOutlined, ExclamationCircleFilled } from '@ant-design/icons-vue'
+import { PlusOutlined, SearchOutlined, ExclamationCircleFilled, TagOutlined } from '@ant-design/icons-vue'
 import { DEVICE_TYPE_ENUM } from '@/constants/device'
 import { getDeviceType } from '@/utils/device'
 
-// 定义搜索参数类型
 type SearchParams = {
   current: number
   pageSize: number
@@ -238,642 +241,343 @@ type SearchParams = {
   sortOrder?: string
 }
 
-// 表格列配置
 const columns = [
-  {
-    title: '标签ID',
-    dataIndex: 'id',
-    key: 'id',
-  },
-  {
-    title: '标签名称',
-    dataIndex: 'tagName',
-    key: 'tagName',
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime',
-    key: 'createTime',
-  },
-  {
-    title: '操作',
-    key: 'action',
-    scopedSlots: { customRender: 'action' },
-  },
+  { title: t('pages.admin.tagManagePage.tagId'), dataIndex: 'id', key: 'id', width: 180 },
+  { title: t('pages.admin.tagManagePage.colTagName'), dataIndex: 'tagName', key: 'tagName' },
+  { title: t('pages.admin.tagManagePage.colCreateTime'), dataIndex: 'createTime', key: 'createTime', width: 220 },
+  { title: t('pages.admin.tagManagePage.colAction'), key: 'action', width: 120, align: 'right' },
 ]
 
-// 标签列表数据
 const tagList = ref([])
-// 总记录数
 const total = ref(0)
-// 分页配置及搜索参数整合
+const loading = ref(false)
 const searchParams = reactive<SearchParams>({
   current: 1,
-  pageSize: 8,
+  pageSize: 10,
   sortField: 'createTime',
-  sortOrder: 'ascend',
-  tagName: '',
-})
-// PC端分页选项
-const pcPageSizeOptions = ['5', '8', '10', '20', '50']
-// 添加标签模态框是否可见
-const addModalVisible = ref(false)
-// 添加标签表单数据
-const addForm = reactive({
+  sortOrder: 'descend', // 默认按最新创建的降序，体验更好
   tagName: '',
 })
 
-// 设备类型
-const device = ref<string>('')
-onMounted(async () => {
-  device.value = await getDeviceType()
-})
-
-const showPageSizeSheet = ref(false)
-const jumpPage = ref('')
-
-// 移动端分页选项
+const pcPageSizeOptions = ['10', '20', '30', '50']
 const pageSizeOptions = [
-  { name: '10条/页', value: 10 },
-  { name: '20条/页', value: 20 },
-  { name: '30条/页', value: 30 },
-  { name: '50条/页', value: 50 },
+  { name: t('pages.admin.tagManagePage.pageSize10'), value: 10 },
+  { name: t('pages.admin.tagManagePage.pageSize20'), value: 20 },
+  { name: t('pages.admin.tagManagePage.pageSize30'), value: 30 },
+  { name: t('pages.admin.tagManagePage.pageSize50'), value: 50 },
 ]
 
-// 获取标签列表数据
-const getTagList = async () => {
-  try {
-    const res = await listTagVoByPageUsingPost({
-      ...searchParams,
-    })
-    if (res.data.code === 0 && res.data.data) {
-      tagList.value = res.data.data.records
-      total.value = res.data.data.total
-    } else {
-      message.error('获取标签列表失败')
-    }
-  } catch (error) {
-    console.error('获取标签列表出错', error)
-    message.error('获取标签列表失败')
-  }
-}
+const addModalVisible = ref(false)
+const addLoading = ref(false)
+const addForm = reactive({ tagName: '' })
+const device = ref<string>('')
+const showPageSizeSheet = ref(false)
 
-// 页面加载时获取标签列表
-onMounted(() => {
+onMounted(async () => {
+  device.value = await getDeviceType()
   getTagList()
 })
 
-// 处理分页尺寸改变时的逻辑（每页显示条数改变）
+const getTagList = async () => {
+  loading.value = true
+  try {
+    const res = await listTagVoByPageUsingPost({ ...searchParams })
+    if (res.data.code === 0 && res.data.data) {
+      tagList.value = res.data.data.records
+      total.value = parseInt(res.data.data.total)
+    } else {
+      message.error(t('pages.admin.tagManagePage.fetchListFail'))
+    }
+  } catch (error) {
+    message.error(t('pages.admin.tagManagePage.networkErr'))
+  } finally {
+    loading.value = false
+  }
+}
+
 const onShowSizeChange = (current: number, pageSize: number) => {
-  searchParams.current = 1 // 切换每页条数时，默认回到第一页，可根据需求调整
+  searchParams.current = 1
   searchParams.pageSize = pageSize
   getTagList()
 }
 
-// 处理页码改变时的逻辑
 const onPageChange = (page: number, pageSize: number) => {
   searchParams.current = page
   searchParams.pageSize = pageSize
   getTagList()
 }
 
-// 处理表格页码、页大小改变等操作（包括排序等情况）
-const handleTableChange = (paginationParam: any) => {
-  searchParams.current = paginationParam.current
-  searchParams.pageSize = paginationParam.pageSize
-  if (paginationParam.sortField && paginationParam.sortOrder) {
-    searchParams.sortField = paginationParam.sortField
-    searchParams.sortOrder = paginationParam.sortOrder === 'ascend' ? 'ascend' : 'descend'
+const handleTableChange = (paginationParam: any, filters: any, sorter: any) => {
+  if (sorter && sorter.field && sorter.order) {
+    searchParams.sortField = sorter.field
+    searchParams.sortOrder = sorter.order === 'ascend' ? 'ascend' : 'descend'
   }
   getTagList()
 }
 
-// 处理搜索操作，优化了未输入信息时的逻辑
 const doSearch = () => {
-  // 重置页码
   searchParams.current = 1
   getTagList()
 }
 
-// 显示添加标签模态框
 const showAddModal = () => {
+  addForm.tagName = ''
   addModalVisible.value = true
 }
 
-// 处理添加标签操作，确保正确获取输入值并传递给后端
 const handleAdd = async () => {
-  const tagNameValue = addForm.tagName // 获取输入框的值并去除两端空格
-  if (tagNameValue === '') {
-    message.error('请输入标签名称')
+  const tagNameValue = addForm.tagName.trim()
+  if (!tagNameValue) {
+    message.warning(t('pages.admin.tagManagePage.inputTagName'))
     return
   }
+  if (addLoading.value) return // 防抖处理
+
+  addLoading.value = true
   try {
-    const addParams = {
-      tagName: tagNameValue, // 使用处理后的非空值传递给后端
-    }
-    const res = await addTagUsingPost(addParams)
+    const res = await addTagUsingPost({ tagName: tagNameValue })
     if (res.data.code === 0) {
-      message.success('添加标签成功')
+      message.success(t('pages.admin.tagManagePage.addSuccessText'))
       addModalVisible.value = false
       getTagList()
     } else {
-      message.error('添加标签失败')
+      message.error(res.data.message || t('pages.admin.tagManagePage.addFail'))
     }
   } catch (error) {
-    console.error('添加标签出错', error)
-    message.error('添加标签失败')
+    message.error(t('pages.admin.tagManagePage.addFailNetwork'))
+  } finally {
+    addLoading.value = false
   }
 }
 
-// 删除确认相关的状态
 const deleteConfirmVisible = ref(false)
 const selectedTag = ref<API.TagVO | null>(null)
 
-// 显示删除确认框
 const showDeleteConfirm = (tag: API.TagVO) => {
   selectedTag.value = tag
   deleteConfirmVisible.value = true
 }
 
-// 确认删除
 const confirmDelete = async () => {
   if (!selectedTag.value?.id) return
-  
   try {
     const res = await deleteTagUsingPost({ id: selectedTag.value.id })
     if (res.data.code === 0) {
-      message.success('删除成功')
+      message.success(t('pages.admin.tagManagePage.deleteSuccess'))
       deleteConfirmVisible.value = false
-      // 刷新数据
       getTagList()
     } else {
-      message.error('删除失败：' + res.data.message)
+      message.error(res.data.message || t('pages.admin.tagManagePage.deleteFailText'))
     }
   } catch (error) {
-    message.error('删除失败，请稍后重试')
+    message.error(t('pages.admin.tagManagePage.deleteFailRetry'))
   }
 }
 
-// 移动端分页处理方法
 const onMobilePageChange = (page: number) => {
   searchParams.current = page
   getTagList()
+  document.querySelector('.yuemu-m-scroll-view')?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const handlePageSizeChange = (action: { value: number }) => {
   searchParams.current = 1
   searchParams.pageSize = action.value
   getTagList()
-}
-
-// 处理页码跳转
-const handleJumpPage = () => {
-  const page = parseInt(jumpPage.value)
-  if (isNaN(page)) {
-    return
-  }
-
-  const maxPage = Math.ceil(total.value / searchParams.pageSize)
-  if (page < 1 || page > maxPage) {
-    message.warning(`请输入1-${maxPage}之间的页码`)
-    return
-  }
-
-  searchParams.current = page
-  getTagList()
-  jumpPage.value = ''
+  showPageSizeSheet.value = false
 }
 </script>
 
 <style scoped>
-/* 可以在这里添加页面的自定义样式 */
-.search-and-add-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.add-button-wrapper {
-  margin-left: 10px;
-}
-
-.custom-button {
-  margin-left: 0;
-}
-.mz-antd-pagination {
-  text-align: right;
-  margin-top: 20px;
-}
-
-/* 移动端样式 */
-.mobile-container {
-  background: #f7f8fa;
+/* ==================== 1. 基础全局配置 ==================== */
+#yuemu-tag-manage-page {
   min-height: 100vh;
-  padding-bottom: 50px;
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: var(--theme-transition);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.mobile-content {
-  padding: 12px;
+.yuemu-text-secondary { color: var(--text-secondary); }
+.yuemu-text-mono { font-family: monospace; }
+
+/* ==================== 2. PC 端工作台 ==================== */
+.yuemu-pc-dashboard {
+  padding: 32px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.action-bar {
-  margin: 12px;
-}
-
-.add-button {
-  background: linear-gradient(135deg, #40c9ff 0%, #1890ff 100%);
-  border: none;
-  border-radius: 8px;
-  height: 36px;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
-}
-
-.tag-list {
-  padding: 0;
-}
-
-.tag-group {
-  margin-bottom: 8px;
-}
-
-.tag-card {
-  background: #fff;
-  width: 100%;
-}
-
-.card-title {
-  font-size: 16px;
-  font-weight: 500;
-  color: #323233;
-  margin-bottom: 8px;
-}
-
-.card-info {
-  font-size: 14px;
-  color: #666;
-}
-
-.info-item {
-  margin-bottom: 8px;
-}
-
-.info-item .label {
-  color: #999;
-  margin-right: 8px;
-}
-
-.info-item .value {
-  color: #323233;
-}
-
-.card-footer {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-/* 分页样式 */
-.mobile-pagination {
-  margin-top: 16px;
-  padding: 12px;
-  background: white;
-  border-radius: 8px;
-}
-
-.pagination-info {
+/* 头部面板 */
+.yuemu-dashboard-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  color: #666;
-  font-size: 13px;
-}
-
-.page-size-selector {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border: 1px solid #ebedf0;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-}
-
-.pagination-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-/* 跳转页码样式 */
-.jump-page {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: #666;
-}
-
-.jump-page :deep(.van-field) {
-  width: 48px;
-  padding: 0;
-}
-
-.jump-page :deep(.van-field__control) {
-  height: 28px;
-  padding: 0 4px;
-  text-align: center;
-  border: 1px solid #ebedf0;
-  border-radius: 4px;
-  font-size: 13px;
-}
-
-/* 隐藏输入框的上下箭头 */
-.jump-page :deep(.van-field__control::-webkit-inner-spin-button),
-.jump-page :deep(.van-field__control::-webkit-outer-spin-button) {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.jump-page :deep(.van-field__control) {
-  -moz-appearance: textfield;
-}
-
-/* 按钮统一样式 */
-.action-button {
-  height: 32px;
-  border-radius: 8px;
-  padding: 0 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  color: white;
-  border: none;
-}
-
-/* 搜索按钮 */
-.search-button {
-  background: linear-gradient(135deg, #36cfc9 0%, #13c2c2 100%);
-  box-shadow: 0 4px 12px rgba(19, 194, 194, 0.2);
-}
-
-.search-button:hover {
-  background: linear-gradient(135deg, #40d9d4 0%, #36cfc9 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(19, 194, 194, 0.3);
-}
-
-/* 创建按钮 */
-.create-button {
-  background: linear-gradient(135deg, #40c9ff 0%, #1890ff 100%);
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
-}
-
-.create-button:hover {
-  background: linear-gradient(135deg, #69d4ff 0%, #40a9ff 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.3);
-}
-
-/* 表格按钮样式 */
-.table-button {
-  height: 28px;
-  border-radius: 6px;
-  padding: 0 12px;
-  font-size: 13px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  transition: all 0.3s ease;
-  color: white;
-}
-
-.table-button .anticon {
-  font-size: 14px;
-}
-
-/* 删除按钮 */
-.delete-button {
-  background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%);
-  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.2);
-}
-
-.delete-button:hover {
-  background: linear-gradient(135deg, #ff9c9a 0%, #ff7875 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
-}
-
-/* 移动端按钮样式 */
-.mobile-button {
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  height: 28px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* 分页器样式优化 */
-:deep(.custom-pagination) {
-  .van-pagination__item {
-    min-width: 28px;
-    height: 28px;
-    line-height: 28px;
-    border-radius: 16px;
-    font-size: 14px;
-    border: 1px solid #ebedf0;
-    margin: 0 2px;
-  }
-
-  .van-pagination__item--active {
-    background: #1989fa;
-    color: white;
-    border-color: #1989fa;
-  }
-
-  .van-pagination__prev,
-  .van-pagination__next {
-    background: #f7f8fa;
-    border: 1px solid #ebedf0;
-    font-weight: bold;
-    min-width: 28px !important;
-    height: 28px !important;
-    line-height: 28px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .van-icon {
-    font-size: 14px;
-    color: #666;
-  }
-}
-.search-section {
-  position: sticky;
-  top: 4px; /* 调整搜索栏的粘性定位位置 */
-  z-index: 100;
-  background: #f7f8fa;
-  /* 抵消父元素的内边距 */
-  margin: 0 -12px 12px;
-}
-
-/* 按钮激活状态 */
-.action-button:active,
-.table-button:active,
-:deep(.van-button:active) {
-  transform: translateY(0);
-  opacity: 0.9;
-}
-
-/* PC端表格和分页容器样式 */
-.tag-table {
-  margin-bottom: 16px;
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-}
-
-/* 删除确认弹框样式 */
-:deep(.delete-confirm-modal) {
-  .ant-modal-content {
-    padding: 0;
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  .ant-modal-body {
-    padding: 0;
-  }
-}
-
-.delete-confirm-content {
-  padding: 32px 24px;
-  text-align: center;
-}
-
-.warning-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-
-  .anticon {
-    animation: pulse 2s infinite;
-  }
-}
-
-.confirm-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 12px;
-}
-
-.confirm-desc {
-  font-size: 14px;
-  color: #64748b;
+  align-items: flex-end;
   margin-bottom: 24px;
-  line-height: 1.6;
+}
+.yuemu-page-title { margin: 0; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.5px; }
+.yuemu-page-desc { margin: 4px 0 0 0; font-size: 14px; color: var(--text-secondary); opacity: 0.8; }
+.yuemu-header-right { display: flex; gap: 12px; }
+
+/* 检索过滤栏 */
+.yuemu-filter-bar {
+  background: var(--card-background);
+  border-radius: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px var(--shadow-color);
+  margin-bottom: 24px;
+}
+.yuemu-filter-form { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
+
+/* ==================== 3. 基础 UI 组件覆写 (核心暗色适配) ==================== */
+/* 按钮 */
+.yuemu-btn-primary {
+  background: var(--link-color) !important; color: #fff !important; border: none !important; border-radius: 8px !important; font-weight: 500; height: 36px; padding: 0 16px; box-shadow: 0 4px 12px rgba(var(--link-color-rgb), 0.25);
+}
+.yuemu-btn-primary:hover { filter: brightness(1.1); }
+
+/* 输入框 */
+:deep(.yuemu-input-base), :deep(.yuemu-input-base > .ant-input) {
+  background-color: var(--hover-background) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  transition: all 0.3s;
+}
+:deep(.yuemu-input-base.ant-input-affix-wrapper) { background-color: var(--hover-background) !important; }
+:deep(.yuemu-input-base.ant-input-affix-wrapper > input.ant-input) { background-color: transparent !important; border: none !important; color: var(--text-primary) !important; }
+:deep(.yuemu-input-base:hover), :deep(.yuemu-input-base.ant-input-affix-wrapper:hover), :deep(.yuemu-input-base:focus-within) {
+  border-color: var(--link-color) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+:deep(.ant-input::placeholder), :deep(.ant-input-affix-wrapper input::placeholder) { color: var(--text-secondary) !important; opacity: 0.6; }
+:deep(.ant-input-clear-icon) { color: var(--text-secondary) !important; background-color: transparent !important; }
+:deep(.ant-input-clear-icon:hover) { color: var(--text-primary) !important; }
+
+/* 弹层黑夜模式 */
+@media (prefers-color-scheme: dark) {
+  .yuemu-apple-modal .ant-modal-content { background: #1f1f1f !important; border: 1px solid #333 !important; color: #fff !important; }
+  .yuemu-apple-modal .ant-modal-header { background: #1f1f1f !important; border-bottom: 1px solid #333 !important; }
+  .yuemu-apple-modal .ant-modal-title { color: #fff !important; }
+  .ant-modal-close { color: #999 !important; }
 }
 
-.confirm-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
+/* ==================== 4. 表格无界感重构 ==================== */
+.yuemu-table-container {
+  background: var(--card-background);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  box-shadow: 0 8px 30px var(--shadow-color);
 }
 
-.cancel-button {
-  min-width: 100px;
-  height: 38px;
-  border-radius: 19px;
-  border: 1px solid #e2e8f0;
-  color: #64748b;
-  font-size: 14px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    color: #1a1a1a;
-    border-color: #94a3b8;
-    background: #f8fafc;
+:deep(.yuemu-seamless-table) {
+  .ant-table { background: transparent !important; color: var(--text-primary) !important; }
+  .ant-table-thead > tr > th {
+    background: transparent !important; border-bottom: 1px solid var(--border-color) !important; color: var(--text-secondary) !important; font-weight: 600; font-size: 13px; text-transform: uppercase;
   }
+  .ant-table-thead > tr > th::before { display: none !important; }
+  .ant-table-tbody > tr > td {
+    background: transparent !important; border-bottom: 1px solid var(--border-color) !important; padding: 16px !important; transition: background 0.3s;
+  }
+  .ant-table-tbody > tr:hover > td { background: var(--hover-background) !important; }
 }
 
-.confirm-button {
-  min-width: 100px;
-  height: 38px;
-  border-radius: 19px;
-  background: #ff6b6b;
-  border: none;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+/* 小标签设计 */
+.yuemu-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 500; gap: 4px; }
+.yuemu-bg-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
 
-  &:hover {
-    background: #ff5252;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
-  }
+.yuemu-action-cell { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.yuemu-icon-text-btn { background: transparent; border: none; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.yuemu-icon-text-btn:hover { background: var(--hover-background); }
+.yuemu-color-danger { color: #ef4444; }
 
-  &:active {
-    transform: translateY(1px);
-  }
+/* 分页 */
+.yuemu-pagination-bar { margin-top: 24px; display: flex; justify-content: flex-end; }
+:deep(.ant-pagination-item), :deep(.ant-pagination-prev), :deep(.ant-pagination-next) { background: transparent !important; border-color: var(--border-color) !important; }
+:deep(.ant-pagination-item a) { color: var(--text-primary) !important; }
+:deep(.ant-pagination-item-active) { border-color: var(--link-color) !important; background: var(--hover-background) !important; }
+:deep(.ant-pagination-item-active a) { color: var(--link-color) !important; }
+:deep(.ant-select-selector) { background: transparent !important; border-color: var(--border-color) !important; color: var(--text-primary) !important;}
+:deep(.ant-pagination-options-quick-jumper input) { background: transparent !important; border-color: var(--border-color) !important; color: var(--text-primary) !important;}
+
+/* ==================== 5. 移动端 Feed 瀑布流 ==================== */
+.yuemu-m-container { min-height: 100vh; display: flex; flex-direction: column; }
+
+.yuemu-m-sticky-header {
+  position: sticky; top: 0; z-index: 100; padding: 12px 16px;
+  background: rgba(var(--header-background-rgb, 255,255,255), 0.85);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
 }
+@media (prefers-color-scheme: dark) { .yuemu-m-sticky-header { background: rgba(30,30,30,0.85); } }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+.yuemu-m-header-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.yuemu-m-title { font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0; }
+.yuemu-m-actions { display: flex; gap: 10px; }
+.yuemu-m-primary-btn { background: var(--link-color) !important; border: none !important; width: 32px; height: 32px; box-shadow: 0 2px 8px var(--shadow-color); }
+
+.yuemu-m-search-row { display: flex; align-items: center; gap: 12px; }
+:deep(.yuemu-m-search) { flex: 1; padding: 0 !important; background: transparent !important; }
+:deep(.van-search__content) { background: var(--hover-background) !important; border: 1px solid var(--border-color); border-radius: 12px; }
+:deep(.van-field__control) { color: var(--text-primary) !important; }
+:deep(.van-field__control::placeholder) { color: var(--text-secondary) !important; }
+:deep(.yuemu-m-search .van-icon) { color: var(--text-secondary) !important; }
+
+.yuemu-m-scroll-view { flex: 1; overflow-y: auto; padding: 16px; }
+.yuemu-m-card-list { display: flex; flex-direction: column; gap: 16px; }
+
+.yuemu-m-card {
+  background: var(--card-background); border: 1px solid var(--border-color);
+  border-radius: 20px; padding: 16px; box-shadow: 0 4px 12px var(--shadow-color);
 }
-
-/* 移动端适配 */
-@media screen and (max-width: 768px) {
-  .delete-confirm-content {
-    padding: 24px 16px;
-  }
-
-  .warning-icon {
-    font-size: 40px;
-  }
-
-  .confirm-title {
-    font-size: 16px;
-  }
-
-  .confirm-desc {
-    font-size: 13px;
-  }
-
-  .confirm-actions {
-    gap: 8px;
-  }
-
-  .cancel-button,
-  .confirm-button {
-    min-width: 90px;
-    height: 36px;
-    font-size: 13px;
-  }
+.yuemu-m-card-header { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.yuemu-m-icon-square {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  display: flex; justify-content: center; align-items: center; font-size: 20px;
 }
+.yuemu-m-main-info { flex: 1; display: flex; flex-direction: column; }
+.yuemu-m-card-title { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+
+.yuemu-m-card-body { margin-bottom: 16px; }
+
+.yuemu-m-card-actions { display: flex; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 16px; }
+.yuemu-m-action-btn { flex: 1; padding: 8px 0; border-radius: 10px; border: 1px solid var(--border-color); background: var(--card-background); font-size: 13px; font-weight: 600; }
+.yuemu-m-action-btn.yuemu-danger { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); }
+
+/* 移动端分页 */
+.yuemu-m-pagination { margin-top: 24px; padding-bottom: 20px; }
+.yuemu-m-page-info { display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 12px; margin-bottom: 12px; }
+.yuemu-m-page-size-trigger { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: var(--hover-background); border-radius: 12px; cursor: pointer; color: var(--link-color); border: 1px solid var(--border-color); }
+:deep(.yuemu-dark-van-pagination .van-pagination__item) { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
+:deep(.yuemu-dark-van-pagination .van-pagination__item--active) { background: var(--link-color); color: #fff; border-color: var(--link-color); border-radius: 8px; }
+
+
+
+/* ==================== 6. Apple 风格表单弹窗 ==================== */
+:deep(.yuemu-apple-modal .ant-modal-content) { background: var(--card-background); border-radius: 20px; padding: 0; overflow: hidden; border: 1px solid var(--border-color); }
+:deep(.yuemu-apple-modal .ant-modal-header) { background: var(--card-background); padding: 20px 24px; border-bottom: 1px solid var(--border-color); }
+:deep(.yuemu-apple-modal .ant-modal-title) { font-weight: 700; font-size: 18px; text-align: center; }
+
+.yuemu-modal-form { padding: 24px; }
+.yuemu-form-item { margin-bottom: 16px; }
+.yuemu-form-item label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+.yuemu-required { color: #ef4444; }
+
+.yuemu-modal-footer { display: flex; gap: 12px; margin-top: 32px; }
+.yuemu-btn-secondary { flex: 1; padding: 12px; border-radius: 14px; background: var(--hover-background); color: var(--text-primary); font-weight: 600; border: 1px solid var(--border-color); cursor: pointer; }
+.yuemu-btn-primary-gradient { flex: 2; padding: 12px; border-radius: 14px; background: linear-gradient(135deg, var(--link-color), var(--link-hover-color)); color: #fff; font-weight: 600; border: none; box-shadow: 0 4px 15px rgba(var(--link-color-rgb), 0.3); cursor: pointer; }
+.yuemu-btn-primary-gradient:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.yuemu-confirm-content { text-align: center; padding: 24px; }
+.yuemu-icon-warning { font-size: 48px; color: #ef4444; margin-bottom: 16px; }
+.yuemu-confirm-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.yuemu-confirm-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px; }
+.yuemu-confirm-actions { display: flex; border-top: 1px solid var(--border-color); margin: 0 -24px -24px; }
+.yuemu-action-cancel, .yuemu-action-danger { flex: 1; height: 50px; background: transparent; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
+.yuemu-action-cancel { color: var(--text-primary); border-right: 1px solid var(--border-color); }
+.yuemu-action-danger { color: #ef4444; }
+.yuemu-action-cancel:hover, .yuemu-action-danger:hover { background: var(--hover-background); }
 </style>

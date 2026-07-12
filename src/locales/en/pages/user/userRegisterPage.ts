@@ -1,0 +1,20 @@
+export default {
+  title: 'Join Yuemu',
+  emailPlaceholder: 'Email',
+  codePlaceholder: 'Code',
+  getCode: 'Get Code',
+  passwordPlaceholder: 'Password (8+ chars)',
+  confirmPasswordPlaceholder: 'Confirm Password',
+  inviteCodePlaceholder: 'Invite Code (Optional)',
+  hasAccount: 'Already have an account?',
+  loginNow: 'Login Now',
+  wechatRegister: 'Quick WeChat Register',
+  createAccount: 'Create Account',
+  fillRequired: 'Please fill in all required fields',
+  passwordLength: 'Password must be at least 8 characters',
+  passwordNotMatch: 'Passwords do not match',
+  codeSent: 'Code sent',
+  codeSendFail: 'Failed to send code: ',
+  registerSuccess: 'Registration successful',
+  registerFail: 'Registration failed, '
+};

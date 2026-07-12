@@ -1,1390 +1,890 @@
 <template>
-  <div id="pictureDetailPage">
-    <a-row :gutter="[16, 16]">
-      <!-- 图片预览 -->
-      <a-col :sm="24" :md="16" :xl="18">
-        <a-card class="preview-card" :bordered="false">
-          <template #title> </template>
-          <div class="image-container">
-            <template v-if="pictureLoaded">
-              <a-image :src="picture.url" />
-            </template>
-            <template v-else>
-              <div class="loading-container">
-                <div class="loading-content">
-                  <div class="loading-spinner">
-                    <a-spin size="large">
-                      <template #indicator>
-                        <LoadingOutlined :style="{ fontSize: '24px', color: '#ff8e53' }" spin />
-                      </template>
-                    </a-spin>
-                  </div>
-                  <div class="loading-text">
-                    <div class="primary-text">图片加载中...</div>
-                    <div class="secondary-text">请稍候片刻</div>
-                  </div>
+  <div class="picture-detail-page" :class="{ 'is-mobile': isMobile, 'is-loaded': pageReady }">
+
+    <template v-if="pictureLoaded && picture.id">
+      <div class="background-effects">
+        <div
+          class="color-blur-layer"
+          :style="{
+            background: `linear-gradient(135deg, ${dominantColor}, ${adjustColor(dominantColor, 20)}, var(--background))`,
+            opacity: 0.3
+          }"
+        ></div>
+        <div
+          class="blurred-image-layer"
+          :style="{ backgroundImage: picture.url ? `url(${picture.url})` : 'none' }"
+        ></div>
+      </div>
+    </template>
+
+    <div class="top-nav-bar">
+      <button class="nav-btn" @click="handleBack" :title="$t('pages.pictureDetailPage.back')">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="nav-actions" v-if="isMobile">
+        <button class="nav-btn" @click="doShare" :title="$t('pages.pictureDetailPage.share')">
+          <i class="fas fa-share-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="content-layer">
+      <div v-if="isDeleted" class="deleted-view">
+        <div class="deleted-content">
+          <i class="fas fa-trash-can"></i>
+          <h2>{{ $t('pages.pictureDetailPage.deletedTitle') }}</h2>
+          <p>{{ $t('pages.pictureDetailPage.deletedDesc') }}</p>
+          <button class="btn-primary" @click="handleBack">{{ $t('pages.pictureDetailPage.backToPrev') }}</button>
+        </div>
+      </div>
+
+      <div v-else class="layout-container">
+
+        <div class="preview-section">
+          <div v-if="!pictureLoaded" class="image-skeleton">
+            <div class="shimmer"></div>
+          </div>
+
+          <div v-else class="image-wrapper" :class="{ 'ready': imgReady }">
+            <img v-if="picture.url" :src="picture.url" class="bg-fill-blur" alt="" />
+            <img
+              v-if="picture.url"
+              :src="picture.url"
+              :alt="picture.name"
+              class="main-image"
+              @load="handleImageLoad"
+              @click="showImagePreview"
+            />
+          </div>
+
+          <div class="image-overlay-tools" v-if="!isMobile && imgReady">
+            <div class="tool-item like" :class="{ active: picture.isLiked === 1 }" @click="doLike" :title="$t('pages.pictureDetailPage.like')">
+              <i class="fas fa-heart"></i>
+            </div>
+            <div class="tool-item favorite" :class="{ active: picture.isFavorited === 1 }" @click="doFavorite" :title="$t('pages.pictureDetailPage.favorite')">
+              <i class="fas fa-star"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-section">
+
+          <div v-if="!pictureLoaded" class="info-skeleton">
+            <div class="skeleton-header"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-text short"></div>
+          </div>
+
+          <template v-else>
+            <div class="author-fixed-header">
+              <div class="author-info" @click="handleUserClick(picture.user)">
+                <img :src="picture.user?.userAvatar || getDefaultAvatar(picture.user?.userName)" class="author-avatar" alt="" />
+                <span class="author-name">{{ picture.user?.userName || $t('pages.pictureDetailPage.anonymous') }}</span>
+              </div>
+              <button
+                v-if="picture.user?.id !== loginUserStore.loginUser?.id"
+                class="follow-btn-inline"
+                :class="{ 'followed': isFollowed }"
+                @click.stop="handleFollow"
+              >
+                {{ isFollowed ? $t('pages.pictureDetailPage.followed') : $t('pages.pictureDetailPage.follow') }}
+              </button>
+            </div>
+
+            <div class="scrollable-content" ref="scrollContainer" @scroll="handleScroll">
+              <div class="post-content-area">
+                <h1 class="pic-title">{{ picture.name || $t('pages.pictureDetailPage.untitled') }}</h1>
+
+                <div class="pic-intro-wrapper" v-if="picture.introduction">
+                  <div class="pic-intro" :class="{ 'is-collapsed': !isIntroExpanded }" v-html="formattedIntroduction"></div>
+                  <button v-if="isLongIntro" class="expand-btn" @click="isIntroExpanded = !isIntroExpanded">
+                    {{ isIntroExpanded ? $t('pages.pictureDetailPage.collapse') : $t('pages.pictureDetailPage.expand') }}
+                  </button>
+                </div>
+
+                <div class="pic-tags" v-if="picture.tags?.length">
+                  <span v-for="tag in picture.tags" :key="tag" class="tag-item">#{{ tag }}</span>
+                </div>
+
+                <div class="post-time-stats">
+                  <span v-html="$t('pages.pictureDetailPage.publishInfo').replace('{time}', formatTime(picture.createTime)).replace('{views}', String(picture.viewCount || 0))"></span>
                 </div>
               </div>
-            </template>
-          </div>
-        </a-card>
-      </a-col>
-      <!-- 图片信息区域 -->
-      <a-col :sm="24" :md="8" :xl="6">
-        <a-card class="info-card" :bordered="false">
-          <!-- 信息描述列表 -->
-          <a-descriptions :column="1" class="info-descriptions">
-            <a-descriptions-item label="作者" class="author-item">
-              <a-space>
-                <a-avatar class="user-avatar" :src="picture.user?.userAvatar || getDefaultAvatar(picture.user?.userName)"/>
-                <div class="author-name">{{ picture.user?.userName }}</div>
-                <a-button
-                  v-if="picture.user?.id !== loginUserStore.loginUser?.id"
-                  :type="isFollowed ? 'default' : 'primary'"
-                  size="small"
-                  class="follow-button"
-                  @click="handleFollow"
-                  :loading="followLoading"
-                >
-                  {{ isFollowed ? '已关注' : '关注' }}
-                </a-button>
-              </a-space>
-            </a-descriptions-item>
-            <a-descriptions-item label="名称">
-              {{ picture.name ?? '未命名' }}
-            </a-descriptions-item>
-            <a-descriptions-item label="简介">
-              {{ picture.introduction ?? '-' }}
-            </a-descriptions-item>
-            <a-descriptions-item label="分类" v-if="canEdit">
-              {{ picture.category ?? '默认' }}
-            </a-descriptions-item>
-            <a-descriptions-item label="标签" v-if="canEdit">
-              <a-tag v-for="tag in picture.tags" :key="tag">
-                {{ tag }}
-              </a-tag>
-            </a-descriptions-item>
-            <a-descriptions-item label="格式" v-if="device === DEVICE_TYPE_ENUM.PC">
-              {{ picture.picFormat ?? '-' }}
-            </a-descriptions-item>
-            <a-descriptions-item label="宽度" v-if="device === DEVICE_TYPE_ENUM.PC">
-              {{ picture.picWidth ?? '-' }}
-            </a-descriptions-item>
-            <a-descriptions-item label="高度" v-if="device === DEVICE_TYPE_ENUM.PC">
-              {{ picture.picHeight ?? '-' }}
-            </a-descriptions-item>
-            <a-descriptions-item label="宽高比">
-              {{ picture.picScale ?? '-' }}
-            </a-descriptions-item>
-            <a-descriptions-item label="大小">
-              {{ formatSize(picture.picSize) }}
-            </a-descriptions-item>
-            <a-descriptions-item label="主色调">
-              <a-space>
-                <div
-                  v-if="picture.picColor"
-                  :style="{
-                    width: '66px',
-                    height: '24px',
-                    backgroundColor: toHexColor(picture.picColor),
-                  }"
-                />
-                <div v-else>-</div>
-              </a-space>
-            </a-descriptions-item>
-            <a-descriptions-item v-if="device !== DEVICE_TYPE_ENUM.PC">
-              <div class="mobile-actions">
-                <a-space align="start">
-                  <a-button type="primary" @click="doDownload" class="action-btn download-btn">
-                    <DownloadOutlined />
-                  </a-button>
-                  <a-button
-                    type="primary"
-                    @click="doShare"
-                    v-if="showShareButton"
-                    class="action-btn share-btn"
-                  >
-                    <ShareAltOutlined />
-                  </a-button>
-                  <a-button
-                    type="primary"
-                    @click="doEdit"
-                    v-if="canEdit"
-                    class="action-btn edit-btn"
-                  >
-                    <EditOutlined />
-                  </a-button>
-                  <a-button
-                    type="primary"
-                    @click="doDelete"
-                    v-if="canEdit"
-                    class="action-btn delete-btn"
-                  >
-                    <DeleteOutlined />
-                  </a-button>
-                </a-space>
-              </div>
-            </a-descriptions-item>
-          </a-descriptions>
 
-          <!-- 操作按钮区域 -->
-          <div class="action-area" v-if="device === DEVICE_TYPE_ENUM.PC">
-            <a-space wrap>
-              <a-button type="primary" @click="doDownload" class="action-btn download-btn">
-                <DownloadOutlined />
-              </a-button>
-              <a-button
-                type="primary"
-                @click="doShare"
-                v-if="showShareButton"
-                class="action-btn share-btn"
-              >
-                <ShareAltOutlined />
-              </a-button>
-              <a-button type="primary" @click="doEdit" v-if="canEdit" class="action-btn edit-btn">
-                <EditOutlined />
-              </a-button>
-              <a-button
-                type="primary"
-                @click="doDelete"
-                v-if="canDelete"
-                class="action-btn delete-btn"
-              >
-                <DeleteOutlined />
-              </a-button>
-            </a-space>
+              <div class="divider"></div>
+
+              <div class="comments-area">
+                <div class="comments-count-title-wrapper">
+                  <div class="comments-count-title">{{ $t('pages.pictureDetailPage.commentsCount', { count: picture.commentCount || 0 }) }}</div>
+                  <button class="guess-like-btn" @click="doGuessLike">
+                    <i class="fas fa-magic"></i>
+                    <span>{{ $t('pages.pictureDetailPage.guessYouLike') }}</span>
+                  </button>
+                </div>
+
+                <comment-list
+                  v-if="comments.length"
+                  :comments="comments"
+                  @reply-clicked="handleReplyClick"
+                  @update-comments="queryComments"
+                />
+
+                <div v-if="comments.length === 0 && !commentloading" class="empty-comment-state">
+                  <img src="@/assets/illustrations/empty.png" :alt="$t('pages.pictureDetailPage.noCommentAlt')" />
+                  <p>{{ $t('pages.pictureDetailPage.noCommentText') }}</p>
+                </div>
+
+                <div v-if="commentloading" class="loading-more">
+                  <i class="fas fa-spinner fa-spin"></i> {{ $t('pages.pictureDetailPage.loading') }}
+                </div>
+                <div v-if="isEndOfData && comments.length > 0" class="end-of-data">
+                  {{ $t('pages.pictureDetailPage.end') }}
+                </div>
+              </div>
+            </div>
+
+            <div class="action-footer-fixed">
+              <div class="comment-input-container">
+                <div v-if="replyCommentId" class="reply-hint">
+                  <span>{{ $t('pages.pictureDetailPage.replyPrefix').replace('{user}', getReplyUserName()) }}</span>
+                  <i class="fas fa-times" @click="cancelReply"></i>
+                </div>
+                <div class="input-box-wrapper">
+                  <input
+                    v-model="commentContent"
+                    class="comment-input"
+                    type="text"
+                    :placeholder="picture.allowComment ? $t('pages.pictureDetailPage.addComment') : $t('pages.pictureDetailPage.commentClosed')"
+                    :disabled="!picture.allowComment"
+                    @keydown.enter="addComment"
+                  />
+                  <button class="emoji-btn" @click.stop="toggleEmojiPicker" @mousedown.prevent><i class="far fa-smile"></i></button>
+                  <button class="send-btn" :disabled="!commentContent.trim() || isAddingComment" @click="addComment">{{ $t('pages.pictureDetailPage.send') }}</button>
+                </div>
+
+                <div v-if="showEmojiPicker" class="emoji-picker-wrapper" @mousedown.prevent>
+                  <emoji-picker class="custom-emoji-picker" :i18n="emojiI18n" @select="onEmojiSelect" />
+                </div>
+              </div>
+
+              <div class="footer-buttons">
+                <div class="footer-btn-item like" :class="{ active: picture.isLiked === 1 }" @click="doLike">
+                  <i class="fas fa-heart"></i> <span>{{ picture.likeCount || 0 }}</span>
+                </div>
+                <div class="footer-btn-item favorite" :class="{ active: picture.isFavorited === 1 }" @click="doFavorite">
+                  <i class="fas fa-star"></i> <span>{{ picture.favoriteCount || 0 }}</span>
+                </div>
+                <div class="footer-btn-item" @click="doShare">
+                  <i class="fas fa-share-alt"></i> <span>{{ picture.shareCount || 0 }}</span>
+                </div>
+                <div class="footer-btn-item more" @click="showMoreModal = true">
+                  <i class="fas fa-ellipsis-h"></i>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-layer">
+      <Teleport to="body">
+        <div v-if="showMoreModal" class="custom-dropdown-overlay" @click="showMoreModal = false">
+          <div class="custom-dropdown-content" @click.stop>
+            <div v-if="picture.user?.id && String(picture.user.id) === String(loginUserStore.loginUser?.id)" class="dropdown-item" @click="goToAnalytics"><i class="fas fa-chart-bar"></i> {{ $t('pages.pictureDetailPage.analytics') }}</div>
+            <div class="dropdown-item" @click="openChatModal"><i class="fas fa-comments"></i> {{ $t('pages.pictureDetailPage.chatRoom') }}</div>
+            <div v-if="picture.user?.id && String(picture.user.id) === String(loginUserStore.loginUser?.id)" class="dropdown-item" @click="openPermissionSetting"><i class="fas fa-cog"></i> {{ $t('pages.pictureDetailPage.permissions') }}</div>
+            <div v-if="picture.user?.id && String(picture.user.id) === String(loginUserStore.loginUser?.id) && !hasCopyright" class="dropdown-item" @click="goToCopyrightRegister"><i class="fas fa-copyright"></i> {{ $t('pages.pictureDetailPage.copyrightReg') }}</div>
+            <div v-if="picture.user?.id && String(picture.user.id) === String(loginUserStore.loginUser?.id) && hasCopyright" class="dropdown-item" @click="goToEditCopyright"><i class="fas fa-shield-alt"></i> {{ $t('pages.pictureDetailPage.editCopyright') }}</div>
+            <div class="dropdown-item" @click="goToCopyrightTrace"><i class="fas fa-search"></i> {{ $t('pages.pictureDetailPage.tracePic') }}</div>
+            <div class="dropdown-item" @click="openReportModal"><i class="fas fa-flag"></i> {{ $t('pages.pictureDetailPage.report') }}</div>
+            <div v-if="picture.user?.id && String(picture.user.id) === String(loginUserStore.loginUser?.id)" class="dropdown-item" @click="doEdit"><i class="fas fa-edit"></i> {{ $t('pages.pictureDetailPage.editInfo') }}</div>
+            <div v-if="picture.user?.id && String(picture.user.id) === String(loginUserStore.loginUser?.id)" class="dropdown-item danger" @click="showDeleteConfirm"><i class="fas fa-trash-alt"></i> {{ $t('pages.pictureDetailPage.deletePic') }}</div>
+            <div v-if="picture.isDownload !== 0" class="dropdown-item" @click="handleDownload"><i class="fas fa-download"></i> {{ $t('pages.pictureDetailPage.savePic') }}</div>
           </div>
-        </a-card>
-      </a-col>
-    </a-row>
+        </div>
+      </Teleport>
+
+      <ShareModal ref="shareModalRef" :link="shareLink" :imageUrl="picture.url" :title="picture.name" :user="picture.user" :createTime="picture.createTime" />
+      <ReportModal ref="reportModalRef" :target-type="'1'" :target-id="String(picture.id)" />
+
+      <div v-if="showChatModal" class="custom-confirm-overlay">
+        <div class="chat-room-content" @click.stop>
+          <div class="modal-header">
+            <h3><span v-html="$t('pages.pictureDetailPage.chatRoomTitle', { count: onlineCount || 0 })"></span></h3>
+            <button class="modal-close-btn" @click="showChatModal = false"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="chat-room-body" style="height: 50vh; overflow-y: auto;">
+            <PictureChatRoom ref="chatRoomRef" :pictureId="props.id" @message="handleChatMessage" class="modal-chat-room" />
+          </div>
+        </div>
+      </div>
+
+      <div v-if="showPermissionSetting" class="custom-confirm-overlay">
+        <div class="permission-setting-content" @click.stop>
+          <div class="modal-header">
+            <h3>{{ $t('pages.pictureDetailPage.permTitle') }}</h3>
+            <button class="modal-close-btn" @click="showPermissionSetting = false"><i class="fas fa-times"></i></button>
+          </div>
+          <ContentPermissionSetting
+            :pictureId="props.id"
+            :initialPermissions="{ allowLike: picture.allowLike ? 1 : 0, allowComment: picture.allowComment ? 1 : 0, allowCollect: picture.allowCollect ? 1 : 0, allowShare: picture.allowShare ? 1 : 0 }"
+            @permissions-updated="handlePermissionsUpdated"
+          />
+        </div>
+      </div>
+
+      <div v-if="deleteConfirmVisible" class="custom-confirm-overlay">
+        <div class="confirm-box">
+          <h3>{{ $t('pages.pictureDetailPage.hint') }}</h3>
+          <p>{{ $t('pages.pictureDetailPage.confirmDelDesc') }}</p>
+          <div class="confirm-actions">
+            <button class="btn-cancel" @click="deleteConfirmVisible = false">{{ $t('pages.pictureDetailPage.cancel') }}</button>
+            <button class="btn-danger" @click="confirmDelete">{{ $t('pages.pictureDetailPage.confirmDelete') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <a-image v-if="picture.url && !isMobile" :src="picture.url" :preview="{ visible: showPreview, onVisibleChange: handlePreviewChange }" style="display: none;" />
+    <ImagePreview v-if="isMobile" v-model:visible="showPreview" :images="[picture.url]" :initialIndex="0" />
   </div>
-  <ShareModal ref="shareModalRef" :link="shareLink" />
 </template>
 
 <script setup lang="ts">
-import { computed, h, onMounted, ref, watch } from 'vue'
-import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
-import { message } from 'ant-design-vue'
-import {
-  DeleteOutlined,
-  DownloadOutlined,
-  EditOutlined,
-  ShareAltOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons-vue'
-import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { useRoute, useRouter } from 'vue-router'
-import { downloadImage, formatSize, toHexColor } from '@/utils'
-import { getDeviceType } from '@/utils/device.ts'
-import { DEVICE_TYPE_ENUM } from '@/constants/device.ts'
-import { prevRoute } from '@/router'
+import { useI18n } from 'vue-i18n';
+
+import { ref, computed, onMounted, nextTick, onUnmounted, reactive } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
+import { downloadImage, toHexColor } from '@/utils'
+import { getDeviceType } from '@/utils/device'
+import { DEVICE_TYPE_ENUM } from '@/constants/device'
 import ShareModal from '@/components/ShareModal.vue'
-import { SPACE_PERMISSION_ENUM } from '@/constants/space.ts'
+import EmojiPicker from '@/components/EmojiPicker.vue'
+import { getDefaultAvatar } from '@/utils/userUtils'
+import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController'
 import { addUserFollowsUsingPost, findIsFollowUsingPost } from '@/api/userFollowsController'
+import { message } from 'ant-design-vue'
+import ImagePreview from '@/components/ImagePreview.vue'
+import CommentList from '@/components/CommentList.vue'
+import { addCommentUsingPost, queryCommentUsingPost } from '@/api/commentsController'
+import { doLikeUsingPost } from '@/api/likeRecordController'
+import { throttle } from 'lodash-es'
+import { doShareUsingPost } from '@/api/shareRecordController'
+import { addFavoriteRecordUsingPost, cancelFavoriteUsingPost } from '@/api/favoriteRecordController'
+import { formatTime } from '@/utils/dateUtils'
+import ReportModal from '@/components/ReportModal.vue'
+import { getCopyrightByPictureIdUsingGet } from '@/api/pictureCopyrightController'
+import PictureChatRoom from '@/components/PictureChatRoom.vue'
+import ContentPermissionSetting from '@/components/ContentPermissionSetting.vue'
 
-const route = useRoute() // 获取当前路由实例
-// 定义用于存储设备类型的响应式变量
-const device = ref<string>('')
-// 新增一个响应式变量用于标记图片是否加载完成，初始化为false
-const pictureLoaded = ref(false)
-// 页面加载时获取设备类型并获取数据
-onMounted(async () => {
-  device.value = await getDeviceType()
-  const currentRoutePath = route.path // 获取当前路由的路径
-  // console.log('当前路由路径：', currentRoutePath)
-  // 获取图片详情，在获取成功后将图片加载完成标记设为true
-  await fetchPictureDetail()
-  await checkIsFollowed()
-  pictureLoaded.value = true
-})
+const { t } = useI18n();
 
-// 获取默认头像
-const getDefaultAvatar = (userName: string) => {
-  const defaultName = userName || 'Guest'
-  return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(defaultName)}&backgroundColor=ffd5dc,ffdfbf,ffd5dc`
-}
-// 通用权限检查函数
-function createPermissionChecker(permission: string) {
-  return computed(() => {
-    return (picture.value.permissionList ?? []).includes(permission)
-  })
-}
-
-// 定义权限检查
-const canEdit = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
-const canDelete = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
-
-//是否显示分享按钮
-const showShareButton = computed(() => {
-  // 仅登录用户可分享
-  // console.log('prevRoute.name', prevRoute)
-  return prevRoute.name !== '空间详情'
-})
 interface Props {
   id: string | number
 }
 
 const props = defineProps<Props>()
-const picture = ref<API.PictureVO>({} as API.PictureVO)
-
+const router = useRouter()
 const loginUserStore = useLoginUserStore()
 
+// 状态
+const isMobile = ref(false)
+const pageReady = ref(false)
+const pictureLoaded = ref(false)
+const imgReady = ref(false)
+const isDeleted = computed(() => pictureLoaded.value && (!picture.value || !picture.value.id))
 
-// 获取图片详情
+const picture = ref<API.PictureVO>({} as API.PictureVO)
+const comments = ref<API.CommentsVO[]>([])
+const commentloading = ref(false)
+const isEndOfData = ref(false)
+const isFollowed = ref(false)
+
+// 文本展开收起状态
+const isIntroExpanded = ref(false)
+const isLongIntro = computed(() => {
+  const intro = picture.value.introduction || ''
+  // 超过60个字符或者换行超过3行，就显示展开按钮
+  return intro.length > 60 || intro.split('\n').length > 3
+})
+
+// 弹窗状态
+const showPreview = ref(false)
+const showMoreModal = ref(false)
+const showChatModal = ref(false)
+const showPermissionSetting = ref(false)
+const deleteConfirmVisible = ref(false)
+const showEmojiPicker = ref(false)
+const hasCopyright = ref(false)
+const copyrightInfo = ref<API.CopyrightInfoVO | null>(null)
+
+const onlineCount = ref(0)
+const scrollContainer = ref<HTMLElement | null>(null)
+const shareModalRef = ref()
+const reportModalRef = ref()
+
+// 计算属性
+const dominantColor = computed(() => picture.value?.picColor ? toHexColor(picture.value.picColor) : '#1a1a1a')
+const shareLink = computed(() => picture.value?.id ? `${window.location.origin}/picture/${picture.value.id}` : '')
+const formattedIntroduction = computed(() => (picture.value.introduction || '').replace(/\n/g, '<br/>'))
+
+// 分页
+const queryRequest = reactive<API.CommentsQueryRequest>({
+  targetId: String(props.id),
+  targetType: 1,
+  current: 1,
+  pageSize: 20
+})
+
+onMounted(async () => {
+  const device = await getDeviceType()
+  isMobile.value = device === DEVICE_TYPE_ENUM.MOBILE || window.innerWidth < 768
+
+  await fetchPictureDetail()
+  pageReady.value = true
+
+  if (picture.value?.id) {
+    queryComments()
+    checkIsFollowed()
+    loadCopyrightInfo()
+  }
+})
+
+const handleBack = () => {
+  router.back()
+}
+
+// 核心数据加载
 const fetchPictureDetail = async () => {
   try {
-    const res = await getPictureVoByIdUsingGet({
-      id: props.id,
-    })
+    const res = await getPictureVoByIdUsingGet({ id: props.id })
     if (res.data.code === 0 && res.data.data) {
       picture.value = res.data.data
-    } else {
-      message.error('获取图片详情失败，' + res.data.message)
+      onlineCount.value = res.data.data.chatCount || 0
     }
-  } catch (e: any) {
-    message.error('获取图片详情失败：' + e.message)
+  } catch (e) {} finally {
+    pictureLoaded.value = true
   }
 }
 
-const router = useRouter()
+// 图片加载完成
+const handleImageLoad = () => { imgReady.value = true }
+const showImagePreview = () => { showPreview.value = true }
+const handlePreviewChange = (visible: boolean) => { showPreview.value = visible }
 
-// 编辑
-const doEdit = () => {
+function adjustColor(hex: string, percent: number) {
+  hex = hex.replace('#', '').padStart(6, '0')
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
+  const adjustValue = (value: number) => Math.min(255, Math.max(0, Math.round(value + (value * (percent / 100)))))
+  return `#${adjustValue(r).toString(16).padStart(2, '0')}${adjustValue(g).toString(16).padStart(2, '0')}${adjustValue(b).toString(16).padStart(2, '0')}`
+}
+
+// 互动功能
+const doLike = async () => {
+  if (!loginUserStore.loginUser?.id) return message.warning(t('pages.pictureDetailPage.needLogin'))
+  const newStatus = picture.value.isLiked === 1 ? false : true
+  try {
+    const res = await doLikeUsingPost({ targetId: props.id, targetType: 1, isLiked: newStatus })
+    if (res.data.code === 0) {
+      picture.value.isLiked = newStatus ? 1 : 0
+      picture.value.likeCount = String(Number(picture.value.likeCount || 0) + (newStatus ? 1 : -1))
+    }
+  } catch (e) {}
+}
+
+const doFavorite = async () => {
+  if (!loginUserStore.loginUser?.id) return message.warning(t('pages.pictureDetailPage.needLogin'))
+  const isFavorited = picture.value.isFavorited === 1
+  try {
+    const res = isFavorited
+      ? await cancelFavoriteUsingPost({ userId: loginUserStore.loginUser.id, targetId: props.id, targetType: 1 })
+      : await addFavoriteRecordUsingPost({ userId: loginUserStore.loginUser.id, targetId: props.id, targetType: 1, targetUserId: picture.value.user?.id, isFavorite: true })
+    if (res.data.code === 0) {
+      picture.value.isFavorited = isFavorited ? 0 : 1
+      picture.value.favoriteCount = String(Number(picture.value.favoriteCount || 0) + (isFavorited ? -1 : 1))
+      message.success(isFavorited ? t('pages.pictureDetailPage.cancelFav') : t('pages.pictureDetailPage.favSuccess'))
+    }
+  } catch (e) {}
+}
+
+const doShare = async () => {
+  if (!loginUserStore.loginUser?.id) return message.warning(t('pages.pictureDetailPage.needLogin'))
+  try {
+    const res = await doShareUsingPost({ targetId: picture.value.id, targetType: 1, isShared: true })
+    if (res.data?.code === 0) {
+      picture.value.isShared = 1
+      picture.value.shareCount = String(Number(picture.value.shareCount || 0) + 1)
+      shareModalRef.value?.openModal()
+    }
+  } catch (e) {}
+}
+
+const doGuessLike = () => {
+  if (!picture.value.url) return message.warning(t('pages.pictureDetailPage.invalidUrl'))
   router.push({
-    path: '/add_picture',
+    path: '/guess_you_like',
     query: {
-      id: picture.value.id,
-      spaceId: picture.value.spaceId,
-    },
+      url: picture.value.url,
+      id: picture.value.id
+    }
   })
 }
 
-// 删除图片
-const doDelete = async () => {
-  try {
-    const res = await deletePictureUsingPost({
-      id: props.id,
-      userId: loginUserStore.loginUser.id,
-    })
-    if (res.data.code === 0 && res.data.data) {
-      message.success('删除成功，数据更新可能需要一段时间')
-      // 使用 router.back() 返回上一页，而不是直接跳转到主页
-      router.back()
-    } else {
-      message.error('删除失败，' + res.data.message)
-    }
-  } catch (e: any) {
-    message.error('删除失败，' + e.message)
-  }
+// 用户与关注
+const handleUserClick = (user: any) => {
+  if (user?.id) router.push(`/user/${user.id}`)
 }
 
-// 下载图片
-const doDownload = () => {
-  downloadImage(picture.value.url)
-}
-
-// ----- 分享操作 ----
-const shareModalRef = ref()
-// 分享链接
-const shareLink = ref<string>()
-// 分享
-const doShare = () => {
-  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.value.id}`
-  if (shareModalRef.value) {
-    shareModalRef.value.openModal()
-  }
-}
-
-// 计算属性添加空值检查
-const pageTitle = computed(() => {
-  return `${picture.value?.name || '加载中'} - 图片详情`
-})
-
-const isFollowed = ref(false)
-const followLoading = ref(false)
-
-// 检查是否已关注
 const checkIsFollowed = async () => {
-  if (!loginUserStore.loginUser?.id || !picture.value?.user?.id) {
-    return
-  }
+  if (!loginUserStore.loginUser?.id || !picture.value?.user?.id) return
   try {
-    const res = await findIsFollowUsingPost({
-      followerId: loginUserStore.loginUser.id,
-      followingId: picture.value.user.id
-    })
-    if (res.data?.data) {
-      isFollowed.value = res.data.data
-    }
-  } catch (error) {
-    // console.error('检查关注状态失败:', error)
-  }
+    const res = await findIsFollowUsingPost({ followerId: loginUserStore.loginUser.id, followingId: picture.value.user.id })
+    isFollowed.value = !!res.data?.data
+  } catch (e) {}
 }
 
-// 处理关注/取消关注
 const handleFollow = async () => {
+  if (!loginUserStore.loginUser?.id) return message.warning(t('pages.pictureDetailPage.needLogin'))
+  try {
+    const res = await addUserFollowsUsingPost({ followerId: loginUserStore.loginUser.id, followingId: picture.value.user.id, followStatus: isFollowed.value ? 0 : 1 })
+    if (res.data.code === 0) {
+      isFollowed.value = !isFollowed.value
+      message.success(isFollowed.value ? t('pages.pictureDetailPage.followed') : t('pages.pictureDetailPage.unfollowed'))
+    }
+  } catch (e) {}
+}
+
+// 评论
+const commentContent = ref('')
+const isAddingComment = ref(false)
+const replyCommentId = ref('')
+
+const queryComments = async () => {
+  if (commentloading.value) return
+  commentloading.value = true
+  try {
+    const res = await queryCommentUsingPost(queryRequest)
+    if (res.data?.code === 0 && res.data.data) {
+      const records = res.data.data.records || []
+      comments.value = queryRequest.current === 1 ? records : [...comments.value, ...records]
+      isEndOfData.value = records.length < queryRequest.pageSize
+    }
+  } finally { commentloading.value = false }
+}
+
+const handleScroll = throttle(() => {
+  const el = scrollContainer.value
+  if (!el) return
+  if (el.scrollHeight - el.scrollTop - el.clientHeight < 150) {
+    if (!isEndOfData.value && !commentloading.value) {
+      queryRequest.current++
+      queryComments()
+    }
+  }
+}, 200)
+
+// 辅助方法：递归查找树形评论节点
+const findComment = (list: any[], id: string): any => {
+  for (const c of list) {
+    if (c.commentId === id) return c;
+    if (c.children && c.children.length > 0) {
+      const found = findComment(c.children, id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+// 辅助方法：移除伪造的乐观评论
+const removeOptimisticComment = (id: string) => {
+  comments.value = comments.value.filter(c => c.commentId !== id)
+  const removeFromChildren = (list: any[]) => {
+    for (const c of list) {
+      if (c.children) {
+        c.children = c.children.filter((child: any) => child.commentId !== id)
+        removeFromChildren(c.children)
+      }
+    }
+  }
+  removeFromChildren(comments.value)
+}
+
+// 核心：带乐观更新的添加评论
+const addComment = async () => {
+  const content = commentContent.value.trim()
+  if (!content || isAddingComment.value) return
+
   if (!loginUserStore.loginUser?.id) {
-    message.warning('请先登录')
+    message.warning(t('pages.pictureDetailPage.needLogin'))
     return
   }
 
-  followLoading.value = true
+  isAddingComment.value = true
+
+  // --- 乐观加载 UI (Optimistic UI) 阶段 ---
+  const tempId = `temp-${Date.now()}`
+  const parentId = replyCommentId.value || '0'
+  const targetUserName = getReplyUserName()
+
+  const optimisticComment = {
+    commentId: tempId,
+    content: content,
+    createTime: new Date().toISOString(),
+    likeCount: '0',
+    dislikeCount: '0',
+    commentUser: {
+      id: loginUserStore.loginUser?.id,
+      userName: loginUserStore.loginUser?.userName,
+      userAvatar: loginUserStore.loginUser?.userAvatar,
+    },
+    isOptimistic: true // 触发 CommentList 里的闪烁发光骨架特效
+  }
+
+  // 插入伪造的数据
+  if (parentId !== '0') {
+    (optimisticComment as any).parentId = parentId;
+    (optimisticComment as any).targetUser = { userName: targetUserName };
+    const parent = findComment(comments.value, parentId);
+    if (parent) {
+      if (!parent.children) parent.children = [];
+      parent.children.push(optimisticComment);
+    }
+  } else {
+    comments.value.unshift(optimisticComment as any);
+  }
+
+  // 1毫秒也不等，瞬间清空输入框
+  commentContent.value = ''
+  replyCommentId.value = ''
+  showEmojiPicker.value = false
+
+  // 自动滚动到评论区头部 (只有发主评论时需要)
+  if (parentId === '0') {
+    nextTick(() => {
+      const scrollEl = scrollContainer.value
+      if (scrollEl) {
+        scrollEl.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    })
+  }
+  // --- 乐观加载阶段结束 ---
+
+  // --- 真实的 API 请求 ---
   try {
-    const res = await addUserFollowsUsingPost({
-      followerId: loginUserStore.loginUser.id,
-      followingId: picture.value.user.id,
-      followStatus: isFollowed.value ? 0 : 1
+    const res = await addCommentUsingPost({
+      targetId: props.id,
+      targetType: 1,
+      content: content,
+      parentCommentId: parentId
     })
 
-    if (res.data?.code === 0) {
-      isFollowed.value = !isFollowed.value
+    if (res.data.code === 0) {
+      // 成功了，增加数字
+      picture.value.commentCount = String(Number(picture.value.commentCount || 0) + 1)
+
+      // 找到刚才插入的临时评论，并将其替换为真实数据
+      const tempComment = findComment(comments.value, tempId)
+      if (tempComment) {
+        const realId = res.data.data
+        tempComment.commentId = realId ? String(realId) : `real-${Date.now()}`
+        // 解除乐观加载状态
+        tempComment.isOptimistic = false
+      }
     } else {
-      message.error('操作失败')
+      // 如果后端拒绝了，撤回刚才的操作
+      removeOptimisticComment(tempId)
+      commentContent.value = content // 把文字还给用户
+      message.error(res.data.message || t('pages.pictureDetailPage.commentFail'))
     }
   } catch (error) {
-    // console.error('关注操作失败:', error)
-    message.error('操作失败，请稍后重试')
+    // 如果网络断了，撤回
+    removeOptimisticComment(tempId)
+    commentContent.value = content
+    message.error(t('pages.pictureDetailPage.commentFailRetry'))
   } finally {
-    followLoading.value = false
+    isAddingComment.value = false
   }
 }
 
+const handleReplyClick = (cid: string) => {
+  replyCommentId.value = cid
+  nextTick(() => document.querySelector('.comment-input')?.focus())
+}
+const cancelReply = () => { replyCommentId.value = '' }
+const getReplyUserName = () => comments.value.find(c => String(c.commentId) === String(replyCommentId.value))?.commentUser?.userName || ''
 
+// 表情包
+const toggleEmojiPicker = () => showEmojiPicker.value = !showEmojiPicker.value
+const onEmojiSelect = (emoji: string) => {
+  commentContent.value += emoji
+  nextTick(() => {
+    const inputEl = document.querySelector('.comment-input') as HTMLInputElement
+    if (inputEl) { inputEl.focus(); inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length) }
+  })
+}
+const emojiI18n = { search: t('pages.pictureDetailPage.emojiSearch'), categories: { recent: t('pages.pictureDetailPage.emojiCats.recent'), smileys: t('pages.pictureDetailPage.emojiCats.smileys'), people: t('pages.pictureDetailPage.emojiCats.people'), nature: t('pages.pictureDetailPage.emojiCats.nature'), foods: t('pages.pictureDetailPage.emojiCats.foods'), activity: t('pages.pictureDetailPage.emojiCats.activity'), places: t('pages.pictureDetailPage.emojiCats.places'), objects: t('pages.pictureDetailPage.emojiCats.objects'), symbols: t('pages.pictureDetailPage.emojiCats.symbols'), flags: t('pages.pictureDetailPage.emojiCats.flags') } }
 
+// 更多菜单功能
+const openReportModal = () => { reportModalRef.value?.openModal(); showMoreModal.value = false }
+const openChatModal = () => { showChatModal.value = true; showMoreModal.value = false }
+const handleChatMessage = (msg: any) => { if (msg.type === 'onlineUsers') onlineCount.value = msg.onlineCount }
+const openPermissionSetting = () => { showPermissionSetting.value = true; showMoreModal.value = false }
+const handlePermissionsUpdated = (newPermissions: any) => {
+  Object.assign(picture.value, newPermissions)
+  showPermissionSetting.value = false
+}
+const handleDownload = () => { downloadImage(picture.value.url, picture.value.name); showMoreModal.value = false }
+const doEdit = () => router.push({ path: '/add_picture', query: { id: picture.value.id, spaceId: picture.value.spaceId } })
+const showDeleteConfirm = () => { deleteConfirmVisible.value = true; showMoreModal.value = false }
+const confirmDelete = async () => {
+  const res = await deletePictureUsingPost({ id: picture.value.id })
+  if (res.data.code === 0) { message.success(t('pages.pictureDetailPage.delSuccess')); router.back() }
+}
+const loadCopyrightInfo = async () => {
+  try {
+    const res = await getCopyrightByPictureIdUsingGet({ pictureId: String(props.id) })
+    if (res.data.code === 0 && res.data.data) { copyrightInfo.value = res.data.data; hasCopyright.value = true }
+  } catch (e) {}
+}
+const goToCopyrightRegister = () => router.push({ path: '/picture/copyright/register', query: { pictureId: String(props.id) } })
+const goToEditCopyright = () => router.push({ path: '/picture/copyright/register', query: { pictureId: String(props.id), edit: 'true' } })
+const goToCopyrightTrace = () => router.push(copyrightInfo.value?.copyrightCode ? { path: '/picture/copyright/trace', query: { code: copyrightInfo.value.copyrightCode } } : '/picture/copyright/trace')
+const goToAnalytics = () => {
+  if (!props.id) return message.warning(t('pages.pictureDetailPage.noPicId'))
+  router.push(`/item/analytics/picture/${props.id}`)
+  showMoreModal.value = false
+}
 </script>
 
 <style scoped>
-#pictureDetailPage {
+/* 核心：锁定PC端全局滚动 */
+.picture-detail-page {
+  position: relative;
+  width: 100%;
+  height: 100vh;      /* 严格锁定视口高度 */
+  overflow: hidden;   /* 彻底切断全局滚动 */
+  background: var(--background, #f5f5f5);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.picture-detail-page.is-loaded {
+  opacity: 1;
+}
+
+/* 顶部导航 */
+.top-nav-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px; padding: 0 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 100;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%);
+  pointer-events: none;
+}
+.nav-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; pointer-events: auto;
+  backdrop-filter: blur(8px); transition: all 0.2s;
+}
+.nav-btn:hover { background: rgba(0, 0, 0, 0.6); transform: scale(1.05); }
+
+/* 背景特效 */
+.background-effects { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.color-blur-layer { position: absolute; inset: 0; filter: blur(80px); transition: background 0.8s ease; }
+.blurred-image-layer { position: absolute; inset: 0; background-position: center; background-size: cover; filter: blur(40px) brightness(0.6) opacity(0.5); transform: scale(1.1); }
+
+/* 内容层 */
+.content-layer {
+  position: relative; z-index: 10;
+  flex: 1; display: flex; flex-direction: column;
+  min-height: 0; /* Flex 核心防破 */
+}
+
+/* 核心布局：左图右流 */
+.layout-container {
+  display: flex; width: 100%; max-width: 1400px;
+  margin: 0 auto; flex: 1;
+  height: 100%; min-height: 0; /* 再次掐断撑破 */
+  padding: 10px 20px 20px; gap: 20px; box-sizing: border-box;
+}
+
+/* ================= 左侧大图 ================= */
+.preview-section {
+  flex: 7; position: relative;
+  background: rgba(0, 0, 0, 0.2); border-radius: 20px;
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.image-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; opacity: 0; transform: scale(0.98); transition: all 0.5s ease; }
+.image-wrapper.ready { opacity: 1; transform: scale(1); }
+.bg-fill-blur { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(50px) brightness(0.5); opacity: 0.6; z-index: 1; }
+.main-image { max-width: 95%; max-height: 95%; object-fit: contain; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border-radius: 8px; cursor: zoom-in; z-index: 2; }
+.image-overlay-tools { position: absolute; bottom: 30px; display: flex; gap: 20px; padding: 12px 24px; background: rgba(0, 0, 0, 0.5); border-radius: 40px; border: 1px solid rgba(255,255,255, 0.2); backdrop-filter: blur(10px); z-index: 10; }
+.tool-item { color: #fff; font-size: 24px; cursor: pointer; transition: transform 0.2s; }
+.tool-item:hover { transform: scale(1.2); }
+.tool-item.active.like { color: #ff4d4f; }
+.tool-item.active.favorite { color: #ffca28; }
+
+/* ================= 右侧流 ================= */
+.details-section {
+  flex: 3; min-width: 360px;
+  background: var(--card-background); border-radius: 20px;
+  display: flex; flex-direction: column; min-height: 0; /* 掐断子项溢出 */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border-color);
+}
+
+/* 1. 固定头部 (作者) */
+.author-fixed-header {
+  padding: 20px; border-bottom: 1px solid var(--border-color);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.author-info { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.author-avatar { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border-color); }
+.author-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+.follow-btn-inline { padding: 6px 16px; border-radius: 16px; background: #3b82f6; color: #fff; border: none; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.2s; }
+.follow-btn-inline.followed { background: var(--hover-background); color: var(--text-secondary); }
+
+/* 2. 核心滚动区 (简介+评论) */
+.scrollable-content {
+  flex: 1; overflow-y: auto; padding: 20px;
+  scrollbar-width: thin;
+}
+.scrollable-content::-webkit-scrollbar { width: 6px; }
+.scrollable-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+.post-content-area { margin-bottom: 20px; }
+.pic-title { font-size: 20px; font-weight: 700; margin: 0 0 12px 0; color: var(--text-primary); }
+
+/* 折叠控制 */
+.pic-intro-wrapper { position: relative; margin-bottom: 12px; }
+.pic-intro { font-size: 15px; line-height: 1.6; color: var(--text-primary); opacity: 0.9; }
+.pic-intro.is-collapsed {
+  display: -webkit-box; -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; overflow: hidden;
+}
+.expand-btn { background: none; border: none; color: #3b82f6; font-size: 15px; font-weight: 500; cursor: pointer; padding: 0; margin-top: 4px; }
+
+.pic-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.tag-item { color: #3b82f6; font-size: 14px; cursor: pointer; }
+.post-time-stats { font-size: 12px; color: var(--text-secondary); }
+
+.divider { height: 1px; background: var(--border-color); margin: 20px 0; }
+
+.comments-count-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 16px;
 }
+.comments-count-title { font-size: 15px; font-weight: 600; margin: 0; color: var(--text-primary); }
 
-/* 预览卡片样式 */
-.preview-card {
-  background: #f9f9f9;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+.guess-like-btn {
+  display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 16px;
+  background: var(--hover-background); border: 1px solid var(--border-color); color: var(--text-primary);
+  font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;
+}
+.guess-like-btn:hover {
+  color: #3b82f6; border-color: #3b82f6; background: rgba(59, 130, 246, 0.05);
+  transform: translateY(-1px); box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
 }
 
-.preview-card:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+/* 3. 固定底部 (输入框+互动) */
+.action-footer-fixed {
+  flex-shrink: 0; padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
 }
+.comment-input-container { position: relative; margin-bottom: 16px; }
+.reply-hint { display: flex; justify-content: space-between; font-size: 12px; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; }
+.input-box-wrapper { display: flex; gap: 10px; align-items: center; }
+.comment-input { flex: 1; background: var(--hover-background); border: none; padding: 10px 16px; border-radius: 20px; color: var(--text-primary); font-size: 14px; outline: none; }
+.emoji-btn { background: none; border: none; font-size: 20px; cursor: pointer; }
+.send-btn { background: #3b82f6; color: #fff; border: none; padding: 8px 16px; border-radius: 18px; font-weight: 600; cursor: pointer; }
+.send-btn:disabled { background: var(--border-color); color: var(--text-secondary); }
 
-.card-title {
-  font-size: 16px;
-  color: #333;
-  font-weight: 500;
-}
+.footer-buttons { display: flex; justify-content: space-between; padding: 0 10px; }
+.footer-btn-item { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); cursor: pointer; font-size: 16px; }
+.footer-btn-item span { font-size: 13px; font-weight: 500; }
+.footer-btn-item.active.like { color: #ff4d4f; }
+.footer-btn-item.active.favorite { color: #ffca28; }
+.footer-btn-item.active i.fa-share-alt { color: #10b981; }
 
-/* 图片容器样式优化 */
-.image-container {
-  position: relative;
-  width: 100%;
-  min-height: 200px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  padding: 16px;
-  transition: all 0.3s ease;
-}
+.empty-comment-state { text-align: center; padding: 40px 0; color: var(--text-secondary); }
+.empty-comment-state img { width: 120px; margin-bottom: 16px; opacity: 0.8; }
+.loading-more, .end-of-data { text-align: center; padding: 20px 0; color: var(--text-secondary); font-size: 13px; }
 
-/* 预览图片样式优化 */
-:deep(.custom-image) {
-  width: 100%;
-  height: 100%;
+/* 骨架屏 */
+.image-skeleton { width: 100%; height: 100%; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+.shimmer { width: 40px; height: 40px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.info-skeleton { padding: 24px; }
+.skeleton-header { width: 60%; height: 48px; background: var(--hover-background); border-radius: 24px; margin-bottom: 20px; }
+.skeleton-text { width: 100%; height: 16px; background: var(--hover-background); border-radius: 8px; margin-bottom: 12px; }
+.skeleton-text.short { width: 80%; }
 
-  .ant-image-img {
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+/* ================= 移动端适配 (解除控制，恢复原生滚动) ================= */
+@media (max-width: 768px) {
+  .picture-detail-page {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto; /* 移动端靠原生滚动 */
   }
 
-  &:hover .ant-image-img {
-    transform: scale(1.01);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  }
-}
+  .content-layer { padding-top: 0; }
+  .top-nav-bar { background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); }
 
-/* 加载占位符样式优化 */
-.loading-placeholder {
-  width: 100%;
-  height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 8px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-
-  .loading-content {
-    display: flex;
+  .layout-container {
     flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding: 24px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: auto;
+    padding: 0; gap: 0;
   }
 
-  .loading-text {
-    color: #64748b;
-    font-size: 14px;
-    margin-top: 8px;
+  .preview-section {
+    width: 100vw; height: 100vw; max-height: 60vh;
+    border-radius: 0; border: none; background: rgba(0,0,0,0.8); backdrop-filter: none;
   }
-}
+  .main-image { max-width: 100%; max-height: 100%; border-radius: 0; box-shadow: none; }
 
-/* 预览遮罩层样式优化 */
-.preview-mask {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: white;
-  font-size: 16px;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  transition: all 0.3s ease;
-  opacity: 0;
-  transform: translateY(10px);
+  .details-section {
+    border-radius: 24px 24px 0 0; margin-top: -20px; z-index: 10; border: none;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  }
 
-  &:hover {
-    opacity: 1;
-    transform: translateY(0);
+  .scrollable-content {
+    overflow-y: visible; /* 移动端不需要内部滚动 */
+  }
+
+  .action-footer-fixed {
+    position: sticky; bottom: 0;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
 }
 
-/* 预览模式样式优化 */
-:deep(.ant-image-preview) {
-  .ant-image-preview-img {
-    max-width: 90vw;
-    max-height: 90vh;
-    border-radius: 8px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  }
-
-  .ant-image-preview-operations {
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    border-radius: 8px;
-    margin: 16px;
-    padding: 8px 16px;
-  }
-
-  .ant-image-preview-operations-operation {
-    padding: 8px;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-    }
-  }
-}
-
-/* 信息卡片样式 */
-.info-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.card-title {
-  font-size: 16px;
-  color: #333;
-  font-weight: 500;
-}
-
-/* 描述列表样式 */
-.info-descriptions :deep(.ant-descriptions-item) {
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.info-descriptions :deep(.ant-descriptions-item-label) {
-  color: #666;
-  font-size: 14px;
-  width: 80px;
-}
-
-.info-descriptions :deep(.ant-descriptions-item-content) {
-  color: #333;
-  font-size: 14px;
-}
-
-/* 作者信息样式 */
-.author-item {
-  margin-bottom: 8px;
-}
-
-.author-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-}
-
-/* 按钮区域样式 */
-.action-area {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
-}
-
-/* 统一的按钮基础样式 */
-.action-btn {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: none !important;
-  position: relative;
-  overflow: hidden;
-  border-radius: 10px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: white !important;
-}
-
-/* 下载按钮 - 蓝紫渐变 */
-:deep(.download-btn.ant-btn-primary) {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
-}
-
-/* 分享按钮 - 蓝橙渐变 */
-:deep(.share-btn.ant-btn-primary) {
-  background: linear-gradient(135deg, #0ea5e9, #f59e0b) !important;
-  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);
-}
-
-/* 编辑按钮 - 绿色渐变 */
-:deep(.edit-btn.ant-btn-primary) {
-  background: linear-gradient(135deg, #10b981, #059669) !important;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
-}
-
-/* 删除按钮 - 红色渐变 */
-:deep(.delete-btn.ant-btn-primary) {
-  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
-}
-
-/* 图标样式 */
-.action-btn :deep(.anticon) {
-  font-size: 18px;
-  color: white !important;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  transition: all 0.3s ease;
-}
-
-/* 按钮悬停效果 */
-.action-btn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1) saturate(1.1);
-}
-
-.action-btn:hover :deep(.anticon) {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
-}
-
-/* 点击效果 */
-.action-btn:active {
-  transform: scale(0.95);
-  filter: brightness(0.95);
-}
-
-/* 按钮发光效果 */
-.action-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0) 20%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(255, 255, 255, 0) 80%,
-    transparent 100%
-  );
-  animation: shine 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-@keyframes shine {
-  0% {
-    left: -150%;
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.3;
-  }
-  100% {
-    left: 150%;
-    opacity: 0;
-  }
-}
-
-/* 让每个按钮的动画错开开始时间 */
-.download-btn::before {
-  animation-delay: 0s;
-}
-
-.share-btn::before {
-  animation-delay: 1s;
-}
-
-.edit-btn::before {
-  animation-delay: 2s;
-}
-
-.delete-btn::before {
-  animation-delay: 3s;
-}
-
-/* 按钮容器样式 */
-.action-area {
-  display: flex;
-  padding: 8px 0;
-}
-
-.action-area :deep(.ant-space) {
-  gap: 12px !important;
-}
-
-/* 移除旧的 PC 端按钮样式 */
-@media screen and (min-width: 769px) {
-  .action-btn {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-/* 移动端样式 */
-@media screen and (max-width: 768px) {
-  #pictureDetailPage {
-    margin: 0;
-    width: 100%;
-  }
-
-  .preview-card {
-    margin: 0;
-    border-radius: 0;
-    width: 100%;
-  }
-
-  .image-container {
-    border-radius: 0;
-    background: #f9f9f9;
-    width: 100%;
-    padding: 0;
-    min-height: 300px;
-    position: relative;
-  }
-
-  :deep(.ant-card-body) {
-    padding: 0;
-    width: 100%;
-  }
-
-  :deep(.ant-image) {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 300px;
-  }
-
-  :deep(.ant-image-img) {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 660px;
-    min-width: 100%;
-    object-fit: contain;
-  }
-
-  /* 加载占位符样式优化 */
-  .loading-placeholder {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f9f9f9;
-    z-index: 1;
-
-    .loading-content {
-      padding: 16px;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(8px);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .loading-text {
-      font-size: 13px;
-      color: #64748b;
-      margin: 0;
-    }
-
-    :deep(.ant-spin) {
-      .ant-spin-dot {
-        font-size: 24px;
-        margin: auto;
-      }
-
-      .ant-spin-text {
-        padding-top: 8px;
-        font-size: 13px;
-        color: #64748b;
-      }
-    }
-  }
-
-  /* 针对小图的特殊处理 */
-  :deep(.ant-image-img[style*='width: 0']),
-  :deep(.ant-image-img[style*='width:0']),
-  :deep(.ant-image-img[style*='width: auto']),
-  :deep(.ant-image-img[style*='width:auto']) {
-    width: 100% !important;
-    height: auto !important;
-    object-fit: contain;
-  }
-
-  /* 修复信息卡片样式 */
-  .info-card {
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .info-card :deep(.ant-card-body) {
-    padding: 12px 16px;
-  }
-
-  /* 修复描述列表样式 */
-  .info-descriptions :deep(.ant-descriptions-row) {
-    display: flex;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .info-descriptions :deep(.ant-descriptions-item) {
-    padding: 8px 0;
-    width: 100%;
-  }
-
-  .info-descriptions :deep(.ant-descriptions-item-container) {
-    display: flex;
-  }
-
-  .info-descriptions :deep(.ant-descriptions-item-label) {
-    width: 60px;
-    font-size: 13px;
-    color: #666;
-    flex-shrink: 0;
-  }
-
-  .info-descriptions :deep(.ant-descriptions-item-content) {
-    flex: 1;
-    font-size: 13px;
-    color: #333;
-    padding-left: 8px;
-  }
-
-  /* 标签样式 */
-  :deep(.ant-tag) {
-    margin: 2px 4px 2px 0;
-    font-size: 12px;
-  }
-
-  /* 作者信息样式 */
-  .author-item :deep(.ant-space) {
-    display: flex;
-    align-items: center;
-  }
-
-  .author-name {
-    font-size: 13px;
-    margin-left: 8px;
-  }
-
-  /* 按钮区域样式 */
-  .info-descriptions :deep(.ant-descriptions-item:last-child) {
-    border-bottom: none;
-  }
-
-  .mobile-actions {
-    display: flex;
-    padding: 4px 0;
-  }
-
-  .mobile-actions :deep(.ant-space) {
-    width: 100%;
-    gap: 8px !important;
-    justify-content: flex-start;
-  }
-
-  .mobile-actions .action-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 6px;
-  }
-
-  .mobile-actions .action-btn :deep(.anticon) {
-    font-size: 16px;
-  }
-
-  /* 移动端按钮样式细节优化 */
-  .mobile-actions .action-btn:deep(.ant-btn-primary) {
-    background: linear-gradient(45deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-    border: none;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-    color: white;
-  }
-
-  .mobile-actions .action-btn:deep(.ant-btn-primary.ant-btn-background-ghost) {
-    background: linear-gradient(45deg, #06b6d4 0%, #3b82f6 50%, #f97316 100%);
-    border: none;
-    color: white;
-    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
-  }
-
-  .mobile-actions .action-btn:deep(.ant-btn:not(.ant-btn-primary):not(.ant-btn-dangerous)) {
-    background: linear-gradient(45deg, #059669 0%, #10b981 50%, #34d399 100%);
-    border: none;
-    color: white;
-    box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
-  }
-
-  .mobile-actions .action-btn:deep(.ant-btn-dangerous) {
-    background: linear-gradient(45deg, #dc2626 0%, #ef4444 50%, #f87171 100%);
-    border: none;
-    color: white;
-    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
-  }
-
-  /* 按钮悬停效果增强 */
-  .mobile-actions .action-btn:hover {
-    transform: translateY(-2px) scale(1.05);
-    filter: brightness(1.1) contrast(1.1);
-  }
-
-  /* 点击效果增强 */
-  .mobile-actions .action-btn:active {
-    transform: scale(0.95);
-    filter: brightness(0.95) contrast(0.95);
-  }
-
-  /* 图标发光效果 */
-  .mobile-actions .action-btn :deep(.anticon) {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  }
-
-  /* 涟漪效果增强 */
-  .mobile-actions .action-btn::after {
-    background: rgba(255, 255, 255, 0.8);
-  }
-
-  @keyframes ripple {
-    0% {
-      transform: scale(0, 0);
-      opacity: 0.8;
-    }
-    20% {
-      transform: scale(25, 25);
-      opacity: 0.5;
-    }
-    100% {
-      opacity: 0;
-      transform: scale(40, 40);
-    }
-  }
-
-  /* 按钮基础样式 */
-  .mobile-actions :deep(.action-btn.ant-btn) {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    border: none !important;
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: white !important;
-  }
-
-  /* 下载按钮 - 蓝紫渐变 */
-  .mobile-actions :deep(.download-btn.ant-btn-primary) {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
-  }
-
-  /* 分享按钮 - 蓝橙渐变 */
-  .mobile-actions :deep(.share-btn.ant-btn-primary) {
-    background: linear-gradient(135deg, #0ea5e9, #f59e0b) !important;
-    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);
-  }
-
-  /* 编辑按钮 - 绿色渐变 */
-  .mobile-actions :deep(.edit-btn.ant-btn-primary) {
-    background: linear-gradient(135deg, #10b981, #059669) !important;
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
-  }
-
-  /* 删除按钮 - 红色渐变 */
-  .mobile-actions :deep(.delete-btn.ant-btn-primary) {
-    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
-  }
-
-  /* 图标样式 */
-  .mobile-actions :deep(.action-btn .anticon) {
-    font-size: 18px;
-    color: white !important;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-    transition: all 0.3s ease;
-  }
-
-  /* 按钮悬停效果 */
-  .mobile-actions :deep(.action-btn:hover) {
-    transform: translateY(-2px);
-    filter: brightness(1.1) saturate(1.1);
-  }
-
-  .mobile-actions :deep(.action-btn:hover .anticon) {
-    transform: scale(1.1);
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
-  }
-
-  /* 点击效果 */
-  .mobile-actions :deep(.action-btn:active) {
-    transform: scale(0.95);
-    filter: brightness(0.95);
-  }
-
-  /* 按钮发光效果 */
-  .mobile-actions :deep(.action-btn)::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    animation: shine 2s infinite;
-  }
-
-  @keyframes shine {
-    0% {
-      left: -100%;
-    }
-    50% {
-      left: 100%;
-    }
-    100% {
-      left: 100%;
-    }
-  }
-
-  /* 按钮容器样式 */
-  .mobile-actions {
-    display: flex;
-    padding: 8px 0;
-  }
-
-  .mobile-actions :deep(.ant-space) {
-    gap: 12px !important;
-  }
-
-  .loading-placeholder {
-    .loading-content {
-      padding: 16px;
-      background: rgba(255, 255, 255, 0.95);
-    }
-
-    .loading-text {
-      font-size: 13px;
-    }
-
-    :deep(.ant-spin) {
-      .ant-spin-dot {
-        font-size: 24px;
-      }
-
-      .ant-spin-text {
-        padding-top: 8px;
-        font-size: 13px;
-      }
-    }
-  }
-}
-
-/* PC端样式 */
-@media screen and (min-width: 769px) {
-  .image-container {
-    min-height: 400px;
-    max-height: 660px;
-    background: #f9f9f9;
-    border-radius: 4px;
-    padding: 20px;
-  }
-
-  :deep(.ant-image) {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  :deep(.ant-image-img) {
-    max-width: 100%;
-    max-height: 620px;
-    object-fit: contain;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-  }
-}
-
-/* 添加悬停效果 */
-:deep(.ant-image-img:hover) {
-  transform: scale(1.02);
-  transition: all 0.3s ease;
-}
-
-/* PC端按钮样式 */
-@media screen and (min-width: 769px) {
-  .action-btn {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-  }
-
-  .action-btn :deep(.anticon) {
-    font-size: 18px;
-  }
-
-  /* 主按钮样式 */
-  .action-btn:deep(.ant-btn-primary) {
-    background: linear-gradient(135deg, #ff8e53, #ff6b6b);
-    border: none;
-    box-shadow: 0 2px 8px rgba(255, 142, 83, 0.2);
-  }
-
-  /* 幽灵按钮样式 */
-  .action-btn:deep(.ant-btn-primary.ant-btn-background-ghost) {
-    border: 1px solid #ff8e53;
-    color: #ff8e53;
-  }
-
-  /* 普通按钮样式 */
-  .action-btn:deep(.ant-btn:not(.ant-btn-primary):not(.ant-btn-dangerous)) {
-    border: 1px solid #d9d9d9;
-    color: #666;
-  }
-
-  /* 危险按钮样式 */
-  .action-btn:deep(.ant-btn-dangerous) {
-    border: 1px solid #ff4d4f;
-    color: #ff4d4f;
-  }
-
-  /* 按钮悬停效果 */
-  .action-btn:hover {
-    transform: translateY(-2px);
-    transition: transform 0.2s;
-  }
-}
-
-/* 按钮交互效果 */
-.action-btn:active {
-  transform: scale(0.95);
-  transition: transform 0.2s;
-}
-
-.action-btn:hover {
-  transform: translateY(-2px);
-  transition: transform 0.2s;
-}
-
-/* 加载占位符基础样式 */
-.loading-placeholder {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f9f9f9;
-  z-index: 1;
-
-  .loading-content {
-    padding: 24px 32px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(8px);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    z-index: 2;
-  }
-
-  .loading-text {
-    color: #64748b;
-    font-size: 14px;
-    margin: 0;
-  }
-
-  :deep(.ant-spin) {
-    .ant-spin-dot {
-      font-size: 24px;
-      margin: auto;
-    }
-  }
-}
-
-@media screen and (max-width: 768px) {
-  /* ... 其他移动端样式保持不变 ... */
-
-  .image-container {
-    border-radius: 0;
-    background: #f9f9f9;
-    width: 100%;
-    padding: 0;
-    min-height: 300px;
-    position: relative;
-  }
-
-  :deep(.ant-image) {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  :deep(.ant-image-img) {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 90vh;
-    object-fit: contain;
-  }
-
-  /* 移动端加载占位符样式调整 */
-  .loading-placeholder {
-    .loading-content {
-      padding: 20px 24px;
-      background: rgba(255, 255, 255, 0.95);
-    }
-
-    .loading-text {
-      font-size: 13px;
-    }
-
-    :deep(.ant-spin) {
-      .ant-spin-dot {
-        font-size: 22px;
-      }
-    }
-  }
-}
-
-/* 加载容器基础样式 */
-.loading-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  z-index: 10;
-}
-
-.loading-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  animation: fadeIn 0.3s ease;
-  min-width: 200px;
-}
-
-.loading-spinner {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 8px;
-  animation: pulse 2s infinite ease-in-out;
-}
-
-.loading-text {
-  text-align: center;
-}
-
-.primary-text {
-  color: #1a1a1a;
-  font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 4px;
-}
-
-.secondary-text {
-  color: #64748b;
-  font-size: 14px;
-}
-
-/* 移动端样式调整 */
-@media screen and (max-width: 768px) {
-  .loading-content {
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    min-width: 180px;
-  }
-
-  .primary-text {
-    font-size: 15px;
-    color: #1a1a1a;
-    font-weight: 500;
-  }
-
-  .secondary-text {
-    font-size: 13px;
-    color: #64748b;
-    margin-top: 4px;
-  }
-
-  :deep(.ant-spin) {
-    .ant-spin-dot {
-      font-size: 22px !important;
-    }
-
-    .ant-spin-dot-item {
-      background-color: #ff8e53 !important;
-    }
-
-    .anticon {
-      font-size: 22px !important;
-      color: #ff8e53 !important;
-    }
-  }
-
-  .loading-spinner {
-    margin-bottom: 12px;
-  }
-}
-
-/* 动画效果 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.loading-spinner {
-  animation: pulse 2s infinite ease-in-out;
-}
-
-/* 加载动画样式 */
-:deep(.ant-spin) {
-  .ant-spin-dot {
-    font-size: 24px !important;
-  }
-
-  .ant-spin-dot-item {
-    background-color: #ff8e53;
-  }
-
-  .anticon {
-    font-size: 24px;
-    color: #ff8e53;
-  }
-}
-
-.follow-button {
-  min-width: 68px;
-  height: 28px;
-  border-radius: 14px;
-  font-size: 13px;
-  padding: 0 12px;
-  transition: all 0.3s ease;
-}
-
-.follow-button.ant-btn-primary {
-  background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
-  border: none;
-  color: white;
-  box-shadow: 0 2px 6px rgba(255, 107, 107, 0.2);
-}
-
-.follow-button.ant-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-}
-
-.follow-button.ant-btn-default {
-  border-color: #e2e8f0;
-  color: #64748b;
-}
-
-.follow-button.ant-btn-default:hover {
-  color: #ff8e53;
-  border-color: #ff8e53;
-  background: #fff6f3;
-}
+/* 弹窗通用样式 */
+.custom-dropdown-overlay { position: fixed; inset: 0; z-index: 10010; }
+.custom-dropdown-content { position: absolute; right: 20px; bottom: 80px; background: var(--card-background); border-radius: 16px; box-shadow: 0 20px 50px var(--shadow-color); border: 1px solid var(--border-color); padding: 8px; width: 180px; }
+.dropdown-item { padding: 12px 14px; font-size: 14px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 10px; }
+.dropdown-item:hover { background: var(--hover-background); color: #3b82f6; }
+.dropdown-item.danger { color: #ef4444; }
+
+.custom-confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10020; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.confirm-box { background: var(--card-background); border-radius: 16px; padding: 24px; width: 300px; text-align: center; }
+.confirm-actions { display: flex; gap: 12px; margin-top: 20px; }
+.btn-cancel, .btn-danger { flex: 1; padding: 10px; border-radius: 20px; cursor: pointer; border: none; font-weight: 500; }
+.btn-cancel { background: var(--hover-background); color: var(--text-primary); }
+.btn-danger { background: #ef4444; color: #fff; }
+
+.permission-setting-content, .chat-room-content { background: var(--card-background); border-radius: 20px; width: 90vw; max-width: 500px; padding: 20px; max-height: 80vh; display: flex; flex-direction: column; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; }
+.modal-header h3 { margin: 0; font-size: 18px; font-weight: 600; }
+.modal-close-btn { background: var(--hover-background); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); }
+.emoji-picker-wrapper { position: absolute; bottom: 100%; right: 0; z-index: 200; margin-bottom: 10px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: var(--card-background); border: 1px solid var(--border-color); }
 </style>
-p

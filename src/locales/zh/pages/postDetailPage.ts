@@ -1,0 +1,82 @@
+export default {
+  speedControl: '切换速度',
+  stopScroll: '停止滚动',
+  stop: '停止',
+  actions: {
+    like: '点赞',
+    comment: '评论',
+    favorite: '收藏',
+    share: '分享',
+    more: '更多'
+  },
+  anonymous: '匿名用户',
+  followed: '已关注',
+  follow: '关注',
+  coverAlt: '封面图',
+  contentDivider: '正文',
+  commentsCount: '共 {count} 条评论',
+  endMessage: '- 没有更多了 -',
+  replyPrefix: '回复 {\'@\'}{user}',
+  addComment: '说点什么...',
+  send: '发送',
+  delModal: {
+    title: '确认删除帖子？',
+    desc: '删除后无法恢复，请谨慎操作',
+    cancel: '取消',
+    confirm: '确认删除'
+  },
+  permTitle: '内容权限设置',
+  untitled: '未命名帖子',
+  moreActions: {
+    edit: '编辑',
+    del: '删除',
+    pause: '暂停',
+    scroll: '滚动',
+    analytics: '数据统计',
+    report: '举报',
+    perm: '权限'
+  },
+  speeds: {
+    slow: '慢速',
+    normal: '正常',
+    fast: '快速'
+  },
+  msgs: {
+    speedSwitched: '已切换至: {speed}',
+    scrollPausedComments: '已滚动至评论区，自动滚动已暂停',
+    scrollStoppedBottom: '已滚动至底部，自动滚动已停止',
+    getDetailFail: '获取帖子详情失败',
+    needLogin: '请先登录',
+    followSuccess: '关注成功',
+    unfollowSuccess: '取消关注成功',
+    opFail: '操作失败',
+    opFailRetry: '操作失败，请稍后重试',
+    likeFail: '点赞失败',
+    shareSuccess: '分享成功',
+    getCommentsFail: '获取评论失败',
+    commentFail: '评论失败',
+    commentFailRetry: '评论发布失败，请重试',
+    noPostId: '无法获取作品ID',
+    delSuccess: '删除成功',
+    delFail: '删除失败',
+    unfavSuccess: '已取消收藏',
+    unfavFail: '取消收藏失败：{msg}',
+    unfavFailDefault: '取消收藏失败',
+    favSuccess: '收藏成功',
+    favFail: '收藏失败：{msg}',
+    favFailDefault: '收藏失败'
+  },
+  emojiSearch: '搜索表情',
+  emojiCats: {
+    recent: '最近使用',
+    smileys: '表情',
+    people: '人物',
+    nature: '自然',
+    foods: '食物',
+    activity: '活动',
+    places: '地点',
+    objects: '物品',
+    symbols: '符号',
+    flags: '旗帜'
+  }
+};

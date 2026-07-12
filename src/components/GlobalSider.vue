@@ -1,348 +1,426 @@
 <template>
-  <div id="globalSider">
-    <div class="sider-wrapper" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
-      <a-layout-sider
-        v-if="loginUserStore.loginUser.id"
-        :width="expanded ? 200 : 80"
-        breakpoint="lg"
-        collapsed-width="80"
-        :trigger="null"
-        collapsible
-        :collapsed="!expanded"
-        class="custom-sider"
-      >
-        <a-menu
-          v-model:selectedKeys="current"
-          mode="inline"
-          :items="menuItems"
-          @click="doMenuClick"
-          class="custom-menu"
-        />
-      </a-layout-sider>
+  <div
+    id="yuemu-globalSider"
+    class="yuemu-sider-container"
+    :class="{
+      'yuemu-minimized': isMinimized,
+      'yuemu-is-dragging': isDragging,
+      'yuemu-is-left': layoutStore.siderSide === 'left',
+      'yuemu-is-right': layoutStore.siderSide === 'right'
+    }"
+    :style="{
+      left: isDragging ? `${dragLeft}px` : undefined,
+      top: isDragging ? `${dragTop}px` : undefined,
+      right: isDragging ? 'auto' : undefined,
+      transform: isDragging ? 'none' : 'translateY(-50%)'
+    }"
+  >
+    <div v-if="!isMinimized" class="yuemu-sider-wrapper" @mousedown="handleMouseDown">
+      <div class="yuemu-fixed-header">
+        <a-tooltip :placement="tooltipPlacement" :title="t('user.profile')">
+          <router-link to="/my" class="yuemu-avatar-link">
+            <div class="yuemu-avatar-wrapper">
+              <a-avatar :src="loginUserStore.loginUser?.userAvatar || defaultAvatarImg" :size="32" />
+              <div class="yuemu-status-indicator"></div>
+            </div>
+          </router-link>
+        </a-tooltip>
+      </div>
+
+      <div class="yuemu-scrollable-content">
+        <div class="yuemu-item-list">
+          <a-tooltip :placement="tooltipPlacement" :title="t('nav.home')">
+            <router-link to="/" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/' }">
+              <div class="yuemu-icon-box"><i class="fa-solid fa-house"></i></div>
+            </router-link>
+          </a-tooltip>
+
+          <a-tooltip :placement="tooltipPlacement" :title="t('nav.forum')">
+            <router-link to="/forum" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/forum' }">
+              <div class="yuemu-icon-box"><i class="fa-solid fa-file-lines"></i></div>
+            </router-link>
+          </a-tooltip>
+
+          <a-tooltip :placement="tooltipPlacement" :title="t('components.globalSider.chat')">
+            <router-link :to="chatRoute" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === chatRoute }">
+              <div class="yuemu-icon-box"><i class="fa-solid fa-comments"></i></div>
+            </router-link>
+          </a-tooltip>
+
+          <a-tooltip :placement="tooltipPlacement" :title="t('nav.messages')">
+            <router-link to="/message-center" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/message-center' }">
+              <div class="yuemu-icon-box">
+                <i class="fa-solid fa-bell"></i>
+                <div v-if="unreadCount > 0" class="yuemu-mini-badge"></div>
+              </div>
+            </router-link>
+          </a-tooltip>
+
+          <a-tooltip :placement="tooltipPlacement" :title="t('components.globalSider.games')">
+            <router-link to="/games" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/games' }">
+              <div class="yuemu-icon-box"><i class="fa-solid fa-rocket"></i></div>
+            </router-link>
+          </a-tooltip>
+
+          <a-tooltip :placement="tooltipPlacement" :title="t('components.globalSider.tools')">
+            <router-link to="/tools" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/tools' }">
+              <div class="yuemu-icon-box"><i class="fa-solid fa-cubes"></i></div>
+            </router-link>
+          </a-tooltip>
+        </div>
+      </div>
+
+      <div class="yuemu-fixed-footer">
+        <a-tooltip :placement="tooltipPlacement" :title="themeText + t('components.globalSider.themeSuffix')">
+          <button class="yuemu-nav-item yuemu-control-btn yuemu-theme-btn" @click.stop="toggleTheme">
+            <div class="yuemu-icon-box">
+              <i :class="themeIconClass"></i>
+            </div>
+          </button>
+        </a-tooltip>
+
+        <a-tooltip :placement="tooltipPlacement" :title="t('components.globalSider.collapse')">
+          <button class="yuemu-nav-item yuemu-control-btn" @click.stop="toggleMinimize">
+            <div class="yuemu-icon-box">
+              <i class="fa-solid" :class="layoutStore.siderSide === 'left' ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+            </div>
+          </button>
+        </a-tooltip>
+      </div>
     </div>
+
+    <a-tooltip :placement="tooltipPlacement" :title="t('components.globalSider.expandSider')">
+      <div v-show="isMinimized" class="yuemu-sticky-edge-trigger" @click="toggleMinimize">
+        <i class="fa-solid yuemu-sticky-icon" :class="layoutStore.siderSide === 'left' ? 'fa-angle-double-right' : 'fa-angle-double-left'"></i>
+      </div>
+    </a-tooltip>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { h, ref, computed, watchEffect, onMounted } from 'vue'
-import {
-  PictureOutlined,
-  UserOutlined,
-  CloudUploadOutlined,
-  TeamOutlined,
-  PlusOutlined,
-  DownOutlined,
-  UpOutlined,
-} from '@ant-design/icons-vue'
-import { useRouter } from 'vue-router'
-import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { SPACE_TYPE_ENUM } from '@/constants/space.ts'
-import { message } from 'ant-design-vue'
-import { listMyTeamSpaceUsingPost } from '@/api/spaceUserController.ts'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
+import { useMessageCenterStore } from '@/stores/useMessageCenterStore'
+import { useLayoutStore } from '@/stores/useLayoutStore'
+import { useThemeStore } from '@/stores/useThemeStore'
+import { getDefaultAvatar } from '@/utils/userUtils.ts'
+import { getDeviceType } from '@/utils/device'
+import { DEVICE_TYPE_ENUM } from '@/constants/device'
+import defaultAvatarImg from '@/assets/default.png'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const loginUserStore = useLoginUserStore()
-const router = useRouter()
-const expanded = ref(false)
-const isTeamExpanded = ref(false)
-const userId = computed(() => loginUserStore.loginUser.id)
+const messageCenterStore = useMessageCenterStore()
+const layoutStore = useLayoutStore()
+const themeStore = useThemeStore()
+const route = useRoute()
 
-// 处理鼠标进入
-const handleMouseEnter = () => {
-  expanded.value = true
+const isMinimized = ref(getDeviceType() === DEVICE_TYPE_ENUM.MOBILE)
+const isDragging = ref(false)
+const dragLeft = ref(0)
+const dragTop = ref(0)
+const offsetX = ref(0)
+const offsetY = ref(0)
+
+const unreadCount = computed(() => messageCenterStore.unreadTotal)
+const chatRoute = computed(() => getDeviceType() === DEVICE_TYPE_ENUM.MOBILE ? '/chat-list' : '/pc-chat')
+const tooltipPlacement = computed(() => layoutStore.siderSide === 'left' ? 'right' : 'left')
+const themeIconClass = computed(() => themeStore.isDarkTheme ? 'fa-solid fa-sun' : 'fa-solid fa-moon')
+const themeText = computed(() => themeStore.isDarkTheme ? t('components.globalSider.lightTheme') : t('components.globalSider.darkTheme'))
+
+const toggleTheme = () => {
+  themeStore.toggleTheme()
+  window.dispatchEvent(new Event('themeChange'))
 }
 
-// 处理鼠标离开
-const handleMouseLeave = () => {
-  expanded.value = false
+const toggleMinimize = () => {
+  isMinimized.value = !isMinimized.value
 }
 
-// 固定的菜单列表
-const fixedMenuItems = [
-  {
-    key: '/',
-    icon: () => h(PictureOutlined, { style: 'font-size: 20px; color: #ff8e53;' }),
-    label: '公共图库',
-  },
-  {
-    key: '/my_space',
-    label: '我的空间',
-    icon: () => h(UserOutlined, { style: 'font-size: 20px; color: #36cfc9;' }),
-  },
-  {
-    key: '/my_ports',
-    label: '我的发布',
-    icon: () => h(CloudUploadOutlined, { style: 'font-size: 20px; color: #73d13d;' }),
-  },
-]
+const handleMouseDown = (e: MouseEvent) => {
+  if (getDeviceType() === DEVICE_TYPE_ENUM.MOBILE) return
+  isDragging.value = true
 
-const teamSpaceList = ref<API.SpaceUserVO[]>([])
+  const rect = (e.currentTarget as HTMLElement).parentElement?.getBoundingClientRect()
+  if (rect) {
+    offsetX.value = e.clientX - rect.left
+    offsetY.value = e.clientY - rect.top
+    dragLeft.value = rect.left
+    dragTop.value = rect.top
+  }
 
-// 处理添加团队点击
-const handleAddTeam = (e: Event) => {
-  e.stopPropagation()
-  router.push('/add_space?type=' + SPACE_TYPE_ENUM.TEAM)
+  window.addEventListener('mousemove', handleMouseMove)
+  window.addEventListener('mouseup', handleMouseUp)
+  e.preventDefault()
 }
 
-// 计算菜单项
-const menuItems = computed(() => {
-  const items = [...fixedMenuItems]
+const handleMouseMove = (e: MouseEvent) => {
+  if (!isDragging.value) return
+  const currentX = e.clientX
+  const currentY = e.clientY
+  const screenWidth = window.innerWidth
 
-  // 团队空间菜单
-  const teamMenuItem = {
-    key: 'team-spaces',
-    icon: () => h(TeamOutlined, { style: 'font-size: 20px; color: #4f46e5;' }),
-    children: [],
-    class: 'team-menu-item',
+  dragLeft.value = currentX - offsetX.value
+  dragTop.value = currentY - offsetY.value
+
+  if (currentX < screenWidth / 2) {
+    if (layoutStore.siderSide !== 'left') layoutStore.setSiderSide('left')
+  } else {
+    if (layoutStore.siderSide !== 'right') layoutStore.setSiderSide('right')
   }
+}
 
-  // 设置标题和添加按钮
-  teamMenuItem.label = h('div', { class: 'team-menu-title' }, [
-    '我的团队',
-    h(
-      'a-button',
-      {
-        type: 'link',
-        class: 'add-team-btn',
-        onClick: handleAddTeam,
-      },
-      [h(PlusOutlined)],
-    ),
-  ])
-
-  // 如果有团队列表数据
-  if (teamSpaceList.value.length > 0) {
-    const displayCount = 3 // 默认显示前3个团队
-    const isExpanded = ref(false)
-
-    teamSpaceList.value.forEach((team, index) => {
-      if (!isTeamExpanded.value && index >= displayCount) {
-        return
-      }
-
-      // 判断是否是用户创建的团队
-      const isCreator = team.space?.userId === userId.value
-      const teamLabel = isCreator ? `${team.space?.spaceName} (我的)` : team.space?.spaceName
-
-      teamMenuItem.children.push({
-        key: `/space/${team.spaceId}`,
-        label: teamLabel,
-      })
-    })
-
-    // 添加展开/收起按钮
-    if (teamSpaceList.value.length > displayCount && !isTeamExpanded.value) {
-      teamMenuItem.children.push({
-        key: 'expand',
-        label: h(
-          'div',
-          { class: 'expand-collapse-text' },
-          `展开其他 ${teamSpaceList.value.length - displayCount} 个团队`,
-        ),
-        onClick: (e: Event) => {
-          e.stopPropagation()
-          isTeamExpanded.value = true
-        },
-      })
-    } else if (isTeamExpanded.value) {
-      teamMenuItem.children.push({
-        key: 'collapse',
-        label: h('div', { class: 'expand-collapse-text' }, '收起'),
-        onClick: (e: Event) => {
-          e.stopPropagation()
-          isTeamExpanded.value = false
-        },
-      })
-    }
-  }
-
-  items.push(teamMenuItem)
-  return items
-})
-
-// 获取团队空间列表（只在组件挂载时获取一次）
-onMounted(async () => {
-  try {
-    const res = await listMyTeamSpaceUsingPost({})
-    if (res.data.code === 0) {
-      teamSpaceList.value = res.data.data ?? []
-    }
-  } catch (error) {
-    console.error('获取团队空间列表失败:', error)
-  }
-})
-
-// 当前要高亮的菜单项
-const current = ref<string[]>([])
-
-// 监听路由变化，更新高亮菜单项
-router.afterEach((to) => {
-  current.value = [to.path]
-})
-
-// 路由跳转事件
-const doMenuClick = ({ key }: { key: string }) => {
-  // 忽略展开/收起的点击
-  if (key === 'expand' || key === 'collapse') {
-    return
-  }
-  router.push(key)
+const handleMouseUp = () => {
+  isDragging.value = false
+  window.removeEventListener('mousemove', handleMouseMove)
+  window.removeEventListener('mouseup', handleMouseUp)
 }
 </script>
 
 <style scoped>
-#globalSider {
-  .sider-wrapper {
-    position: relative;
-    height: 100%;
-    display: flex;
-  }
+* { box-sizing: border-box; }
 
-  .custom-sider {
-    margin-right: 16px;
-    background: white;
-    transition: all 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
-    overflow: hidden;
-    box-shadow: 1px 0 0 0 rgba(0, 0, 0, 0.05);
-    height: 100%;
-  }
-
-  :deep(.ant-menu) {
-    border: none;
-    transition: all 0.3s;
-    height: 100%;
-    padding-top: 8px;
-  }
-
-  :deep(.ant-menu-item) {
-    height: 48px;
-    line-height: 48px;
-    border-radius: 12px;
-    margin: 4px 8px;
-    color: #64748b;
-    padding: 0 16px !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    /* 未选中状态的图标颜色 */
-    .anticon {
-      transition: all 0.3s ease;
-      margin-right: 10px;
-    }
-
-    /* 悬浮状态 */
-    &:hover {
-      color: #ff8e53;
-      background: #fff6f3;
-
-      .anticon {
-        transform: scale(1.1);
-      }
-    }
-
-    /* 选中状态 */
-    &.ant-menu-item-selected {
-      color: #ff8e53;
-      background: #fff6f3;
-      font-weight: 500;
-
-      &::after {
-        display: none;
-      }
-    }
-  }
-
-  /* 折叠状态下的样式 */
-  :deep(.ant-menu-inline-collapsed) {
-    width: 80px;
-
-    .ant-menu-item {
-      padding: 0 28px !important;
-
-      .anticon {
-        margin-right: 0;
-        font-size: 20px;
-      }
-    }
-  }
-
-  :deep(.ant-layout-sider-children) {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* 响应式调整 */
-  @media screen and (max-width: 992px) {
-    .custom-sider {
-      margin-right: 0;
-    }
-
-    :deep(.ant-menu-item) {
-      height: 42px;
-      line-height: 42px;
-      margin: 2px 4px;
-    }
-  }
+.yuemu-sider-container {
+  height: min(400px, 60vh);
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 56px;
+  z-index: 1000;
+  background: transparent !important;
 }
 
-.team-menu-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.yuemu-sider-container.yuemu-is-dragging {
+  transition: none !important;
+  z-index: 10001;
+}
+
+.yuemu-sider-container.yuemu-minimized { width: 0; }
+
+.yuemu-sider-container.yuemu-is-left { left: 0; }
+.yuemu-sider-container.yuemu-is-right { right: 0; left: auto; }
+
+.yuemu-sider-wrapper {
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--header-background);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1.5px solid var(--header-border);
+  border-radius: 32px;
+  box-shadow: 0 12px 48px var(--header-shadow);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  padding: 12px 0;
+  cursor: grab;
 }
 
-.add-team-btn {
-  font-size: 20px;
-  padding: 4px;
-  height: auto;
-  color: #4f46e5;
-  opacity: 0.8;
-  transition: all 0.3s ease;
-  margin-left: 8px;
+.yuemu-sider-wrapper:active { cursor: grabbing; }
+
+.yuemu-sider-container.yuemu-minimized .yuemu-sider-wrapper {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(var(--minimized-x, -100%)) scale(0.9);
+  pointer-events: none;
+  display: none;
+}
+
+.yuemu-is-left .yuemu-sider-wrapper { --minimized-x: -100%; }
+.yuemu-is-right .yuemu-sider-wrapper { --minimized-x: 100%; }
+
+.yuemu-fixed-header {
+  width: 100%;
+  padding: 8px 0 16px 0;
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid var(--header-border);
+  margin-bottom: 8px;
+}
+
+.yuemu-avatar-wrapper {
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.yuemu-avatar-link:hover .yuemu-avatar-wrapper { transform: scale(1.15) rotate(5deg); }
+
+.yuemu-status-indicator {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 8px;
+  height: 8px;
+  background: #27c93f;
+  border: 1.5px solid white;
+  border-radius: 50%;
+}
+
+.yuemu-scrollable-content {
+  width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.yuemu-scrollable-content::-webkit-scrollbar {
+  display: none;
+}
+
+.yuemu-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  align-items: center;
+}
+
+.yuemu-nav-item {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.add-team-btn:hover {
-  opacity: 1;
-  background: #f5f3ff;
-  transform: scale(1.1);
-  border-radius: 4px;
-}
-
-:deep(.team-menu-item) {
-  .ant-menu-submenu-title {
-    padding-left: 31px;
-  }
-
-  /* 没有团队时隐藏箭头 */
-  &:not(.ant-menu-submenu-open):not(:hover) .ant-menu-submenu-arrow {
-    display: none;
-  }
-}
-
-/* 确保图标大小一致 */
-:deep(.anticon) {
-  font-size: 20px !important;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.expand-collapse-text {
-  font-size: 13px;
-  color: #6b7280;
-
-  border-radius: 4px;
-  transition: all 0.3s ease;
+  height: 38px;
+  width: 38px;
+  border-radius: 19px;
+  color: var(--header-text);
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: none;
+  background: transparent;
   cursor: pointer;
+  position: relative;
+  padding: 0;
 }
 
-.expand-collapse-text:hover {
-  color: #4f46e5;
-  background: #f5f3ff;
+.yuemu-nav-item:hover {
+  background: var(--nav-item-hover);
+  color: var(--nav-item-active-text);
+  transform: translateX(var(--hv-x, 2px));
+}
+
+.yuemu-is-left .yuemu-nav-item:hover { --hv-x: 2px; }
+.yuemu-is-right .yuemu-nav-item:hover { --hv-x: -2px; }
+
+.yuemu-nav-item.yuemu-active {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+}
+
+.yuemu-icon-box {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+}
+
+.yuemu-fixed-footer {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.yuemu-control-btn { width: 38px; height: 38px; }
+
+.yuemu-theme-btn {
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.yuemu-theme-btn:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  transform: translateX(var(--hv-x, 2px)) rotate(20deg);
+}
+
+.yuemu-mini-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
+.yuemu-sticky-edge-trigger {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: min(120px, 20vh);
+  background: linear-gradient(135deg, #2563eb, #70a1ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 6px 0 20px rgba(37, 99, 235, 0.4);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1001;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.yuemu-is-left .yuemu-sticky-edge-trigger { left: 0; border-radius: 0 16px 16px 0; }
+.yuemu-is-right .yuemu-sticky-edge-trigger {
+  right: 0; left: auto;
+  border-radius: 16px 0 0 16px;
+  box-shadow: -6px 0 20px rgba(37, 99, 235, 0.4);
+}
+
+.yuemu-sticky-edge-trigger:hover { width: 38px; background: #2563eb; }
+.yuemu-sticky-icon { color: white; font-size: 16px; transition: all 0.3s; }
+
+.yuemu-sticky-edge-trigger:hover .yuemu-sticky-icon {
+  transform: scale(1.3) translateX(var(--icon-x, 2px));
+}
+
+@media (max-width: 768px) {
+  .yuemu-sider-container { height: min(360px, 60vh); width: 52px; }
+  .yuemu-sider-wrapper { border-radius: 24px; padding: 8px 0; }
+  .yuemu-sticky-edge-trigger { width: 4px; height: 80px; justify-content: flex-end; padding-right: 2px; }
+  .yuemu-is-left .yuemu-sticky-edge-trigger { border-radius: 0 8px 8px 0; }
+  .yuemu-is-right .yuemu-sticky-edge-trigger { border-radius: 8px 0 0 8px; justify-content: flex-start; padding-left: 2px; }
+}
+
+:deep(.dark-theme) .yuemu-sider-wrapper {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+:deep(.dark-theme) .yuemu-nav-item { color: #94a3b8; }
+
+/* 移动端强制移除点击时的悬停缩放，防止底层长按死锁 */
+@media (max-width: 768px) {
+  .ant-card-hoverable:active, .ant-card-hoverable:hover,
+  .ant-card-hoverable:active *, .ant-card-hoverable:hover *,
+  .yuemu-nav-item:active, .yuemu-nav-item:hover,
+  .yuemu-nav-item:active *, .yuemu-nav-item:hover *,
+  .yuemu-avatar-link:active, .yuemu-avatar-link:hover,
+  .yuemu-avatar-link:active *, .yuemu-avatar-link:hover *,
+  .yuemu-theme-btn:active, .yuemu-theme-btn:hover,
+  .yuemu-theme-btn:active *, .yuemu-theme-btn:hover *,
+  .yuemu-sticky-edge-trigger:active, .yuemu-sticky-edge-trigger:hover,
+  .yuemu-sticky-edge-trigger:active *, .yuemu-sticky-edge-trigger:hover * {
+    transform: none !important;
+  }
 }
 </style>

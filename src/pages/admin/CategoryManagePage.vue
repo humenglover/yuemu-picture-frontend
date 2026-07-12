@@ -1,229 +1,258 @@
 <template>
-  <div id="categoryManagePage">
-    <!-- PC端展示 -->
+  <div id="yuemu-categoryManagePage">
     <template v-if="device === DEVICE_TYPE_ENUM.PC">
-      <!-- 搜索表单与添加按钮容器，使其在同一行显示 -->
-      <div class="search-and-add-container">
-        <a-form layout="inline" :model="searchParams" @finish="doSearch">
-          <a-form-item label="分类名称">
+      <div class="yuemu-pc-container">
+        <div class="yuemu-header-panel">
+          <div class="yuemu-header-main-row">
+            <div class="yuemu-page-info">
+              <h1 class="yuemu-page-title">{{ t('pages.admin.categoryManagePage.title') }}</h1>
+              <p class="yuemu-text-secondary" style="margin: 4px 0 0 0; font-size: 13px;">{{ t('pages.admin.categoryManagePage.desc') }}</p>
+            </div>
+            <div class="yuemu-action-group">
+              <a-button type="primary" class="yuemu-btn-primary" @click="showAddModal">
+                <PlusOutlined /> {{ t('pages.admin.categoryManagePage.addCategory') }}
+              </a-button>
+            </div>
+          </div>
+
+          <div class="yuemu-search-form">
+            <a-radio-group v-model:value="searchParams.type" @change="handleTypeChange" class="yuemu-radio-group">
+              <a-radio-button :value="0">{{ t('pages.admin.categoryManagePage.picCategory') }}</a-radio-button>
+              <a-radio-button :value="1">{{ t('pages.admin.categoryManagePage.postCategory') }}</a-radio-button>
+              <a-radio-button :value="2">{{ t('pages.admin.categoryManagePage.audioCategory') }}</a-radio-button>
+            </a-radio-group>
+
             <a-input
               v-model:value="searchParams.categoryName"
-              placeholder="输入分类名称"
-              allow-clear
-            />
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" html-type="submit" class="action-button search-button">
-              <SearchOutlined />搜索
-            </a-button>
-          </a-form-item>
-        </a-form>
-        <div class="add-button-wrapper">
-          <a-button type="primary" class="action-button create-button" @click="showAddModal">
-            <PlusOutlined />添加分类
-          </a-button>
+              :placeholder="t('pages.admin.categoryManagePage.searchPlaceholder')"
+              allowClear
+              @change="doSearch"
+              class="yuemu-input"
+              style="width: 240px; margin-left: auto;"
+            >
+              <template #prefix><SearchOutlined class="yuemu-text-secondary" /></template>
+            </a-input>
+          </div>
         </div>
-      </div>
-      <!-- 表格 -->
-      <a-table
-        :columns="columns"
-        :data-source="categoryList"
-        :pagination="false"
-        @change="handleTableChange"
-        class="category-table"
-      >
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.dataIndex === 'createTime'">
-            <div
-              :style="{
-                maxWidth: '250px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }"
-            >
-              {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-            </div>
-          </template>
-          <template v-else-if="column.key === 'action'">
-            <a-space>
-              <a-button 
-                class="table-button delete-button" 
-                @click="showDeleteConfirm(record)"
-              >
-                <DeleteOutlined />删除
-              </a-button>
-            </a-space>
-          </template>
-        </template>
-      </a-table>
-      <!-- 分页组件 -->
-      <div class="pagination-container">
-        <a-pagination
-          v-model:current="searchParams.current"
-          :page-size-options="pcPageSizeOptions"
-          :total="total"
-          show-size-changer
-          :page-size="searchParams.pageSize"
-          @change="onPageChange"
-          @showSizeChange="onShowSizeChange"
-        >
-          <template #buildOptionText="props">
-            <span>{{ props.value }}条/页</span>
-          </template>
-        </a-pagination>
-      </div>
-    </template>
 
-    <!-- 移动端展示 -->
-    <template v-else>
-      <div class="mobile-container">
-        <div class="mobile-content">
-          <!-- 搜索区域 -->
-          <div class="search-section">
-            <van-search
-              v-model="searchParams.categoryName"
-              placeholder="搜索分类名称"
-              @search="doSearch"
-            />
-          </div>
+        <div class="yuemu-table-wrapper">
+          <a-table
+            :columns="columns"
+            :data-source="categoryList"
+            :pagination="false"
+            @change="handleTableChange"
+            rowKey="id"
+            class="yuemu-table"
+          >
+            <template #bodyCell="{ column, record }">
+              <template v-if="column.dataIndex === 'categoryName'">
+                <strong>{{ record.categoryName }}</strong>
+              </template>
+              <template v-if="column.dataIndex === 'type'">
+                <span class="yuemu-tag" :class="'yuemu-type-' + getTypeColor(record.type)">
+                  {{ getTypeText(record.type) }}
+                </span>
+              </template>
+              <template v-if="column.dataIndex === 'createTime'">
+                <span class="yuemu-text-secondary">
+                  {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+                </span>
+              </template>
+              <template v-else-if="column.key === 'action'">
+                <div class="yuemu-mac-action-buttons">
+                  <a-button type="text" class="yuemu-btn-text-red" @click="showDeleteConfirm(record)"> {{ t('pages.admin.categoryManagePage.delete') }} </a-button>
+                </div>
+              </template>
+            </template>
+          </a-table>
+        </div>
 
-          <!-- 添加按钮 -->
-          <div class="action-bar">
-            <van-button type="primary" block @click="showAddModal" class="add-button">
-              <template #icon><PlusOutlined /></template>
-              添加分类
-            </van-button>
-          </div>
-
-          <!-- 分类列表 -->
-          <div class="category-list">
-            <van-cell-group
-              v-for="category in categoryList"
-              :key="category.id"
-              class="category-group"
-            >
-              <van-card class="category-card">
-                <template #title>
-                  <div class="card-title">{{ category.categoryName }}</div>
-                </template>
-
-                <template #desc>
-                  <div class="card-info">
-                    <div class="info-item">
-                      <span class="label">分类ID：</span>
-                      <span class="value">{{ category.id }}</span>
-                    </div>
-                    <div class="info-item">
-                      <span class="label">创建时间：</span>
-                      <span class="value">{{
-                        dayjs(category.createTime).format('YYYY-MM-DD HH:mm:ss')
-                      }}</span>
-                    </div>
-                  </div>
-                </template>
-
-                <template #footer>
-                  <div class="card-footer">
-                    <van-button
-                      type="danger"
-                      size="small"
-                      @click="showDeleteConfirm(category)"
-                      class="mobile-button delete-button"
-                    >
-                      <template #icon><DeleteOutlined /></template>
-                      删除
-                    </van-button>
-                  </div>
-                </template>
-              </van-card>
-            </van-cell-group>
-          </div>
-
-          <!-- 移动端分页 -->
-          <div class="mobile-pagination">
-            <div class="pagination-info">
-              <span>共 {{ total }} 条</span>
-              <div class="page-size-selector" @click="showPageSizeSheet = true">
-                <span>{{ searchParams.pageSize }}条/页</span>
-                <van-icon name="arrow-down" />
-              </div>
-            </div>
-            <div class="pagination-wrapper">
-              <van-pagination
-                v-model="searchParams.current"
-                :total-items="total"
-                :items-per-page="searchParams.pageSize"
-                @change="onMobilePageChange"
-                :show-prev-text="false"
-                :show-next-text="false"
-                :show-page-size="3"
-                class="custom-pagination"
-                force-ellipses
-              >
-                <template #prev-text>
-                  <van-icon name="arrow-left" />
-                </template>
-                <template #next-text>
-                  <van-icon name="arrow" />
-                </template>
-              </van-pagination>
-              <div class="jump-page">
-                <span>跳至</span>
-                <van-field v-model="jumpPage" type="number" @keypress.enter="handleJumpPage" />
-                <span>页</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 每页条数选择器 -->
-          <van-action-sheet
-            v-model:show="showPageSizeSheet"
-            :actions="pageSizeOptions"
-            cancel-text="取消"
-            close-on-click-action
-            @select="handlePageSizeChange"
+        <div class="yuemu-pagination">
+          <a-pagination
+            v-model:current="searchParams.current"
+            :page-size-options="pcPageSizeOptions"
+            :total="total"
+            :show-total="(total) => t('pages.admin.categoryManagePage.totalCategories', { total })"
+            show-size-changer
+            :page-size="searchParams.pageSize"
+            @change="onPageChange"
+            @showSizeChange="onShowSizeChange"
           />
         </div>
       </div>
     </template>
 
-    <!-- 添加分类模态框 -->
-    <a-modal
-      v-model:open="addModalVisible"
-      title="添加分类"
-      @ok="handleAdd"
-      @cancel="addModalVisible = false"
-    >
-      <a-form :model="addForm" ref="addFormRef">
-        <a-form-item label="分类名称" name="categoryName">
-          <a-input v-model:value="addForm.categoryName" />
-        </a-form-item>
-      </a-form>
-    </a-modal>
+    <template v-else>
+      <div class="yuemu-mobile-container">
+        <div class="yuemu-sticky-header">
+          <div class="yuemu-header-top">
+            <h1 class="yuemu-page-title">{{ t('pages.admin.categoryManagePage.title') }}</h1>
+            <van-button icon="plus" size="small" type="primary" round class="yuemu-btn-icon" @click="showAddModal" />
+          </div>
 
-    <!-- 删除确认弹框 -->
+          <div class="yuemu-mobile-tabs-wrapper">
+            <van-tabs v-model:active="searchParams.type" @change="handleTypeChange" class="yuemu-van-tabs">
+              <van-tab :name="0" :title="t('pages.admin.categoryManagePage.picCategory')" />
+              <van-tab :name="1" :title="t('pages.admin.categoryManagePage.postCategory')" />
+              <van-tab :name="2" :title="t('pages.admin.categoryManagePage.audioCategory')" />
+            </van-tabs>
+          </div>
+
+          <div class="yuemu-search-bar-wrapper">
+            <van-search
+              v-model="searchParams.categoryName"
+              :placeholder="t('pages.admin.categoryManagePage.searchPlaceholder')"
+              class="yuemu-search"
+              shape="round"
+              @search="doSearch"
+              clearable
+            />
+          </div>
+        </div>
+
+        <div class="yuemu-mobile-content-scroll">
+          <div class="yuemu-card-list">
+            <div v-for="category in categoryList" :key="category.id" class="yuemu-category-card">
+              <div class="yuemu-card-header">
+                <div class="yuemu-main-info">
+                  <div class="yuemu-title-row">
+                    <span class="yuemu-category-name">{{ category.categoryName }}</span>
+                    <span class="yuemu-tag yuemu-mini" :class="'yuemu-type-' + getTypeColor(category.type)">
+                      {{ getTypeText(category.type) }}
+                    </span>
+                  </div>
+                  <div class="yuemu-meta-row yuemu-text-secondary">
+                    <span>ID: {{ category.id }}</span>
+                    <span>{{ dayjs(category.createTime).format('YYYY-MM-DD HH:mm') }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="yuemu-card-actions">
+                <button class="yuemu-action-btn yuemu-danger" @click="showDeleteConfirm(category)">{{ t('pages.admin.categoryManagePage.deleteCategory') }}</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="yuemu-mobile-pagination">
+            <div class="yuemu-page-info yuemu-text-secondary">
+              <span>{{ t('pages.admin.categoryManagePage.total', { total }) }}</span>
+              <span class="yuemu-page-size-trigger" @click="showPageSizeSheet = true">
+                {{ t('pages.admin.categoryManagePage.pageSize', { size: searchParams.pageSize }) }}
+                <van-icon name="arrow-down" />
+              </span>
+            </div>
+            <van-pagination :prev-text="t('pages.admin.categoryManagePage.prevPage')" :next-text="t('pages.admin.categoryManagePage.nextPage')"
+              v-model="searchParams.current"
+              :total-items="total"
+              :items-per-page="searchParams.pageSize"
+              @change="onMobilePageChange"
+              :show-page-size="3"
+              force-ellipses
+              class="yuemu-van-pagination"
+            />
+          </div>
+        </div>
+
+        <van-action-sheet
+          v-model:show="showPageSizeSheet"
+          :actions="pageSizeOptions"
+          :cancel-text="t('pages.admin.categoryManagePage.cancel')"
+          close-on-click-action
+          @select="handlePageSizeChange"
+          class="yuemu-action-sheet"
+        />
+      </div>
+    </template>
+
+    <template v-if="device === DEVICE_TYPE_ENUM.PC">
+      <a-modal
+        v-model:open="addModalVisible"
+        :title="t('pages.admin.categoryManagePage.addCategoryTitle')"
+        :footer="null"
+        class="yuemu-modal"
+        destroyOnClose
+      >
+        <a-form :model="addForm" ref="addFormRef" class="yuemu-form">
+          <div class="yuemu-form-item">
+            <label>{{ t('pages.admin.categoryManagePage.categoryType') }} <span class="yuemu-required">*</span></label>
+            <a-radio-group v-model:value="addForm.type" class="yuemu-radio-group">
+              <a-radio-button :value="0">{{ t('pages.admin.categoryManagePage.picCategory') }}</a-radio-button>
+              <a-radio-button :value="1">{{ t('pages.admin.categoryManagePage.postCategory') }}</a-radio-button>
+              <a-radio-button :value="2">{{ t('pages.admin.categoryManagePage.audioCategory') }}</a-radio-button>
+            </a-radio-group>
+          </div>
+          <div class="yuemu-form-item">
+            <label>{{ t('pages.admin.categoryManagePage.categoryName') }} <span class="yuemu-required">*</span></label>
+            <a-input v-model:value="addForm.categoryName" :placeholder="t('pages.admin.categoryManagePage.categoryNamePlaceholder')" class="yuemu-input" />
+          </div>
+          <div class="yuemu-modal-footer">
+            <a-button class="yuemu-btn-ghost" @click="addModalVisible = false">{{ t('pages.admin.categoryManagePage.cancel') }}</a-button>
+            <a-button type="primary" class="yuemu-btn-primary" @click="handleAdd">{{ t('pages.admin.categoryManagePage.confirmAdd') }}</a-button>
+          </div>
+        </a-form>
+      </a-modal>
+    </template>
+
+    <template v-else>
+      <van-dialog
+        v-model:show="addModalVisible"
+        :title="t('pages.admin.categoryManagePage.addCategoryTitle')"
+        show-cancel-button
+        :before-close="handleMobileAddDialogClose"
+        class="yuemu-van-dialog"
+      >
+        <van-form ref="mobileAddFormRef" class="yuemu-van-form">
+          <van-cell-group inset>
+            <van-field
+              v-model="addForm.typeText"
+              is-link
+              readonly
+              :label="t('pages.admin.categoryManagePage.categoryType')"
+              :placeholder="t('pages.admin.categoryManagePage.pleaseSelect')"
+              @click="showAddTypePicker = true"
+              :rules="[{ required: true }]"
+            />
+            <van-field
+              v-model="addForm.categoryName"
+              :label="t('pages.admin.categoryManagePage.categoryName')"
+              :placeholder="t('pages.admin.categoryManagePage.enterName')"
+              :rules="[{ required: true }]"
+            />
+          </van-cell-group>
+        </van-form>
+      </van-dialog>
+
+      <van-popup v-model:show="showAddTypePicker" round position="bottom" class="yuemu-action-sheet">
+        <van-picker
+          :columns="[{text:t('pages.admin.categoryManagePage.picCategory'), value:0}, {text:t('pages.admin.categoryManagePage.postCategory'), value:1}, {text:t('pages.admin.categoryManagePage.audioCategory'), value:2}]"
+          @confirm="onAddTypeConfirm"
+          @cancel="showAddTypePicker = false"
+          show-toolbar
+          :title="t('pages.admin.categoryManagePage.selectCategoryType')"
+        />
+      </van-popup>
+    </template>
+
     <a-modal
       v-model:open="deleteConfirmVisible"
       :title="null"
       :footer="null"
-      :width="400"
-      class="delete-confirm-modal"
+      :width="360"
+      class="yuemu-confirm-modal"
+      centered
     >
-      <div class="delete-confirm-content">
-        <div class="warning-icon">
-          <ExclamationCircleFilled style="color: #ff6b6b;" />
+      <div class="yuemu-confirm-content">
+        <div class="yuemu-icon-wrap">
+          <ExclamationCircleFilled />
         </div>
-        <h3 class="confirm-title">确认删除该分类？</h3>
-        <p class="confirm-desc">
-          分类名称：{{ selectedCategory?.categoryName }}<br>
-          分类ID：{{ selectedCategory?.id }}
+        <h3 class="yuemu-confirm-title">{{ t('pages.admin.categoryManagePage.confirmDeleteTitle') }}</h3>
+        <p class="yuemu-confirm-desc">
+          {{ t('pages.admin.categoryManagePage.categoryPrefix') }}{{ selectedCategory?.categoryName }}<br>
+          {{ t('pages.admin.categoryManagePage.deleteWarning') }}
         </p>
-        <div class="confirm-actions">
-          <a-button class="cancel-button" @click="deleteConfirmVisible = false">取消</a-button>
-          <a-button class="confirm-button" danger @click="confirmDelete">
-            确认删除
-          </a-button>
+        <div class="yuemu-confirm-actions">
+          <button class="yuemu-cancel-btn" @click="deleteConfirmVisible = false">{{ t('pages.admin.categoryManagePage.cancel') }}</button>
+          <button class="yuemu-danger-btn" @click="confirmDelete">{{ t('pages.admin.categoryManagePage.confirmDelete') }}</button>
         </div>
       </div>
     </a-modal>
@@ -231,120 +260,90 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+import { ref, reactive, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
-import { PlusOutlined, DeleteOutlined, SearchOutlined, ExclamationCircleFilled } from '@ant-design/icons-vue'
+import { PlusOutlined, SearchOutlined, ExclamationCircleFilled } from '@ant-design/icons-vue'
 import { DEVICE_TYPE_ENUM } from '@/constants/device'
 import { getDeviceType } from '@/utils/device'
 import {
   addCategoryUsingPost,
   deleteCategoryUsingPost,
   listCategoryVoUsingPost,
-  findCategoryUsingPost,
 } from '@/api/categoryController.ts'
 import dayjs from 'dayjs'
 
-// 定义搜索参数类型，与标签管理页面的搜索参数类型结构保持一致
 type SearchParams = {
   current: number
   pageSize: number
   categoryName?: string
   sortField?: string
   sortOrder?: string
+  type: number
 }
 
-// 表格列配置
+const device = ref<string>('')
+
+onMounted(async () => {
+  device.value = await getDeviceType()
+})
+
 const columns = [
-  {
-    title: 'ID',
-    dataIndex: 'id',
-    key: 'id',
-  },
-  {
-    title: '分类名称',
-    dataIndex: 'categoryName',
-    key: 'categoryName',
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime',
-    key: 'createTime',
-  },
-  {
-    title: '操作',
-    key: 'action',
-    scopedSlots: { customRender: 'action' },
-  },
+  { get title() { return t('pages.admin.categoryManagePage.colId') }, dataIndex: 'id', key: 'id', width: 100 },
+  { get title() { return t('pages.admin.categoryManagePage.colCategoryName') }, dataIndex: 'categoryName', key: 'categoryName', width: 250 },
+  { get title() { return t('pages.admin.categoryManagePage.colType') }, dataIndex: 'type', key: 'type', width: 150 },
+  { get title() { return t('pages.admin.categoryManagePage.colCreateTime') }, dataIndex: 'createTime', key: 'createTime', width: 200 },
+  { get title() { return t('pages.admin.categoryManagePage.colAction') }, key: 'action', width: 120, align: 'right' },
 ]
 
-// 搜索表单数据
 const searchParams = reactive<SearchParams>({
   current: 1,
   pageSize: 10,
   categoryName: '',
   sortField: 'createTime',
   sortOrder: 'ascend',
+  type: 0,
 })
 
-// 分类列表数据
 const categoryList = ref([])
-// 总记录数
 const total = ref(0)
-// 分页配置，这里保持和标签管理页面类似的结构，可根据实际需求调整初始值等
-const pagination = ref({})
-// PC端分页选项
-const pcPageSizeOptions = ['5', '8', '10', '20', '50']
-// 设备类型
-const device = ref<string>('')
-onMounted(async () => {
-  device.value = await getDeviceType()
-})
+const pcPageSizeOptions = ['10', '20', '30', '50']
+const pageSizeOptions = [
+  { get name() { return t('pages.admin.categoryManagePage.pageSize10') }, value: 10 },
+  { get name() { return t('pages.admin.categoryManagePage.pageSize20') }, value: 20 },
+  { get name() { return t('pages.admin.categoryManagePage.pageSize30') }, value: 30 },
+  { get name() { return t('pages.admin.categoryManagePage.pageSize50') }, value: 50 },
+]
 
-// 添加分类模态框是否可见
-const addModalVisible = ref(false)
-// 添加分类表单数据
-const addForm = reactive({
-  categoryName: '',
-})
-
-// 获取分类列表数据
 const getCategoryList = async () => {
   try {
-    const res = await listCategoryVoUsingPost({
-      ...searchParams,
-    })
+    const res = await listCategoryVoUsingPost({ ...searchParams })
     if (res.data.code === 0 && res.data.data) {
       categoryList.value = res.data.data.records
       total.value = res.data.data.total
     } else {
-      message.error('获取分类列表失败')
+      message.error(t('pages.admin.categoryManagePage.fetchError'))
     }
   } catch (error) {
-    console.error('获取分类列表出错', error)
-    message.error('获取分类列表失败')
+    message.error(t('pages.admin.categoryManagePage.fetchError'))
   }
 }
 
-// 页面加载时获取分类列表
-onMounted(() => {
-  getCategoryList()
-})
+onMounted(() => { getCategoryList() })
 
-// 处理分页尺寸改变时的逻辑（每页显示条数改变）
 const onShowSizeChange = (current: number, pageSize: number) => {
-  searchParams.current = 1 // 切换每页条数时，默认回到第一页，可根据需求调整
+  searchParams.current = 1
   searchParams.pageSize = pageSize
   getCategoryList()
 }
 
-// 处理页码改变时的逻辑
 const onPageChange = (page: number, pageSize: number) => {
   searchParams.current = page
   searchParams.pageSize = pageSize
   getCategoryList()
 }
 
-// 处理表格页码、页大小改变等操作（包括排序等情况）
 const handleTableChange = (paginationParam: any) => {
   searchParams.current = paginationParam.current
   searchParams.pageSize = paginationParam.pageSize
@@ -355,84 +354,99 @@ const handleTableChange = (paginationParam: any) => {
   getCategoryList()
 }
 
-// 处理搜索操作，优化了未输入信息时的逻辑
 const doSearch = () => {
-  // 重置页码
   searchParams.current = 1
   getCategoryList()
 }
 
-// 显示添加分类模态框
+const handleTypeChange = () => {
+  searchParams.current = 1
+  getCategoryList()
+}
+
+const addModalVisible = ref(false)
+const addForm = reactive({
+  categoryName: '',
+  type: 0,
+  get typeText() { return t('pages.admin.categoryManagePage.picCategory') }
+})
+
 const showAddModal = () => {
+  addForm.categoryName = ''
+  addForm.type = searchParams.type
+  addForm.typeText = getTypeText(searchParams.type)
   addModalVisible.value = true
 }
 
-// 处理添加分类操作
 const handleAdd = async () => {
-  const categoryNameValue = addForm.categoryName.trim()
-  if (categoryNameValue === '') {
-    message.error('请输入分类名称')
-    return
+  if (!addForm.categoryName.trim()) {
+    message.error(t('pages.admin.categoryManagePage.enterCategoryName'))
+    return false
   }
   try {
-    const addParams = {
-      categoryName: categoryNameValue,
-    }
-    const res = await addCategoryUsingPost(addParams)
+    const res = await addCategoryUsingPost({ categoryName: addForm.categoryName.trim(), type: addForm.type })
     if (res.data.code === 0) {
-      message.success('添加分类成功')
+      message.success(t('pages.admin.categoryManagePage.addSuccess'))
       addModalVisible.value = false
       getCategoryList()
+      return true
     } else {
-      message.error('添加分类失败')
+      message.error(res.data.message || t('pages.admin.categoryManagePage.addFailed'))
+      return false
     }
   } catch (error) {
-    console.error('添加分类出错', error)
-    message.error('添加分类失败')
+    message.error(t('pages.admin.categoryManagePage.addError'))
+    return false
   }
 }
 
-// 删除确认相关的状态
+const showAddTypePicker = ref(false)
+const mobileAddFormRef = ref()
+const onAddTypeConfirm = (selected: { text: string, value: number }) => {
+  addForm.type = selected.value
+  addForm.typeText = selected.text
+  showAddTypePicker.value = false
+}
+const handleMobileAddDialogClose = async (action: string) => {
+  if (action === 'confirm') {
+    try {
+      await mobileAddFormRef.value?.validate()
+      const success = await handleAdd()
+      return success
+    } catch {
+      message.error(t('pages.admin.categoryManagePage.fillInfo'))
+      return false
+    }
+  }
+  return true
+}
+
 const deleteConfirmVisible = ref(false)
 const selectedCategory = ref<API.CategoryVO | null>(null)
 
-// 显示删除确认框
 const showDeleteConfirm = (category: API.CategoryVO) => {
   selectedCategory.value = category
   deleteConfirmVisible.value = true
 }
 
-// 确认删除
 const confirmDelete = async () => {
   if (!selectedCategory.value?.id) return
-  
   try {
     const res = await deleteCategoryUsingPost({ categoryId: selectedCategory.value.id })
     if (res.data.code === 0) {
-      message.success('删除成功')
+      message.success(t('pages.admin.categoryManagePage.deleteSuccess'))
       deleteConfirmVisible.value = false
-      // 刷新数据
       getCategoryList()
     } else {
-      message.error('删除失败：' + res.data.message)
+      message.error(t('pages.admin.categoryManagePage.deleteFailedPrefix') + res.data.message)
     }
   } catch (error) {
-    message.error('删除失败，请稍后重试')
+    message.error(t('pages.admin.categoryManagePage.deleteError'))
   }
 }
 
 const showPageSizeSheet = ref(false)
-const jumpPage = ref('')
 
-// 移动端分页选项
-const pageSizeOptions = [
-  { name: '10条/页', value: 10 },
-  { name: '20条/页', value: 20 },
-  { name: '30条/页', value: 30 },
-  { name: '50条/页', value: 50 },
-]
-
-// 移动端分页处理方法
 const onMobilePageChange = (page: number) => {
   searchParams.current = page
   getCategoryList()
@@ -441,496 +455,229 @@ const onMobilePageChange = (page: number) => {
 const handlePageSizeChange = (action: { value: number }) => {
   searchParams.current = 1
   searchParams.pageSize = action.value
+  showPageSizeSheet.value = false
   getCategoryList()
 }
 
-// 处理页码跳转
-const handleJumpPage = () => {
-  const page = parseInt(jumpPage.value)
-  if (isNaN(page)) {
-    return
+const getTypeColor = (type: number) => {
+  switch (type) {
+    case 0: return 'blue'
+    case 1: return 'green'
+    case 2: return 'purple'
+    default: return 'gray'
   }
+}
 
-  const maxPage = Math.ceil(total.value / searchParams.pageSize)
-  if (page < 1 || page > maxPage) {
-    message.warning(`请输入1-${maxPage}之间的页码`)
-    return
+const getTypeText = (type: number) => {
+  switch (type) {
+    case 0: return t('pages.admin.categoryManagePage.picCategory')
+    case 1: return t('pages.admin.categoryManagePage.postCategory')
+    case 2: return t('pages.admin.categoryManagePage.audioCategory')
+    default: return t('pages.admin.categoryManagePage.unknownType')
   }
-
-  searchParams.current = page
-  getCategoryList()
-  jumpPage.value = ''
 }
 </script>
 
 <style scoped>
-/* 可以在这里添加页面的自定义样式 */
-.search-and-add-container {
+#yuemu-categoryManagePage {
+  height: 100%;
+  box-sizing: border-box;
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: var(--theme-transition);
+}
+.yuemu-text-secondary { color: var(--text-secondary); }
+
+/* ==================== PC 端样式 ==================== */
+.yuemu-pc-container {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.yuemu-header-panel {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px var(--shadow-color);
+  margin-bottom: 24px;
+  transition: var(--theme-transition);
+}
+
+.yuemu-header-main-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
+.yuemu-page-title { margin: 0; font-size: 24px; font-weight: 600; color: var(--text-primary); }
 
-.add-button-wrapper {
-  margin-left: 10px;
-}
+.yuemu-search-form { display: flex; align-items: center; flex-wrap: wrap; }
 
-.custom-button {
-  margin-left: 0;
+:deep(.yuemu-input), :deep(.ant-input-affix-wrapper) {
+  background-color: var(--background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  transition: var(--theme-transition);
 }
-.mz-antd-pagination {
-  text-align: right;
-  margin-top: 20px;
-}
+:deep(.yuemu-input input), :deep(.ant-input-affix-wrapper input) { background-color: transparent !important; color: var(--text-primary) !important; }
+:deep(.yuemu-input input::placeholder), :deep(.ant-input-affix-wrapper input::placeholder) { color: var(--text-secondary) !important; }
+:deep(.yuemu-input:focus-within), :deep(.ant-input-affix-wrapper-focused) { border-color: var(--link-color) !important; }
 
-/* PC端表格和分页容器样式 */
-.category-table {
-  margin-bottom: 16px;
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-}
-
-/* 按钮统一样式 */
-.action-button {
-  height: 32px;
-  border-radius: 8px;
-  padding: 0 16px;
+:deep(.yuemu-radio-group) {
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  color: white;
-  border: none;
-}
-
-/* 搜索按钮 */
-.search-button {
-  background: linear-gradient(135deg, #36cfc9 0%, #13c2c2 100%);
-  box-shadow: 0 4px 12px rgba(19, 194, 194, 0.2);
-}
-
-.search-button:hover {
-  background: linear-gradient(135deg, #40d9d4 0%, #36cfc9 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(19, 194, 194, 0.3);
-}
-
-/* 创建按钮 */
-.create-button {
-  background: linear-gradient(135deg, #40c9ff 0%, #1890ff 100%);
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
-}
-
-.create-button:hover {
-  background: linear-gradient(135deg, #69d4ff 0%, #40a9ff 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.3);
-}
-
-/* 表格按钮样式 */
-.table-button {
-  height: 28px;
-  border-radius: 6px;
-  padding: 0 12px;
-  font-size: 13px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  transition: all 0.3s ease;
-  color: white;
-}
-
-.table-button .anticon {
-  font-size: 14px;
-}
-
-/* 删除按钮 */
-.delete-button {
-  background: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
-}
-
-.delete-button:active {
-  background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
-  transform: translateY(1px);
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.1);
-}
-
-/* 删除按钮图标样式 */
-.delete-button :deep(.anticon) {
-  font-size: 14px;
-  transition: transform 0.3s ease;
-}
-
-.delete-button:active :deep(.anticon) {
-  transform: rotate(-15deg);
-}
-
-/* 移动端样式 */
-.mobile-container {
-  background: #f7f8fa;
-  min-height: 100vh;
-  padding-bottom: 50px;
-}
-
-.mobile-content {
-  padding: 12px;
-}
-
-.action-bar {
-  margin: 12px;
-}
-
-.add-button {
-  background: linear-gradient(135deg, #36cfc9 0%, #06b6d4 100%);
-  border: none;
+  background-color: var(--background);
+  padding: 4px;
   border-radius: 8px;
-  height: 36px;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
 }
-
-.add-button:active {
-  background: linear-gradient(135deg, #40d9d4, #0891b2);
-  transform: translateY(1px);
-  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.15);
-}
-
-/* 按钮图标样式 */
-.add-button :deep(.anticon) {
-  font-size: 16px;
-  margin-right: 4px;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-  100% {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-}
-
-.category-list {
-  padding: 0;
-}
-
-.category-group {
-  margin-bottom: 8px;
-}
-
-.category-card {
-  background: #fff;
-  width: 100%;
-}
-
-.card-title {
-  font-size: 16px;
+:deep(.yuemu-radio-group .ant-radio-button-wrapper) {
+  background-color: transparent;
+  border: none !important;
+  color: var(--text-secondary);
+  border-radius: 6px !important;
+  box-shadow: none !important;
   font-weight: 500;
-  color: #323233;
-  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+:deep(.yuemu-radio-group .ant-radio-button-wrapper::before) { display: none !important; }
+:deep(.yuemu-radio-group .ant-radio-button-wrapper-checked) {
+  background-color: var(--card-background) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 2px 8px var(--shadow-color) !important;
 }
 
-.card-info {
-  font-size: 14px;
-  color: #666;
+.yuemu-btn-primary { background-color: var(--link-color) !important; color: var(--text-other) !important; border: none !important; border-radius: 8px !important; font-weight: 500; transition: var(--theme-transition); }
+.yuemu-btn-primary:hover { background-color: var(--link-hover-color) !important; }
+.yuemu-btn-ghost { border-radius: 8px !important; border: 1px solid var(--border-color) !important; color: var(--text-primary) !important; background-color: transparent !important; transition: var(--theme-transition); }
+.yuemu-btn-ghost:hover { background-color: var(--hover-background) !important; }
+
+.yuemu-table-wrapper {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px var(--shadow-color);
+  transition: var(--theme-transition);
 }
 
-.info-item {
-  margin-bottom: 8px;
+:deep(.yuemu-table) {
+  .ant-table { background-color: transparent; color: var(--text-primary); }
+  .ant-table-thead > tr > th { background-color: transparent; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 500; }
+  .ant-table-tbody > tr > td { border-bottom: 1px solid var(--border-color); padding: 16px; color: var(--text-primary); transition: var(--theme-transition); }
+  .ant-table-tbody > tr:hover > td { background-color: var(--hover-background) !important; }
 }
 
-.info-item .label {
-  color: #999;
-  margin-right: 8px;
+.yuemu-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid transparent;
 }
+.yuemu-tag.yuemu-mini { padding: 2px 8px; font-size: 11px; }
+.yuemu-tag.yuemu-type-blue { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border-color: rgba(59, 130, 246, 0.2); }
+.yuemu-tag.yuemu-type-green { background-color: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
+.yuemu-tag.yuemu-type-purple { background-color: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.2); }
 
-.info-item .value {
-  color: #323233;
-}
+.yuemu-mac-action-buttons { display: flex; justify-content: flex-end; gap: 4px; }
+.yuemu-btn-text-red { color: var(--comment-delete-hover-color) !important; }
 
-.card-footer {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
+.yuemu-pagination { margin-top: 24px; display: flex; justify-content: flex-end; }
+:deep(.ant-pagination-item) { background-color: transparent; border-color: var(--border-color); }
+:deep(.ant-pagination-item-active) { background-color: var(--hover-background); border-color: var(--link-color); }
 
-/* 分页样式 */
-.mobile-pagination {
-  margin-top: 16px;
-  padding: 12px;
-  background: white;
-  border-radius: 8px;
-}
-.search-section {
-  position: sticky;
-  top: 0; /* 调整搜索栏的粘性定位位置 */
-  z-index: 100;
-  background: #f7f8fa;
-  /* 抵消父元素的内边距 */
-  margin: 0 -12px 12px;
-}
-
-.pagination-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  color: #666;
-  font-size: 13px;
-}
-
-.page-size-selector {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border: 1px solid #ebedf0;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-}
-
-.pagination-wrapper {
+/* ==================== 移动端样式 ==================== */
+.yuemu-mobile-container {
+  height: 100%;
+  background-color: var(--background);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
 }
 
-/* 跳转页码样式 */
-.jump-page {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: #666;
+.yuemu-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--header-background);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 16px 16px 8px;
+}
+.yuemu-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.yuemu-btn-icon { background-color: var(--link-color) !important; border: none !important; width: 32px; height: 32px; }
+
+.yuemu-mobile-tabs-wrapper { margin: 0 -16px 12px; }
+:deep(.yuemu-van-tabs .van-tabs__nav) { background-color: transparent; }
+:deep(.yuemu-van-tabs .van-tab--active) { color: var(--text-primary); font-weight: 600; }
+:deep(.yuemu-van-tabs .van-tabs__line) { background-color: var(--link-color); bottom: 20px; width: 24px; }
+
+.yuemu-search-bar-wrapper { margin-bottom: 4px; }
+:deep(.yuemu-search) { padding: 0 !important; background-color: transparent !important; }
+:deep(.yuemu-search .van-search__content) { background-color: var(--hover-background); border: 1px solid var(--border-color); }
+
+.yuemu-mobile-content-scroll { flex: 1; padding: 12px 16px 32px; overflow-y: auto; }
+.yuemu-card-list { display: flex; flex-direction: column; gap: 16px; }
+
+.yuemu-category-card {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  transition: var(--theme-transition);
 }
 
-.jump-page :deep(.van-field) {
-  width: 48px;
-  padding: 0;
+.yuemu-card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.yuemu-main-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.yuemu-title-row { display: flex; align-items: center; justify-content: space-between; }
+.yuemu-category-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+.yuemu-meta-row { display: flex; justify-content: space-between; font-size: 13px; }
+
+.yuemu-card-actions {
+  display: flex; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 12px;
 }
-
-.jump-page :deep(.van-field__control) {
-  height: 28px;
-  padding: 0 4px;
-  text-align: center;
-  border: 1px solid #ebedf0;
-  border-radius: 4px;
-  font-size: 13px;
+.yuemu-action-btn {
+  flex: 1; padding: 8px 0; border-radius: 8px; border: 1px solid var(--border-color);
+  font-size: 13px; font-weight: 500; background-color: var(--card-background); color: var(--text-primary);
 }
+.yuemu-action-btn.yuemu-danger { color: var(--comment-delete-hover-color); }
 
-/* 隐藏输入框的上下箭头 */
-.jump-page :deep(.van-field__control::-webkit-inner-spin-button),
-.jump-page :deep(.van-field__control::-webkit-outer-spin-button) {
-  -webkit-appearance: none;
-  margin: 0;
+.yuemu-mobile-pagination { margin-top: 24px; }
+.yuemu-page-info { display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 12px; margin-bottom: 12px; }
+.yuemu-page-size-trigger { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background-color: var(--hover-background); border-radius: 12px; color: var(--link-color); border: 1px solid var(--border-color); }
+:deep(.yuemu-van-pagination .van-pagination__item--active) { background-color: var(--link-color); color: var(--text-other); }
+
+:deep(.yuemu-action-sheet) { background-color: var(--card-background); color: var(--text-primary); }
+:deep(.yuemu-action-sheet .van-action-sheet__item) { background-color: var(--card-background); color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+
+/* ==================== 统一弹窗 ==================== */
+:deep(.yuemu-modal .ant-modal-content), :deep(.yuemu-confirm-modal .ant-modal-content) {
+  background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 16px; padding: 0;
 }
+:deep(.yuemu-modal .ant-modal-header) { background-color: var(--card-background); border-bottom: 1px solid var(--border-color); }
 
-.jump-page :deep(.van-field__control) {
-  -moz-appearance: textfield;
-}
+.yuemu-form .yuemu-form-item { margin-bottom: 16px; }
+.yuemu-form label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
+.yuemu-form .yuemu-required { color: var(--comment-delete-hover-color); }
+.yuemu-modal-footer { display: flex; gap: 12px; margin-top: 24px; }
 
-/* 分页器样式优化 */
-:deep(.custom-pagination) {
-  .van-pagination__item {
-    min-width: 28px;
-    height: 28px;
-    line-height: 28px;
-    border-radius: 16px;
-    font-size: 14px;
-    border: 1px solid #ebedf0;
-    margin: 0 2px;
-  }
+:deep(.yuemu-van-dialog) { background-color: var(--card-background) !important; color: var(--text-primary) !important; }
+:deep(.yuemu-van-form .van-cell) { background-color: var(--background); color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
 
-  .van-pagination__item--active {
-    background: #1989fa;
-    color: white;
-    border-color: #1989fa;
-  }
+.yuemu-confirm-content { text-align: center; padding-top: 10px; }
+.yuemu-icon-wrap { font-size: 44px; color: var(--comment-delete-hover-color); margin-bottom: 12px; }
+.yuemu-confirm-title { font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+.yuemu-confirm-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.4; }
 
-  .van-pagination__prev,
-  .van-pagination__next {
-    background: #f7f8fa;
-    border: 1px solid #ebedf0;
-    font-weight: bold;
-    min-width: 28px !important;
-    height: 28px !important;
-    line-height: 28px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .van-icon {
-    font-size: 14px;
-    color: #666;
-  }
-}
-
-/* 按钮激活状态 */
-.action-button:active,
-.table-button:active,
-:deep(.van-button:active) {
-  transform: translateY(0);
-  opacity: 0.9;
-}
-
-.mobile-button {
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  height: 28px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.3s ease;
-}
-
-/* 删除确认弹框样式 */
-:deep(.delete-confirm-modal) {
-  .ant-modal-content {
-    padding: 0;
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  .ant-modal-body {
-    padding: 0;
-  }
-}
-
-.delete-confirm-content {
-  padding: 32px 24px;
-  text-align: center;
-}
-
-.warning-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-
-  .anticon {
-    animation: pulse 2s infinite;
-  }
-}
-
-.confirm-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 12px;
-}
-
-.confirm-desc {
-  font-size: 14px;
-  color: #64748b;
-  margin-bottom: 24px;
-  line-height: 1.6;
-}
-
-.confirm-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.cancel-button {
-  min-width: 100px;
-  height: 38px;
-  border-radius: 19px;
-  border: 1px solid #e2e8f0;
-  color: #64748b;
-  font-size: 14px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    color: #1a1a1a;
-    border-color: #94a3b8;
-    background: #f8fafc;
-  }
-}
-
-.confirm-button {
-  min-width: 100px;
-  height: 38px;
-  border-radius: 19px;
-  background: #ff6b6b;
-  border: none;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: #ff5252;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
-  }
-
-  &:active {
-    transform: translateY(1px);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* 移动端适配 */
-@media screen and (max-width: 768px) {
-  .delete-confirm-content {
-    padding: 24px 16px;
-  }
-
-  .warning-icon {
-    font-size: 40px;
-  }
-
-  .confirm-title {
-    font-size: 16px;
-  }
-
-  .confirm-desc {
-    font-size: 13px;
-  }
-
-  .confirm-actions {
-    gap: 8px;
-  }
-
-  .cancel-button,
-  .confirm-button {
-    min-width: 90px;
-    height: 36px;
-    font-size: 13px;
-  }
-}
+.yuemu-confirm-actions { display: flex; border-top: 1px solid var(--border-color); margin: 0 -24px -24px; }
+.yuemu-confirm-actions button { flex: 1; background-color: transparent; border: none; height: 50px; font-size: 16px; font-weight: 500; cursor: pointer; }
+.yuemu-cancel-btn { color: var(--text-primary); border-right: 1px solid var(--border-color) !important; }
+.yuemu-danger-btn { color: var(--comment-delete-hover-color); font-weight: 600 !important; }
 </style>

@@ -1,0 +1,20 @@
+export default {
+  "randomLabel": "Random",
+  "modelRT2026": "Model: RT-2026",
+  "highEntropyGenerator": "High Entropy Random Signal Generator",
+  "systemReadyMsg": ">> System Ready",
+  "readingDatabase": ">> Reading database...",
+  "calculating": "Calculating",
+  "standbyText": "Standby",
+  "modeSwitch": "Mode Switch",
+  "paramSetting": "Param Setting",
+  "upperLimit": "Upper Limit:",
+  "startCalc": "Start",
+  "pressForRandomCalc": "Press for random calculation",
+  "logLine": "Log_{time}: Result = {result}",
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode",
+  "singleGen": "Single Generation",
+  "listDraw": "List Draw",
+  "zhangSan": "Zhang San"
+};

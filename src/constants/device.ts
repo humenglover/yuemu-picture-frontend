@@ -1,19 +1,19 @@
-// 设备类型枚举
+import i18n from '@/locales';
+const t = i18n.global.t;
+
 export const DEVICE_TYPE_ENUM = {
   MOBILE: 'mobile',
   PC: 'pc'
 } as const;
 
-// 设备类型文本映射，用于将枚举值对应到更友好的文本描述
 export const DEVICE_TYPE_MAP: Record<string, string> = {
-  'mobile':'移动端',
-  'pc': '电脑端'
+  get 'mobile'() { return t('constants.device.mobile') },
+  get 'pc'() { return t('constants.device.pc') }
 };
 
-// 设备类型选项映射，可用于生成下拉选项等场景（类似之前空间级别选项映射的形式）
 export const DEVICE_TYPE_OPTIONS = Object.keys(DEVICE_TYPE_MAP).map((key) => {
   return {
-    label: DEVICE_TYPE_MAP[key],
+    get label() { return DEVICE_TYPE_MAP[key] },
     value: key
   };
 });

@@ -1,0 +1,20 @@
+export default {
+    title: 'AI Outpainting',
+    originalImage: 'Original Image',
+    noOriginalImage: 'No Original Image',
+    resultImage: 'Result Image',
+    generating: 'Generating...',
+    aiGenerating: 'AI is expanding the canvas...',
+    clickToStart: 'Click the button below to start',
+    aiGeneratingBtn: 'AI is generating...',
+    startOutPainting: 'Start Outpainting',
+    applying: 'Applying and saving...',
+    applyResult: 'Apply this result',
+    taskSubmitted: 'Task submitted, please wait...',
+    taskFailed: 'Image task failed: ',
+    outPaintingSuccess: 'AI Outpainting completed!',
+    outPaintingFailedRetry: 'Outpainting task failed, please try again',
+    pollingFailed: 'Task polling failed: ',
+    applySuccess: 'Result applied successfully!',
+    applyFailed: 'Failed to apply: '
+};

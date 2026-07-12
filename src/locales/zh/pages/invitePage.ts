@@ -1,0 +1,20 @@
+export default {
+  title: '邀请计划',
+  myCode: '我的专属邀请码',
+  copyLink: '复制链接',
+  generating: '生成中...',
+  loadFailRetry: '加载失败，点击重试',
+  inviteDesc: '分享链接给好友，好友注册成功即刻解锁会员特权。',
+  inviteDetails: '邀请明细',
+  leaderboard: '排行榜',
+  emptyInvite: '暂无邀请记录，快去邀请好友吧！',
+  unknownUser: '未知用户',
+  valid: '有效',
+  invalid: '无效',
+  emptyRank: '暂无排行数据',
+  people: ' 人',
+  loading: '加载中...',
+  noMore: '- 已经到底啦 -',
+  copySuccess: '邀请链接已复制，快去分享给好友吧！',
+  errGetCode: '获取邀请码失败'
+};

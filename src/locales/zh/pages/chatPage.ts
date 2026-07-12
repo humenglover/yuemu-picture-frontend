@@ -1,0 +1,22 @@
+export default {
+  back: '返回',
+  allGroup: '全员群',
+  onlineNow: '当前在线',
+  offline: '离线',
+  groupNotice: '群公告',
+  onlineUsers: '在线用户',
+  loadingHistory: '正在追溯聊天记忆...',
+  noOtherOnline: '暂无其他在线用户',
+  noticeTitle: '悦木群公告',
+  noticeSubtitle: '欢迎来到悦木交流空间！',
+  noticeContent1: '为了营造良好的交流环境，请大家：',
+  noticeContent2: '文明用语，互相尊重，友善交流；',
+  noticeContent3: '鼓励分享高质量的图片和创意想法；',
+  noticeContent4: '严禁发布违法违规、低俗、广告等不良内容；',
+  noticeContent5: '共同维护社区氛围，发现违规请及时举报。',
+  understood: '我已了解',
+  understoodDesc: '点击后自动关闭弹窗',
+  admin: '管理员',
+  member: '成员',
+  chatError: '聊天错误：{msg}'
+};

@@ -1,0 +1,22 @@
+export default {
+  back: 'Back',
+  allGroup: 'Global',
+  onlineNow: 'Online',
+  offline: 'Offline',
+  groupNotice: 'Group Notice',
+  onlineUsers: 'Online Users',
+  loadingHistory: 'Retrieving chat memories...',
+  noOtherOnline: 'No other online users',
+  noticeTitle: 'Yuemu Group Notice',
+  noticeSubtitle: 'Welcome to Yuemu Chat Space!',
+  noticeContent1: 'To create a good communication environment, please:',
+  noticeContent2: 'Use civilized language, respect each other, and communicate friendly;',
+  noticeContent3: 'Encourage sharing high-quality pictures and creative ideas;',
+  noticeContent4: 'Strictly prohibit publishing illegal, vulgar, advertising and other harmful contents;',
+  noticeContent5: 'Jointly maintain the community atmosphere, report violations in time.',
+  understood: 'I Understand',
+  understoodDesc: 'Click to close the popup',
+  admin: 'Admin',
+  member: 'Member',
+  chatError: 'Chat Error: {msg}'
+};

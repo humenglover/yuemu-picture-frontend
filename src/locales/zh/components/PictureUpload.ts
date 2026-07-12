@@ -1,0 +1,20 @@
+export default {
+  "processing": "正在处理中...",
+  "clickToChange": "点击更换一张",
+  "uploadingPleaseWait": "正在上传中，请稍候...",
+  "processFileFailedRetry": "处理文件失败，请重试",
+  "pleaseSelectPictureFile": "请选择图片文件",
+  "pictureSizeExceedsLimit": "图片大小不能超过20MB",
+  "pictureTooLarge": "图片过大，可能会影响加载速度",
+  "uploadIllustration": "上传插图",
+  "clickToUploadAmazing": "点击上传精彩",
+  "clickOrDragToUpload": "点击或拖拽上传图片",
+  "cannotCreateCanvas": "无法创建canvas上下文",
+  "imageCompressFailed": "图片压缩失败",
+  "imageLoadFailed": "图片加载失败",
+  "fileReadFailed": "文件读取失败",
+  "uploadFailedWithColon": "图片上传失败：",
+  "checkFormatAndSize": "请检查图片格式和大小",
+  "uploadFailedWithColon2": "上传失败：",
+  "pleaseTryAgainLater": "请稍后重试"
+};

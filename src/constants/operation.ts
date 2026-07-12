@@ -1,21 +1,20 @@
-// 操作枚举类对应的前端常量（定义不同操作对应的数值）
+import i18n from '@/locales';
+const t = i18n.global.t;
+
 export const OPERATION_ENUM = {
   DELETE: 0,
   APPROVE: 1,
   REJECT: 2
 };
 
-// 操作对应的文案映射（将数值映射到对应的文字描述）
 export const OPERATION_MAP = {
-  0: '删除',
-  1: '通过',
-  2: '拒绝'
+  get 0() { return t('constants.operation.delete') },
+  get 1() { return t('constants.operation.approve') },
+  get 2() { return t('constants.operation.reject') }
 };
 
-// 操作下拉表单选项（根据文案映射生成适合下拉框使用的选项数组）
-export const OPERATION_OPTIONS = Object.keys(OPERATION_MAP).map((key) => {
-  return {
-    label: OPERATION_MAP[key],
-    value: key
-  };
-});
+export const OPERATION_OPTIONS = [
+  { get label() { return OPERATION_MAP[0] }, value: 0 },
+  { get label() { return OPERATION_MAP[1] }, value: 1 },
+  { get label() { return OPERATION_MAP[2] }, value: 2 }
+];

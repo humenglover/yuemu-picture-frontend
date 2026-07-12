@@ -1,0 +1,20 @@
+export default {
+  "tacticalRadarT13": "战术测距雷达 // T-13",
+  "trackingStatus": "追踪状态",
+  "realTimeCoordinates": ">> 实时坐标",
+  "mouseX": "横轴(X): {x} px",
+  "mouseY": "纵轴(Y): {y} px",
+  "measurementData": ">> 测量数据",
+  "startXY": "起点 X: {x} | Y: {y}",
+  "distanceStr": "直线距离: {d} px",
+  "clickSetStartPoint": "[ 点击或触摸屏幕设定测量起点 ]",
+  "gridDensity": "网格密度",
+  "high": "高",
+  "medium": "中",
+  "low": "低",
+  "radarScan": "雷达扫描",
+  "measurementCommand": "测量指令",
+  "dataReset": "数据重置",
+  "running": "运行中",
+  "closed": "已关闭"
+};

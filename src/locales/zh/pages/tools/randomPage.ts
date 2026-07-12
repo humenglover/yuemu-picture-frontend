@@ -1,0 +1,20 @@
+export default {
+  "randomLabel": "随机",
+  "modelRT2026": "型号：RT-2026",
+  "highEntropyGenerator": "高熵随机信号发生器",
+  "systemReadyMsg": ">> 系统就绪",
+  "readingDatabase": ">> 正在读取数据库...",
+  "calculating": "演算中",
+  "standbyText": "待机",
+  "modeSwitch": "模式切换",
+  "paramSetting": "参数设定",
+  "upperLimit": "上限：",
+  "startCalc": "启动",
+  "pressForRandomCalc": "按此进行随机演算",
+  "logLine": "记录_{time}: 结果 = {result}",
+  "darkMode": "深色模式",
+  "lightMode": "浅色模式",
+  "singleGen": "单数生成",
+  "listDraw": "名单抽选",
+  "zhangSan": "张三"
+};

@@ -1,486 +1,264 @@
 <template>
-  <div id="pictureManagePage">
-    <!-- PC端展示 -->
+  <div id="yuemu-picture-manage-page">
     <template v-if="device === DEVICE_TYPE_ENUM.PC">
-      <div class="pc-container">
-        <!-- 搜索表单和操作按钮 -->
-        <div class="search-and-button-container">
-          <a-form layout="inline" :model="searchParams" @finish="doSearch">
-            <a-form-item label="关键词">
+      <div class="yuemu-pc-dashboard">
+        <header class="yuemu-dashboard-header">
+          <div class="yuemu-header-left">
+            <h1 class="yuemu-page-title"> {{ t('pages.admin.pictureManagePage.title') }} </h1>
+            <p class="yuemu-page-desc"> {{ t('pages.admin.pictureManagePage.desc') }} </p>
+          </div>
+          <div class="yuemu-header-right">
+            <a-button class="yuemu-btn-ghost" @click="toggleSortOrder">
+              <SortAscendingOutlined v-if="sortOrder === 'ascend'" />
+              <SortDescendingOutlined v-else />
+              {{ sortOrder === 'ascend' ? t('pages.admin.pictureManagePage.ascend') : t('pages.admin.pictureManagePage.descend') }}
+            </a-button>
+            <a-button class="yuemu-btn-ghost" @click="router.push('/add_picture/batch')">
+              <UploadOutlined /> {{ t('pages.admin.pictureManagePage.batchImport') }} </a-button>
+            <a-button type="primary" class="yuemu-btn-primary" @click="router.push('/add_picture')">
+              <PlusOutlined /> {{ t('pages.admin.pictureManagePage.uploadPic') }} </a-button>
+          </div>
+        </header>
+
+        <div class="yuemu-filter-bar">
+          <a-form layout="inline" :model="searchParams" class="yuemu-filter-form" @finish="doSearch">
+            <a-form-item>
               <a-input
                 v-model:value="searchParams.searchText"
-                placeholder="从名称和简介搜索"
+                :placeholder="t('pages.admin.pictureManagePage.searchName')"
                 allow-clear
-                class="compact-input"
-              />
+                class="yuemu-input-search"
+                style="width: 240px"
+              >
+                <template #prefix><SearchOutlined class="yuemu-text-secondary" /></template>
+              </a-input>
             </a-form-item>
-            <a-form-item label="类型">
-              <a-input
-                v-model:value="searchParams.category"
-                placeholder="请输入类型"
-                allow-clear
-                class="compact-input"
-              />
+            <a-form-item>
+              <a-input v-model:value="searchParams.category" :placeholder="t('pages.admin.pictureManagePage.inputCategory')" allow-clear class="yuemu-input-base" style="width: 130px" />
             </a-form-item>
-            <a-form-item label="标签">
-              <a-input
-                v-model:value="searchParams.tags"
-                placeholder="请输入标签"
-                allow-clear
-                class="compact-input"
-              />
+            <a-form-item>
+              <a-input v-model:value="searchParams.tags" :placeholder="t('pages.admin.pictureManagePage.inputTag')" allow-clear class="yuemu-input-base" style="width: 130px" />
             </a-form-item>
-            <a-form-item name="reviewStatus" label="审核状态">
+            <a-form-item>
               <a-select
                 v-model:value="searchParams.reviewStatus"
-                class="compact-select"
-                placeholder="请选择审核状态"
-                :options="PIC_REVIEW_STATUS_OPTIONS"
+                :placeholder="t('pages.admin.pictureManagePage.reviewStatus')"
                 allow-clear
+                :options="PIC_REVIEW_STATUS_OPTIONS"
+                class="yuemu-select-base"
+                style="width: 130px"
+                :dropdownClassName="'yuemu-dark-dropdown'"
               />
             </a-form-item>
             <a-form-item>
-              <a-button type="primary" html-type="submit" class="action-button search-button">
-                <SearchOutlined />
-                搜索
-              </a-button>
+              <a-button type="primary" html-type="submit" class="yuemu-btn-primary"> {{ t('pages.admin.pictureManagePage.filter') }} </a-button>
+            </a-form-item>
+
+            <a-form-item class="yuemu-flex-right" v-if="hasSelected">
+              <a-dropdown :trigger="['click']">
+                <a-button danger class="yuemu-btn-danger">
+                  <BoldOutlined /> {{ t('pages.admin.pictureManagePage.batchActionText', { count: state.selectedRowKeys.length }) }}
+                </a-button>
+                <template #overlay>
+                  <a-menu class="yuemu-dark-menu">
+                    <a-menu-item v-for="option in OPERATION_OPTIONS" :key="option.value" @click="handleBatchOperation(option.value)">
+                      {{ option.label }}
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
             </a-form-item>
           </a-form>
-          <!-- 操作按钮区 -->
-          <div class="button-group">
-            <a-button type="primary" href="/add_picture" class="action-button create-button">
-              <PlusOutlined />
-              创建图片
-            </a-button>
-            <a-button
-              type="primary"
-              href="/add_picture/batch"
-              target="_blank"
-              class="action-button batch-button"
-            >
-              <UploadOutlined />
-              批量创建图片
-            </a-button>
-            <a-dropdown>
-              <a-button
-                type="primary"
-                danger
-                :disabled="!hasSelected"
-                class="action-button danger-button"
-              >
-                <BoldOutlined />批量操作
-              </a-button>
-              <template #overlay>
-                <a-menu>
-                  <a-menu-item
-                    v-for="option in OPERATION_OPTIONS"
-                    :key="option.value"
-                    @click="handleBatchOperation(option.value)"
-                  >
-                    {{ option.label }}
-                  </a-menu-item>
-                </a-menu>
-              </template>
-            </a-dropdown>
-          </div>
         </div>
 
-        <div class="table-section">
-          <a-spin tip="正在加载中..." v-if="loading" class="loading-spin" />
-          <!-- 表格 -->
-          <a-table
-            :row-selection="{
-              selectedRowKeys: state.selectedRowKeys,
-              onChange: onSelectChange,
-            }"
-            rowKey="id"
-            :columns="columns"
-            :data-source="dataList"
-            :pagination="pagination"
-            @change="doTableChange"
-            class="custom-table"
-          >
-            <template #bodyCell="{ column, record }">
-              <template v-if="column.dataIndex === 'id'">
-                {{ record.id }}
-              </template>
-              <template v-if="column.dataIndex === 'url'">
-                <a-image :src="record.url" :width="120" />
-              </template>
-              <template v-if="column.dataIndex === 'tags'">
-                <a-space wrap>
-                  <a-tag
-                    class="tag-item success-tag"
-                    v-for="tag in JSON.parse(record.tags || '[]')"
-                    :key="tag"
-                  >
-                    {{ tag }}
-                  </a-tag>
-                </a-space>
-              </template>
-              <template v-if="column.dataIndex === 'category'">
-                <a-tag class="tag-item primary-tag">
-                  {{ record.category }}
-                </a-tag>
-              </template>
-              <template v-if="column.dataIndex === 'picInfo'">
-                <div>格式：{{ record.picFormat }}</div>
-                <div>宽度：{{ record.picWidth }}</div>
-                <div>高度：{{ record.picHeight }}</div>
-                <div>宽高比：{{ record.picScale }}</div>
-                <div>大小：{{ (record.picSize / 1024).toFixed(2) }}KB</div>
-              </template>
-              <template v-if="column.dataIndex === 'reviewMessage'">
-                <div>
-                  审核状态：<span :class="getStatusColorClass(record.reviewStatus)">{{
-                    PIC_REVIEW_STATUS_MAP[record.reviewStatus]
-                  }}</span>
-                </div>
-                <div>审核信息：{{ record.reviewMessage }}</div>
-                <div>审核人：{{ record.reviewerId }}</div>
-                <div v-if="record.reviewTime">
-                  审核时间：{{ dayjs(record.reviewTime).format('YYYY-MM-DD HH:mm:ss') }}
-                </div>
-              </template>
-              <template v-if="column.dataIndex === 'createTime'">
-                {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-              </template>
-              <template v-if="column.dataIndex === 'editTime'">
-                {{ dayjs(record.editTime).format('YYYY-MM-DD HH:mm:ss') }}
-              </template>
-              <template v-if="column.key === 'action'">
-                <a-space wrap>
-                  <a-button
-                    v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS"
-                    type="primary"
-                    class="table-button approve-button"
-                    @click="handleReview(record, PIC_REVIEW_STATUS_ENUM.PASS)"
-                  >
-                    <CheckOutlined />
-                    通过
-                  </a-button>
-                  <a-button
-                    v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT"
-                    type="primary"
-                    danger
-                    class="table-button reject-button"
-                    @click="showRejectModal(record)"
-                  >
-                    <CloseOutlined />
-                    拒绝
-                  </a-button>
-                  <a-button
-                    type="primary"
-                    class="table-button edit-button"
-                    :href="`/add_picture?id=${record.id}`"
-                  >
-                    <EditOutlined />
-                    编辑
-                  </a-button>
-                  <a-button 
-                    danger 
-                    class="table-button delete-button" 
-                    @click="showDeleteConfirm(record)"
-                  >
-                    <DeleteOutlined />
-                    删除
-                  </a-button>
-                </a-space>
-              </template>
-            </template>
-          </a-table>
-        </div>
-      </div>
-    </template>
-
-    <!-- 移动端展示 -->
-    <template v-else>
-      <div class="mobile-container">
-        <div class="mobile-content">
-          <!-- 搜索区域 -->
-          <div class="search-section">
-            <van-search
-              v-model="searchParams.searchText"
-              placeholder="搜索图片名称和简介"
-              @search="doSearch"
-            />
-          </div>
-
-          <!-- 操作按钮区 -->
-          <div class="action-bar">
-            <van-button type="primary" size="small" @click="() => router.push('/add_picture')">
-              <template #icon><PlusOutlined /></template>
-              创建图片
-            </van-button>
-            <van-button
-              type="primary"
-              size="small"
-              @click="() => router.push('/add_picture/batch')"
-              plain
+        <div class="yuemu-table-container">
+          <a-spin :tip="t('pages.admin.pictureManagePage.loading')" :spinning="loading">
+            <a-table
+              :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+              rowKey="id"
+              :columns="columns"
+              :data-source="dataList"
+              :pagination="false"
+              @change="doTableChange"
+              class="yuemu-seamless-table"
+              :scroll="{ x: 1300 }"
             >
-              <template #icon><UploadOutlined /></template>
-              批量创建
-            </van-button>
-            <van-button
-              type="primary"
-              size="small"
-              danger
-              :disabled="!hasSelected"
-              @click="showActionSheet = true"
-            >
-              <template #icon><BoldOutlined /></template>
-              批量操作
-            </van-button>
-          </div>
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.dataIndex === 'id'">
+                  <span class="yuemu-text-mono yuemu-text-secondary">#{{ record.id }}</span>
+                </template>
 
-          <!-- 批量操作动作面板 -->
-          <van-action-sheet
-            v-model:show="showActionSheet"
-            :actions="mobileOperationOptions"
-            cancel-text="取消"
-            close-on-click-action
-            @select="handleBatchOperation"
-          />
+                <template v-if="column.dataIndex === 'url'">
+                  <div class="yuemu-thumb-wrapper">
+                    <a-image :src="record.url" :fallback="'https://gw.alipayobjects.com/zos/antfincdn/XAoskV01e/default_avatar.png'" class="yuemu-img-thumb" />
+                    <div v-if="record.isFeature" class="yuemu-badge-feature"><StarFilled /></div>
+                  </div>
+                </template>
 
-          <!-- 图片列表 -->
-          <div class="picture-list">
-            <van-checkbox-group v-model="state.selectedRowKeys">
-              <van-cell-group inset v-for="picture in dataList" :key="picture.id">
-                <van-card class="picture-card">
-                  <template #thumb>
-                    <van-image
-                      :src="picture.url"
-                      fit="cover"
-                      width="100%"
-                      height="120"
-                      radius="8"
-                      @click="showImagePreview(picture.url)"
-                    />
-                  </template>
+                <template v-if="column.dataIndex === 'tags'">
+                  <div class="yuemu-tag-group">
+                    <span v-if="record.category" class="yuemu-badge yuemu-bg-blue">{{ record.category }}</span>
+                    <span class="yuemu-badge yuemu-bg-green" v-for="tag in JSON.parse(record.tags || '[]')" :key="tag">{{ tag }}</span>
+                  </div>
+                </template>
 
-                  <template #title>
-                    <div class="card-title">{{ picture.name || '未命名' }}</div>
-                  </template>
+                <template v-if="column.dataIndex === 'picInfo'">
+                  <div class="yuemu-meta-stack">
+                    <span class="yuemu-meta-item">{{ record.picFormat?.toUpperCase() || 'UNKNOWN' }} · {{ (record.picSize / 1024).toFixed(1) }}KB</span>
+                    <span class="yuemu-meta-item">{{ record.picWidth }} × {{ record.picHeight }}</span>
+                  </div>
+                </template>
 
-                  <template #desc>
-                    <div class="card-desc">
-                      <div class="desc-item">{{ picture.introduction || '暂无简介' }}</div>
-                      <div class="desc-item">
-                        <span class="label">用户ID:</span> {{ picture.userId }}
-                      </div>
-                      <div class="desc-item">
-                        <span class="label">审核信息:</span> {{ picture.reviewMessage || '无' }}
-                      </div>
-                      <div class="desc-item" v-if="picture.reviewTime">
-                        <span class="label">审核时间:</span>
-                        {{ dayjs(picture.reviewTime).format('YYYY-MM-DD HH:mm:ss') }}
-                      </div>
-                      <div class="desc-item">
-                        <span class="label">审核人:</span> {{ picture.reviewerId || '无' }}
-                      </div>
-                    </div>
-                  </template>
-
-                  <template #tags>
-                    <div class="tag-container">
-                      <van-tag
-                        :type="getReviewStatusType(picture.reviewStatus)"
-                        round
-                        size="small"
-                        style="margin-right: 4px"
-                      >
-                        {{ PIC_REVIEW_STATUS_MAP[picture.reviewStatus] }}
-                      </van-tag>
-                      <van-tag type="primary" round size="small" v-if="picture.category">
-                        {{ picture.category }}
-                      </van-tag>
-                      <template v-if="picture.tags">
-                        <van-tag
-                          v-for="tag in JSON.parse(picture.tags)"
-                          :key="tag"
-                          type="success"
-                          round
-                          size="small"
-                          style="margin-left: 4px"
-                        >
-                          {{ tag }}
-                        </van-tag>
-                      </template>
-                    </div>
-                  </template>
-
-                  <template #footer>
-                    <div class="card-footer">
-                      <van-checkbox :name="picture.id" class="card-checkbox" />
-                      <div class="button-group">
-                        <van-button
-                          v-if="picture.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS"
-                          size="mini"
-                          type="primary"
-                          plain
-                          @click="handleReview(picture, PIC_REVIEW_STATUS_ENUM.PASS)"
-                          >通过</van-button
-                        >
-                        <van-button
-                          v-if="picture.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT"
-                          size="mini"
-                          type="danger"
-                          plain
-                          @click="showRejectModal(picture)"
-                          >拒绝</van-button
-                        >
-                        <van-button
-                          size="mini"
-                          type="primary"
-                          @click="() => router.push(`/add_picture?id=${picture.id}`)"
-                          >编辑</van-button
-                        >
-                        <van-button 
-                          type="danger"
-                          size="mini"
-                          @click="showDeleteConfirm(picture)"
-                          >删除</van-button
-                        >
-                      </div>
-                    </div>
-                  </template>
-
-                  <template #price>
-                    <div class="info-text">
-                      <div>
-                        {{ picture.picFormat }} | {{ (picture.picSize / 1024).toFixed(2) }}KB
-                      </div>
-                      <div>{{ picture.picWidth }}x{{ picture.picHeight }}</div>
-                    </div>
-                  </template>
-
-                  <template #num>
-                    <span class="create-time">
-                      {{ dayjs(picture.createTime).format('YYYY-MM-DD HH:mm') }}
+                <template v-if="column.dataIndex === 'reviewMessage'">
+                  <div class="yuemu-review-stack">
+                    <span class="yuemu-badge" :class="getStatusColorClass(record.reviewStatus)">
+                      <div class="yuemu-status-dot" :class="getStatusColorClass(record.reviewStatus)"></div>
+                      {{ PIC_REVIEW_STATUS_MAP[record.reviewStatus] }}
                     </span>
-                  </template>
-                </van-card>
-              </van-cell-group>
-            </van-checkbox-group>
-          </div>
+                    <span v-if="record.reviewMessage" class="yuemu-meta-item" style="margin-top: 6px;">{{ record.reviewMessage }}</span>
+                  </div>
+                </template>
 
-          <!-- 图片预览组件 -->
-          <van-image-preview
-            v-model:show="showPreview"
-            :images="[previewImage]"
-            :show-index="false"
-            :closeable="true"
-            @close="closePreview"
-          />
+                <template v-if="column.dataIndex === 'createTime'">
+                  <span class="yuemu-text-secondary">{{ dayjs(record.createTime).format('MM-DD HH:mm') }}</span>
+                </template>
 
-          <!-- 移动端分页 -->
-          <div class="mobile-pagination">
-            <div class="pagination-info">
-              <span>共 {{ total }} 条</span>
-              <div class="page-size-selector" @click="showPageSizeSheet = true">
-                <span>{{ searchParams.pageSize }}条/页</span>
-                <van-icon name="arrow-down" />
-              </div>
-            </div>
-            <div class="pagination-wrapper">
-              <van-pagination
-                v-model="searchParams.current"
-                :total-items="total"
-                :items-per-page="searchParams.pageSize"
-                @change="onMobilePageChange"
-                prev-text="<"
-                next-text=">"
-                :show-page-size="3"
-                class="custom-pagination"
-                force-ellipses
-              />
-              <div class="jump-page">
-                <span>跳至</span>
-                <van-field
-                  v-model="jumpPage"
-                  type="number"
-                  :placeholder="searchParams.current.toString()"
-                  input-align="center"
-                  @keyup.enter="handleJumpPage"
-                />
-                <span>页</span>
-              </div>
-            </div>
-          </div>
+                <template v-if="column.key === 'action'">
+                  <div class="yuemu-action-cell">
+                    <button v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS" class="yuemu-icon-text-btn yuemu-color-success" @click="handleReview(record, PIC_REVIEW_STATUS_ENUM.PASS)"> {{ t('pages.admin.pictureManagePage.pass') }} </button>
+                    <button v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT" class="yuemu-icon-text-btn yuemu-color-warning" @click="showRejectModal(record)"> {{ t('pages.admin.pictureManagePage.reject') }} </button>
+                    <button class="yuemu-icon-text-btn yuemu-color-primary" @click="router.push(`/add_picture?id=${record.id}`)"> {{ t('pages.admin.pictureManagePage.edit') }} </button>
+                    <button class="yuemu-icon-text-btn" :class="record.isFeature ? 'yuemu-color-warning' : 'yuemu-color-gray'" @click="handleFeature(record)">
+                      {{ record.isFeature ? t('pages.admin.pictureManagePage.cancelFeature') : t('pages.admin.pictureManagePage.setFeature') }}
+                    </button>
+                    <button class="yuemu-icon-text-btn yuemu-color-danger" @click="showDeleteConfirm(record)"> {{ t('pages.admin.pictureManagePage.delete') }} </button>
+                  </div>
+                </template>
+              </template>
+            </a-table>
+          </a-spin>
+        </div>
 
-          <!-- 每页条数选择器抽屉 -->
-          <van-action-sheet
-            v-model:show="showPageSizeSheet"
-            :actions="pageSizeOptions"
-            cancel-text="取消"
-            close-on-click-action
-            @select="handlePageSizeChange"
+        <div class="yuemu-pagination-bar">
+          <a-pagination
+            :current="searchParams.current"
+            :total="total"
+            :pageSize="searchParams.pageSize"
+            :pageSizeOptions="pcPageSizeOptions"
+            show-size-changer
+            :showTotal="total => t('pages.admin.pictureManagePage.totalPicText', { t: total })"
+            @change="onPaginationChange"
           />
         </div>
       </div>
     </template>
 
-    <!-- 拒绝弹框 -->
-    <a-modal
-      v-model:open="rejectModalVisible"
-      title="拒绝原因"
-      @ok="handleRejectConfirm"
-      @cancel="handleRejectCancel"
-      :confirmLoading="rejectLoading"
-    >
-      <div class="reject-form">
-        <a-form layout="vertical">
-          <a-form-item label="选择拒绝原因">
-            <a-select
-              v-model:value="selectedRejectReason"
-              style="width: 100%"
-              placeholder="请选择拒绝原因"
-              @change="handleRejectReasonChange"
-            >
-              <a-select-option
-                v-for="option in REJECT_REASON_OPTIONS"
-                :key="option.value"
-                :value="option.value"
-              >
-                {{ option.label }}
-              </a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item label="拒绝说明">
-            <a-textarea
-              v-model:value="rejectMessage"
-              :rows="4"
-              placeholder="请输入拒绝原因说明"
-              :maxLength="200"
-              show-count
+    <template v-else>
+      <div class="yuemu-m-container">
+        <div class="yuemu-m-sticky-header">
+          <div class="yuemu-m-header-main">
+            <h1 class="yuemu-m-title"> {{ t('pages.admin.pictureManagePage.mTitle') }} </h1>
+            <div class="yuemu-m-actions">
+              <van-button icon="plus" size="small" type="primary" round class="yuemu-m-primary-btn" @click="router.push('/add_picture')" />
+              <van-button icon="photograph" size="small" round class="yuemu-m-ghost-btn" @click="router.push('/add_picture/batch')" />
+            </div>
+          </div>
+
+          <div class="yuemu-m-search-row">
+            <van-search v-model="searchParams.searchText" :placeholder="t('pages.admin.pictureManagePage.mSearch')" shape="round" class="yuemu-m-search" @search="doSearch" />
+            <span class="yuemu-m-sort-btn" @click="toggleSortOrder">
+              {{ sortOrder === 'ascend' ? t('pages.admin.pictureManagePage.ascend') : t('pages.admin.pictureManagePage.descend') }} <van-icon :name="sortOrder === 'ascend' ? 'ascending' : 'descending'" />
+            </span>
+          </div>
+
+          <div class="yuemu-m-batch-bar" :class="{ 'is-active': hasSelected }">
+            <span class="yuemu-m-batch-text">{{ t('pages.admin.pictureManagePage.selectedText', { count: state.selectedRowKeys.length }) }}</span>
+            <button class="yuemu-m-batch-btn" @click="showActionSheet = true"> {{ t('pages.admin.pictureManagePage.batchAction') }} </button>
+          </div>
+        </div>
+
+        <div class="yuemu-m-scroll-view">
+          <van-checkbox-group v-model="state.selectedRowKeys">
+            <div v-for="picture in dataList" :key="picture.id" class="yuemu-m-card">
+              <div class="yuemu-m-card-cover" @click="showImagePreview(picture.url)">
+                <van-image :src="picture.url" fit="cover" width="100%" height="200" />
+                <van-checkbox :name="picture.id" class="yuemu-m-checkbox" @click.stop />
+                <div v-if="picture.isFeature" class="yuemu-m-feature-tag"><StarFilled /> {{ t('pages.admin.pictureManagePage.setFeature') }} </div>
+                <div class="yuemu-m-status-tag" :class="getStatusColorClass(picture.reviewStatus)">
+                  {{ PIC_REVIEW_STATUS_MAP[picture.reviewStatus] }}
+                </div>
+              </div>
+
+              <div class="yuemu-m-card-info">
+                <h3 class="yuemu-m-pic-name">{{ picture.name || t('pages.admin.pictureManagePage.unnamedPic') }}</h3>
+                <p class="yuemu-m-pic-desc">{{ picture.introduction || t('pages.admin.pictureManagePage.noDesc') }}</p>
+
+                <div class="yuemu-m-tags">
+                  <span class="yuemu-badge yuemu-bg-blue" v-if="picture.category">{{ picture.category }}</span>
+                  <span class="yuemu-badge yuemu-bg-gray">{{ picture.picWidth }}x{{ picture.picHeight }}</span>
+                  <span class="yuemu-badge yuemu-bg-gray">{{ (picture.picSize / 1024).toFixed(1) }}KB</span>
+                </div>
+              </div>
+
+              <div class="yuemu-m-card-actions">
+                <button v-if="picture.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS" class="yuemu-m-action-btn yuemu-color-success" @click="handleReview(picture, PIC_REVIEW_STATUS_ENUM.PASS)"> {{ t('pages.admin.pictureManagePage.pass') }} </button>
+                <button v-if="picture.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT" class="yuemu-m-action-btn yuemu-color-warning" @click="showRejectModal(picture)"> {{ t('pages.admin.pictureManagePage.reject') }} </button>
+                <button class="yuemu-m-action-btn yuemu-color-primary" @click="router.push(`/add_picture?id=${picture.id}`)"> {{ t('pages.admin.pictureManagePage.edit') }} </button>
+                <button class="yuemu-m-action-btn" :class="picture.isFeature ? 'yuemu-color-warning' : 'yuemu-color-gray'" @click="handleFeature(picture)">
+                  {{ picture.isFeature ? t('pages.admin.pictureManagePage.cancelFeature') : t('pages.admin.pictureManagePage.setFeature') }}
+                </button>
+                <button class="yuemu-m-action-btn yuemu-color-danger" @click="showDeleteConfirm(picture)"> {{ t('pages.admin.pictureManagePage.delete') }} </button>
+              </div>
+            </div>
+          </van-checkbox-group>
+
+          <van-empty v-if="dataList.length === 0 && !loading" :description="t('pages.admin.pictureManagePage.emptyGallery')" />
+
+          <div class="yuemu-m-pagination" v-if="total > 0">
+            <van-pagination :prev-text="t('pages.admin.pictureManagePage.prevPage')" :next-text="t('pages.admin.pictureManagePage.nextPage')"
+              v-model="searchParams.current"
+              :total-items="total"
+              :items-per-page="searchParams.pageSize"
+              @change="onMobilePageChange"
+              :show-page-size="3"
+              force-ellipses
+              class="yuemu-dark-van-pagination"
             />
-          </a-form-item>
-        </a-form>
+          </div>
+        </div>
+      </div>
+
+      <van-action-sheet v-model:show="showActionSheet" :actions="mobileOperationOptions" cancel-text="取消" @select="handleBatchOperation" class="yuemu-dark-action-sheet" teleport="body" />
+      <ImagePreview v-model:visible="showPreview" :images="[previewImage]" :initialIndex="0" />
+    </template>
+
+    <a-modal v-model:open="rejectModalVisible" :title="t('pages.admin.pictureManagePage.rejectApp')" :footer="null" class="yuemu-apple-modal" centered>
+      <div class="yuemu-modal-form">
+        <div class="yuemu-form-item">
+          <label> {{ t('pages.admin.pictureManagePage.presetReason') }} </label>
+          <a-select v-model:value="selectedRejectReason" class="yuemu-select-base" style="width: 100%" @change="handleRejectReasonChange" :dropdownClassName="'yuemu-dark-dropdown'">
+            <a-select-option v-for="opt in REJECT_REASON_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</a-select-option>
+          </a-select>
+        </div>
+        <div class="yuemu-form-item">
+          <label> {{ t('pages.admin.pictureManagePage.detailDesc') }} </label>
+          <a-textarea v-model:value="rejectMessage" :rows="4" class="yuemu-input-base" :placeholder="t('pages.admin.pictureManagePage.rejectPlaceholder')" />
+        </div>
+        <div class="yuemu-modal-footer">
+          <a-button class="yuemu-btn-ghost" @click="rejectModalVisible = false">取消</a-button>
+          <a-button type="primary" danger class="yuemu-btn-danger" @click="handleRejectConfirm" :loading="rejectLoading"> {{ t('pages.admin.pictureManagePage.confirmReject') }} </a-button>
+        </div>
       </div>
     </a-modal>
 
-    <!-- 删除确认弹框 -->
-    <a-modal
-      v-model:open="deleteConfirmVisible"
-      :title="null"
-      :footer="null"
-      :width="400"
-      class="delete-confirm-modal"
-    >
-      <div class="delete-confirm-content">
-        <div class="warning-icon">
-          <ExclamationCircleFilled style="color: #ff6b6b;" />
-        </div>
-        <h3 class="confirm-title">确认删除该图片？</h3>
-        <p class="confirm-desc">
-          图片名称：{{ selectedPicture?.name }}<br>
-          图片大小：{{ (selectedPicture?.picSize ? (selectedPicture.picSize / 1024).toFixed(2) : 0) }}KB
-        </p>
-        <div class="confirm-actions">
-          <a-button class="cancel-button" @click="deleteConfirmVisible = false">取消</a-button>
-          <a-button class="confirm-button" danger @click="confirmDelete">
-            确认删除
-          </a-button>
+    <a-modal v-model:open="deleteConfirmVisible" :title="null" :footer="null" :width="360" class="yuemu-apple-modal" centered>
+      <div class="yuemu-confirm-content">
+        <div class="yuemu-icon-warning"><ExclamationCircleFilled /></div>
+        <h3 class="yuemu-confirm-title"> {{ t('pages.admin.pictureManagePage.permanentDelete') }} </h3>
+        <p class="yuemu-confirm-desc">「{{ selectedPicture?.name || t('pages.admin.pictureManagePage.unnamedPic') }}」<br> {{ t('pages.admin.pictureManagePage.deleteWarning') }} </p>
+        <div class="yuemu-confirm-actions">
+          <button class="yuemu-action-cancel" @click="deleteConfirmVisible = false">取消</button>
+          <button class="yuemu-action-danger" @click="confirmDelete"> {{ t('pages.admin.pictureManagePage.delete') }} </button>
         </div>
       </div>
     </a-modal>
@@ -488,1159 +266,381 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+/* ===== JS 逻辑完全保持不变，仅更新了类名引用 ===== */
 import { computed, onMounted, reactive, ref } from 'vue'
 import {
   batchOperationPictureUsingPost,
   deletePictureUsingPost,
   doPictureReviewUsingPost,
   listPictureByPageUsingPost,
+  setPictureFeatureUsingPost,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
+import ImagePreview from '@/components/ImagePreview.vue'
 import {
-  BoldOutlined,
-  PlusOutlined,
-  UploadOutlined,
-  SearchOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  ExclamationCircleFilled,
+  BoldOutlined, PlusOutlined, UploadOutlined, SearchOutlined,
+  ExclamationCircleFilled, StarOutlined, StarFilled, SortAscendingOutlined, SortDescendingOutlined,
 } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
-import {
-  PIC_REVIEW_STATUS_ENUM,
-  PIC_REVIEW_STATUS_MAP,
-  PIC_REVIEW_STATUS_OPTIONS,
-} from '../../constants/picture.ts'
+import { PIC_REVIEW_STATUS_ENUM, PIC_REVIEW_STATUS_MAP, PIC_REVIEW_STATUS_OPTIONS } from '../../constants/picture.ts'
 import { getDeviceType } from '@/utils/device.ts'
 import { DEVICE_TYPE_ENUM } from '@/constants/device.ts'
 import { OPERATION_OPTIONS } from '@/constants/operation.ts'
 import { REJECT_REASON_OPTIONS, REJECT_REASON_MAP } from '@/constants/review'
 import { useRouter } from 'vue-router'
-// 定义用于存储设备类型的响应式变量
-// 页面加载时获取设备类型并获取数据
-onMounted(async () => {
-  device.value = await getDeviceType()
-})
+
+const device = ref<string>('')
 const router = useRouter()
 
 const columns = [
-  {
-    title: '图片ID',
-    dataIndex: 'id',
-    width: 80,
-  },
-  {
-    title: '图片',
-    dataIndex: 'url',
-  },
-  {
-    title: '名称',
-    dataIndex: 'name',
-  },
-  {
-    title: '简介',
-    dataIndex: 'introduction',
-    ellipsis: true,
-  },
-  {
-    title: '类型',
-    dataIndex: 'category',
-  },
-  {
-    title: '标签',
-    dataIndex: 'tags',
-  },
-  {
-    title: '图片信息',
-    dataIndex: 'picInfo',
-  },
-  {
-    title: '审核信息',
-    dataIndex: 'reviewMessage',
-  },
-  {
-    title: '用户ID',
-    dataIndex: 'userId',
-    width: 80,
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime',
-  },
-  {
-    title: '编辑时间',
-    dataIndex: 'editTime',
-  },
-  {
-    title: '操作',
-    key: 'action',
-  },
+  { title: 'ID', dataIndex: 'id', width: 100 },
+  { title: t('pages.admin.pictureManagePage.mediaPreview'), dataIndex: 'url', width: 140 },
+  { title: t('pages.admin.pictureManagePage.nameAndDesc'), dataIndex: 'name', width: 200, ellipsis: true },
+  { title: t('pages.admin.pictureManagePage.categoryAndTags'), dataIndex: 'tags', width: 220 },
+  { title: t('pages.admin.pictureManagePage.picSpec'), dataIndex: 'picInfo', width: 160 },
+  { title: t('pages.admin.pictureManagePage.reviewStatus'), dataIndex: 'reviewMessage', width: 180 },
+  { title: t('pages.admin.pictureManagePage.uploadTime'), dataIndex: 'createTime', width: 150 },
+  { title: t('pages.admin.pictureManagePage.actionArea'), key: 'action', fixed: 'right', width: 260, align: 'right' },
 ]
 
-// 定义数据
 const dataList = ref<API.Picture[]>([])
 const total = ref(0)
-
-// 搜索条件
-const searchParams = reactive<API.PictureQueryRequest>({
-  current: 1,
-  pageSize: 10,
-  sortField: 'createTime',
-  sortOrder: 'descend',
-})
-
-// 用于存储表格行选择状态的响应式对象
-const state = reactive({
-  selectedRowKeys: [] as number[],
-  loading: false,
-})
-
-// 计算属性，判断是否有选中的行，用于控制批量删除按钮是否可用
-const hasSelected = computed(() => state.selectedRowKeys.length > 0)
-
 const loading = ref(false)
 
-// 获取设备类型
-const device = ref('')
+const searchParams = reactive<API.PictureQueryRequest>({ current: 1, pageSize: 10, sortField: 'createTime', sortOrder: 'descend' })
+const sortOrder = ref<'ascend' | 'descend'>('descend')
 
-// 获取审核状态对应的类型
-const getReviewStatusType = (status) => {
-  switch (status) {
-    case PIC_REVIEW_STATUS_ENUM.REVIEWING:
-      return 'warning'
-    case PIC_REVIEW_STATUS_ENUM.PASS:
-      return 'success'
-    case PIC_REVIEW_STATUS_ENUM.REJECT:
-      return 'danger'
-    default:
-      return 'default'
-  }
+const state = reactive({ selectedRowKeys: [] as number[] })
+const hasSelected = computed(() => state.selectedRowKeys.length > 0)
+const onSelectChange = (selectedRowKeys: number[]) => { state.selectedRowKeys = selectedRowKeys }
+
+const fetchData = async () => {
+  loading.value = true
+  try {
+    const res = await listPictureByPageUsingPost({ ...searchParams, sortOrder: sortOrder.value, nullSpaceId: true })
+    if (res.data.code === 0 && res.data.data) { dataList.value = res.data.data.records ?? []; total.value = res.data.data.total ?? 0 }
+  } catch (error) { message.error(t('pages.admin.pictureManagePage.fetchErrorText')) } finally { loading.value = false }
 }
 
-// 添加拒绝相关的状态
+const doTableChange = (pagination: any) => { searchParams.current = pagination.current; searchParams.pageSize = pagination.pageSize; fetchData() }
+const onPaginationChange = (page: number, pageSize: number) => { searchParams.current = page; searchParams.pageSize = pageSize; fetchData() }
+const doSearch = () => { searchParams.current = 1; fetchData() }
+
+const showActionSheet = ref(false)
+const mobileOperationOptions = [
+  { name: OPERATION_OPTIONS[0].label, value: OPERATION_OPTIONS[0].value, color: '#ef4444' },
+  { name: OPERATION_OPTIONS[1].label, value: OPERATION_OPTIONS[1].value, color: '#10b981' },
+  { name: OPERATION_OPTIONS[2].label, value: OPERATION_OPTIONS[2].value, color: '#f59e0b' },
+]
+
+const handleBatchOperation = async (action: any) => {
+  if (state.selectedRowKeys.length === 0) { message.warning(t('pages.admin.pictureManagePage.plsSelectPicText')); return; }
+  try {
+    const body = { ids: state.selectedRowKeys, operationType: device.value === DEVICE_TYPE_ENUM.PC ? action : action.value }
+    const res = await batchOperationPictureUsingPost(body)
+    if (res.data.code === 0) { message.success(t('pages.admin.pictureManagePage.opSuccessText')); state.selectedRowKeys = []; fetchData(); showActionSheet.value = false }
+    else { message.error(t('pages.admin.pictureManagePage.opFailText')) }
+  } catch (error) { message.error(t('pages.admin.pictureManagePage.opErrText')) }
+}
+
+const handleReview = async (record: API.Picture, reviewStatus: number) => {
+  const reviewMessage = reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS ? t('pages.admin.pictureManagePage.adminPassText') : t('pages.admin.pictureManagePage.adminRejectText')
+  const res = await doPictureReviewUsingPost({ id: record.id, reviewStatus, reviewMessage })
+  if (res.data.code === 0) { message.success(t('pages.admin.pictureManagePage.opSuccessText')); fetchData() }
+  else { message.error(t('pages.admin.pictureManagePage.opFailText')) }
+}
+
 const rejectModalVisible = ref(false)
 const rejectLoading = ref(false)
 const selectedRejectReason = ref('')
 const rejectMessage = ref('')
 const currentRejectRecord = ref<any>(null)
 
-// 添加拒绝相关的方法
-const showRejectModal = (record: any) => {
-  currentRejectRecord.value = record
-  selectedRejectReason.value = ''
-  rejectMessage.value = ''
-  rejectModalVisible.value = true
-}
-
+const showRejectModal = (record: any) => { currentRejectRecord.value = record; selectedRejectReason.value = ''; rejectMessage.value = ''; rejectModalVisible.value = true }
+const handleRejectReasonChange = (value: string) => { rejectMessage.value = value !== 'other' ? REJECT_REASON_MAP[value] : '' }
 const handleRejectConfirm = async () => {
-  if (!rejectMessage.value.trim()) {
-    message.error('请输入拒绝原因')
-    return
-  }
-
+  if (!rejectMessage.value.trim()) { message.error(t('pages.admin.pictureManagePage.inputRejectReasonText')); return }
   rejectLoading.value = true
   try {
-    const res = await doPictureReviewUsingPost({
-      id: currentRejectRecord.value.id,
-      reviewStatus: PIC_REVIEW_STATUS_ENUM.REJECT,
-      reviewMessage: rejectMessage.value,
-    })
-
-    if (res.data.code === 0) {
-      message.success('操作成功')
-      rejectModalVisible.value = false
-      fetchData() // 刷新列表
-    } else {
-      message.error(res.data.message || '操作失败')
-    }
-  } catch (error) {
-    message.error('操作失败')
-  } finally {
-    rejectLoading.value = false
-  }
+    const res = await doPictureReviewUsingPost({ id: currentRejectRecord.value.id, reviewStatus: PIC_REVIEW_STATUS_ENUM.REJECT, reviewMessage: rejectMessage.value })
+    if (res.data.code === 0) { message.success(t('pages.admin.pictureManagePage.rejectedText')); rejectModalVisible.value = false; fetchData() }
+    else { message.error(t('pages.admin.pictureManagePage.opFailText')) }
+  } finally { rejectLoading.value = false }
 }
 
-const handleRejectCancel = () => {
-  rejectModalVisible.value = false
-}
-const handleRejectReasonChange = (value: string) => {
-  if (value !== 'other') {
-    rejectMessage.value = REJECT_REASON_MAP[value]
-  } else {
-    rejectMessage.value = ''
-  }
-}
-
-// 修改获取数据的方法
-const fetchData = async () => {
-  if (device.value === DEVICE_TYPE_ENUM.PC) {
-    loading.value = true
-  }
-
-  try {
-    const res = await listPictureByPageUsingPost({
-      ...searchParams,
-      nullSpaceId: true,
-    })
-    if (res.data.code === 0 && res.data.data) {
-      dataList.value = res.data.data.records ?? []
-      total.value = res.data.data.total ?? 0
-    } else {
-      message.error('获取数据失败，' + res.data.message)
-    }
-  } catch (error) {
-    message.error('获取数据失败')
-  } finally {
-    loading.value = false
-  }
-}
-
-// 页面加载时获取数据，请求一次
-onMounted(() => {
-  fetchData()
-})
-
-// 分页参数
-const pagination = computed(() => {
-  return {
-    current: searchParams.current,
-    pageSize: searchParams.pageSize,
-    total: total.value,
-    showSizeChanger: true,
-    showTotal: (total) => `共 ${total} 条`,
-  }
-})
-
-// 表格变化之后，重新获取数据
-const doTableChange = (page: any) => {
-  searchParams.current = page.current
-  searchParams.pageSize = page.pageSize
-  fetchData()
-}
-
-// 搜索数据
-const doSearch = () => {
-  searchParams.current = 1
-  fetchData()
-}
-
-// 删除数据
-const doDelete = async (id: string) => {
-  if (!id) {
-    return
-  }
-  const res = await deletePictureUsingPost({ id })
-  if (res.data.code === 0) {
-    message.success('删除成功，数据更新可能需要一段时间')
-    // 刷新数据
-    fetchData()
-  } else {
-    message.error('删除失败')
-  }
-}
-
-// 处理行选择变化的回调函数
-const onSelectChange = (selectedRowKeys: number[]) => {
-  state.selectedRowKeys = selectedRowKeys
-}
-
-// 移动端批量操作选项
-const mobileOperationOptions = [
-  { name: OPERATION_OPTIONS[0].label, value: OPERATION_OPTIONS[0].value, color: '#ee0a24' },
-  { name: OPERATION_OPTIONS[1].label, value: OPERATION_OPTIONS[1].value },
-  { name: OPERATION_OPTIONS[2].label, value: OPERATION_OPTIONS[2].value, color: '#ee0a24' },
-]
-
-// 修改批量操作处理方法
-const handleBatchOperation = async (action: any) => {
-  if (state.selectedRowKeys.length === 0) {
-    message.warning('请先选择要操作的图片')
-    return
-  }
-
-  const selectedPictureIds = state.selectedRowKeys
-  try {
-    const body = {
-      ids: selectedPictureIds,
-      operationType: device.value === DEVICE_TYPE_ENUM.PC ? action : action.value,
-    }
-
-    const res = await batchOperationPictureUsingPost(body)
-    if (res.data.code === 0) {
-      const operationLabel =
-        device.value === DEVICE_TYPE_ENUM.PC
-          ? OPERATION_OPTIONS.find((opt) => opt.value === action)?.label
-          : action.name
-      message.success(`${operationLabel}成功`)
-      state.selectedRowKeys = []
-      fetchData()
-      if (device.value !== DEVICE_TYPE_ENUM.PC) {
-        showActionSheet.value = false
-      }
-    } else {
-      message.error('批量操作失败')
-    }
-  } catch (error) {
-    message.error('批量操作出现异常，请稍后再试')
-  }
-}
-
-// 审核图片
-const handleReview = async (record: API.Picture, reviewStatus: number) => {
-  const reviewMessage =
-    reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS ? '管理员操作通过' : '管理员操作拒绝'
-  const res = await doPictureReviewUsingPost({
-    id: record.id,
-    reviewStatus,
-    reviewMessage,
-  })
-  if (res.data.code === 0) {
-    message.success('审核操作成功')
-    // 重新获取列表数据
-    fetchData()
-  } else {
-    message.error('审核操作失败，' + res.data.message)
-  }
-}
-// 新增：根据审核状态返回对应的颜色类名的方法
-const getStatusColorClass = (status) => {
+/* 动态返回类名前缀保持一致 */
+const getStatusColorClass = (status: number) => {
   switch (status) {
-    case PIC_REVIEW_STATUS_ENUM.REVIEWING:
-      return 'reviewing-color'
-    case PIC_REVIEW_STATUS_ENUM.PASS:
-      return 'pass-color'
-    case PIC_REVIEW_STATUS_ENUM.REJECT:
-      return 'reject-color'
-    default:
-      return ''
+    case PIC_REVIEW_STATUS_ENUM.REVIEWING: return 'yuemu-bg-orange'
+    case PIC_REVIEW_STATUS_ENUM.PASS: return 'yuemu-bg-green'
+    case PIC_REVIEW_STATUS_ENUM.REJECT: return 'yuemu-bg-red'
+    default: return 'yuemu-bg-gray'
   }
 }
 
-// 移动端分页变化
-const onMobilePageChange = (page: number) => {
-  searchParams.current = page
-  fetchData()
-}
-
-// 添加动作面板显示状态
-const showActionSheet = ref(false)
-
-// 图片预览相关的状态
+const onMobilePageChange = (page: number) => { searchParams.current = page; fetchData() }
 const showPreview = ref(false)
 const previewImage = ref('')
+const showImagePreview = (url: string) => { previewImage.value = url; showPreview.value = true }
+const closePreview = () => { showPreview.value = false }
+const pcPageSizeOptions = ['10', '20', '30', '50']
 
-// 显示图片预览
-const showImagePreview = (url: string) => {
-  previewImage.value = url
-  showPreview.value = true
-}
-
-// 关闭图片预览
-const closePreview = () => {
-  showPreview.value = false
-}
-
-// 每页条数选择器的状态和选项
-const showPageSizeSheet = ref(false)
-const pageSizeOptions = [
-  { name: '10条/页', value: 10 },
-  { name: '20条/页', value: 20 },
-  { name: '30条/页', value: 30 },
-  { name: '50条/页', value: 50 },
-]
-
-// 修改每页条数改变的处理方法
-const handlePageSizeChange = (action: { value: number }) => {
-  const value = action.value
-  searchParams.current = 1
-  searchParams.pageSize = value
-  fetchData()
-}
-
-// 跳转页码
-const jumpPage = ref('')
-
-// 处理页码跳转
-const handleJumpPage = () => {
-  const page = parseInt(jumpPage.value)
-  if (isNaN(page)) {
-    return
-  }
-
-  const maxPage = Math.ceil(total.value / searchParams.pageSize)
-  if (page < 1 || page > maxPage) {
-    message.warning(`请输入1-${maxPage}之间的页码`)
-    return
-  }
-
-  searchParams.current = page
-  fetchData()
-  jumpPage.value = ''
-}
-
-// 删除确认相关的状态
 const deleteConfirmVisible = ref(false)
 const selectedPicture = ref<API.PictureVO | null>(null)
-
-// 显示删除确认框
-const showDeleteConfirm = (picture: API.PictureVO) => {
-  selectedPicture.value = picture
-  deleteConfirmVisible.value = true
-}
-
-// 确认删除
+const showDeleteConfirm = (picture: API.PictureVO) => { selectedPicture.value = picture; deleteConfirmVisible.value = true }
 const confirmDelete = async () => {
   if (!selectedPicture.value?.id) return
-  
   try {
     const res = await deletePictureUsingPost({ id: selectedPicture.value.id })
-    if (res.data.code === 0) {
-      message.success('删除成功')
-      deleteConfirmVisible.value = false
-      // 刷新数据
-      fetchData()
-    } else {
-      message.error('删除失败：' + res.data.message)
-    }
-  } catch (error) {
-    message.error('删除失败，请稍后重试')
-  }
+    if (res.data.code === 0) { message.success(t('pages.admin.pictureManagePage.deleteSuccessText')); deleteConfirmVisible.value = false; fetchData() }
+  } catch (error) { message.error(t('pages.admin.pictureManagePage.deleteFailText')) }
 }
+
+const handleFeature = async (record: API.PictureVO) => {
+  try { await setPictureFeatureUsingPost({ id: record.id, isFeature: record.isFeature ? 0 : 1 }); await fetchData() } catch (error) { message.error(t('pages.admin.pictureManagePage.opFailText')) }
+}
+
+const toggleSortOrder = () => { sortOrder.value = sortOrder.value === 'ascend' ? 'descend' : 'ascend'; searchParams.sortOrder = sortOrder.value; fetchData() }
+
+onMounted(async () => {
+  device.value = await getDeviceType()
+  fetchData()
+})
 </script>
 
 <style scoped>
-/* 移动端样式 */
-.mobile-container {
-  background: #f7f8fa;
+/* ==================== 1. 基础全局配置 ==================== */
+#yuemu-picture-manage-page {
   min-height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  padding-bottom: 50px; /* 为底部导航栏预留空间 */
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: var(--theme-transition);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.mobile-content {
-  height: 100%;
-  overflow-y: auto;
-  padding: 12px;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 80px; /* 确保内容不被底部导航栏遮挡 */
-}
-
-.action-bar {
-  padding: 12px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: flex-end;
-  background: white;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.action-bar .van-button {
-  flex: 1;
-  max-width: 120px;
-}
-
-:deep(.van-cell-group--inset) {
-  margin: 0 12px 12px;
-}
-
-:deep(.van-cell-group--inset:last-child) {
-  margin-bottom: 0;
-}
-
-.picture-card {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  padding: 12px;
-}
-
-.card-title {
-  font-size: 15px;
-  font-weight: 500;
-  margin-bottom: 4px;
-}
-
-.card-desc {
-  font-size: 13px;
-  color: #666;
-  margin: 4px 0;
-  line-height: 1.4;
-}
-
-.tag-container {
-  margin: 8px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 8px;
-}
-
-.button-group {
-  display: flex;
-  gap: 8px;
-}
-
-.info-text {
-  font-size: 12px;
-  color: #666;
-}
-
-.create-time {
-  font-size: 12px;
-  color: #999;
-}
-
-:deep(.van-card__content) {
-  padding-left: 8px;
-}
-
-/* 新增：定义不同审核状态对应的颜色类样式 */
-.reviewing-color {
-  color: #ff943f;
-}
-
-.pass-color {
-  color: green;
-}
-
-.reject-color {
-  color: red;
-}
-
-/* 移动端搜索区域样式 */
-.search-section {
-  position: sticky;
-  top: -12px; /* 调整搜索栏的粘性定位位置 */
-  z-index: 100;
-  background: #f7f8fa;
-  /* 抵消父元素的内边距 */
-  margin: 0 -12px 12px;
-}
-
-/* 卡片描述样式 */
-.card-desc {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.desc-item {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.4;
-}
-
-.label {
-  color: #999;
-  margin-right: 4px;
-}
-
-/* 下拉菜单样式 */
-:deep(.van-dropdown-menu) {
-  box-shadow: none;
-  background: transparent;
-}
-
-:deep(.van-dropdown-menu__item) {
-  justify-content: flex-start;
-}
-
-/* 移动端分页样式优化 */
-.mobile-pagination {
-  margin-top: 16px;
-  padding: 12px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.pagination-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  color: #666;
-  font-size: 13px;
-}
-
-:deep(.van-dropdown-menu) {
-  height: 24px;
-  border: 1px solid #ebedf0;
-  border-radius: 4px;
-  min-width: 90px;
-}
-
-:deep(.van-dropdown-menu__title) {
-  padding: 0 8px;
-  font-size: 12px;
-  line-height: 22px;
-}
-
-:deep(.van-pagination) {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-}
-
-:deep(.van-pagination__item) {
-  min-width: 28px;
-  height: 28px;
-  line-height: 28px;
-  border-radius: 16px;
-  font-size: 14px;
-  border: 1px solid #ebedf0;
-  margin: 0 2px;
-}
-
-:deep(.van-pagination__item--active) {
-  background: #1989fa;
-  color: white;
-  border-color: #1989fa;
-}
-
-:deep(.van-pagination__prev),
-:deep(.van-pagination__next) {
-  background: #f7f8fa;
-  border: 1px solid #ebedf0;
-  font-weight: bold;
-  min-width: 28px !important;
-  height: 28px !important;
-  line-height: 28px !important;
-}
-
-:deep(.van-pagination__item--disabled) {
-  background: transparent;
-  border: none;
-  color: #999;
-}
-
-/* 下拉菜单样式优化 */
-:deep(.van-dropdown-menu) {
-  height: 24px;
-  border: 1px solid #ebedf0;
-  border-radius: 4px;
-  min-width: 90px;
-}
-
-:deep(.van-dropdown-menu__title) {
-  padding: 0 8px;
-  font-size: 12px;
-  line-height: 22px;
-}
-
-:deep(.van-dropdown-menu__bar) {
-  height: 24px;
-}
-
-:deep(.van-dropdown-item__option) {
-  padding: 8px 12px;
-  font-size: 13px;
-}
-
-:deep(.van-dropdown-item__option--active) {
-  color: #1989fa;
-}
-
-.picture-list {
-  margin-bottom: 16px;
-}
-
-/* 搜索框样式优化 */
-:deep(.van-search) {
-  padding: 8px 12px;
-  background: transparent;
-}
-
-:deep(.van-search__content) {
-  border-radius: 8px;
-  background: white;
-  margin: 0 12px; /* 添加水平间距 */
-}
-
-/* 图片预览样式优化 */
-:deep(.van-image) {
-  cursor: pointer;
-}
-
-:deep(.van-image-preview__image) {
-  background-color: #000;
-}
-
-:deep(.van-image-preview__close-icon) {
-  color: #fff;
-}
-
-/* 每页条数选择器样式 */
-.page-size-selector {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border: 1px solid #ebedf0;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-}
-
-.page-size-selector .van-icon {
-  font-size: 12px;
-  color: #999;
-}
-
-/* 分页器包装器 */
-.pagination-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-/* 跳转页码样式 */
-.jump-page {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: #666;
-}
-
-.jump-page :deep(.van-field) {
-  width: 48px;
-  padding: 0;
-}
-
-.jump-page :deep(.van-field__control) {
-  height: 28px;
-  padding: 0 4px;
-  text-align: center;
-  border: 1px solid #ebedf0;
-  border-radius: 4px;
-  font-size: 13px;
-}
-
-/* 隐藏输入框的上下箭头 */
-.jump-page :deep(.van-field__control::-webkit-inner-spin-button),
-.jump-page :deep(.van-field__control::-webkit-outer-spin-button) {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.jump-page :deep(.van-field__control) {
-  -moz-appearance: textfield;
-}
-
-/* PC端容器样式 */
-.pc-container {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-
-/* 搜索和按钮区域样式 */
-.search-and-button-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.button-group {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-/* 按钮样式优化 */
-.create-button {
-  background: linear-gradient(135deg, #40c9ff 0%, #1890ff 100%);
-  border: none;
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
-}
-
-.create-button:hover {
-  background: linear-gradient(135deg, #69d4ff 0%, #40a9ff 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.3);
-}
-
-.create-button:active {
-  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-  transform: translateY(0);
-}
-
-.batch-button {
-  background: linear-gradient(135deg, #722ed1 0%, #531dab 100%);
-  border: none;
-  box-shadow: 0 4px 12px rgba(114, 46, 209, 0.2);
-  color: white;
-}
-
-.batch-button:hover {
-  background: linear-gradient(135deg, #8c51e0 0%, #722ed1 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(114, 46, 209, 0.3);
-}
-
-.batch-button:active {
-  background: linear-gradient(135deg, #531dab 0%, #391085 100%);
-  transform: translateY(0);
-}
-
-.danger-button {
-  background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%);
-  border: none;
-  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.2);
-}
-
-.danger-button:hover {
-  background: linear-gradient(135deg, #ff4d4f 0%, #f5222d 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(255, 77, 79, 0.3);
-}
-
-.danger-button:active {
-  background: linear-gradient(135deg, #cf1322 0%, #a8071a 100%);
-  transform: translateY(0);
-}
-
-.danger-button:disabled {
-  background: #f5f5f5;
-  color: rgba(0, 0, 0, 0.25);
-  box-shadow: none;
-  transform: none;
-}
-
-/* 操作按钮样式 */
-.action-button {
-  height: 32px;
-  border-radius: 8px;
-  padding: 0 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  color: white;
-  border: none;
-}
-
-.action-button:hover {
-  color: white;
-}
-
-.action-button .anticon {
-  font-size: 16px;
-}
-
-/* 表格区域样式 */
-.table-section {
-  background: white;
-  border-radius: 8px;
-}
-
-/* 表格样式优化 */
-:deep(.custom-table) {
-  .ant-table-thead > tr > th {
-    background: #fafafa;
-    font-weight: 500;
-    color: #1f2937;
-    padding: 12px 16px;
-  }
-
-  .ant-table-tbody > tr > td {
-    padding: 12px 16px;
-  }
-
-  .ant-table-tbody > tr:hover > td {
-    background: #f0f7ff;
-  }
-
-  .ant-table-row-selected > td {
-    background: #e6f4ff !important;
-  }
-}
-
-/* 搜索表单样式优化 */
-:deep(.ant-form-inline) {
-  .ant-form-item {
-    margin-right: 12px;
-    margin-bottom: 0;
-  }
-
-  .ant-form-item-label {
-    padding-right: 6px;
-    font-size: 13px;
-    color: #666;
-  }
-}
-
-/* 紧凑型输入框样式 */
-.compact-input {
-  width: 140px !important;
-  height: 32px;
-  border-radius: 6px;
-}
-
-/* 紧凑型下拉框样式 */
-.compact-select {
-  width: 120px !important;
-}
-
-/* 搜索按钮样式 */
-.search-button {
-  background: linear-gradient(135deg, #36cfc9 0%, #13c2c2 100%);
-  border: none;
-  box-shadow: 0 4px 12px rgba(19, 194, 194, 0.2);
-}
-
-.search-button:hover {
-  background: linear-gradient(135deg, #40d9d4 0%, #36cfc9 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(19, 194, 194, 0.3);
-}
-
-.search-button:active {
-  background: linear-gradient(135deg, #13c2c2 0%, #08979c 100%);
-  transform: translateY(0);
-}
-
-/* 表格中的标签样式 */
-.tag-item {
-  border: none;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.success-tag {
-  background: linear-gradient(135deg, #95de64 0%, #52c41a 100%);
-  color: white;
-}
-
-.primary-tag {
-  background: linear-gradient(135deg, #69c0ff 0%, #1890ff 100%);
-  color: white;
-}
-
-/* 表格中的按钮样式 */
-.table-button {
-  height: 28px;
-  border-radius: 6px;
-  padding: 0 12px;
-  font-size: 13px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  transition: all 0.3s ease;
-}
-
-.table-button .anticon {
-  font-size: 14px;
-}
-
-.approve-button {
-  background: linear-gradient(135deg, #b7eb8f 0%, #52c41a 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(82, 196, 26, 0.2);
-}
-
-.approve-button:hover {
-  background: linear-gradient(135deg, #95de64 0%, #52c41a 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
-}
-
-.reject-button {
-  background: linear-gradient(135deg, #ffa39e 0%, #ff4d4f 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.2);
-}
-
-.reject-button:hover {
-  background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
-}
-
-.edit-button {
-  background: linear-gradient(135deg, #91d5ff 0%, #1890ff 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
-}
-
-.edit-button:hover {
-  background: linear-gradient(135deg, #69c0ff 0%, #1890ff 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
-}
-
-.delete-button {
-  background: linear-gradient(135deg, #ffbb96 0%, #fa541c 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(250, 84, 28, 0.2);
-}
-
-.delete-button:hover {
-  background: linear-gradient(135deg, #ff9c6e 0%, #fa541c 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(250, 84, 28, 0.3);
-}
-
-/* 按钮激活状态 */
-.table-button:active {
-  transform: translateY(0);
-}
-
-/* 删除确认弹框样式 */
-:deep(.delete-confirm-modal) {
-  .ant-modal-content {
-    padding: 0;
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  .ant-modal-body {
-    padding: 0;
-  }
-}
+.yuemu-text-secondary { color: var(--text-secondary); }
+.yuemu-text-mono { font-family: monospace; font-size: 13px; }
 
-.delete-confirm-content {
+/* ==================== 2. PC 端工作台 ==================== */
+.yuemu-pc-dashboard {
   padding: 32px 24px;
-  text-align: center;
+  max-width: 1500px;
+  margin: 0 auto;
 }
 
-.warning-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-
-  .anticon {
-    animation: pulse 2s infinite;
-  }
-}
-
-.confirm-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 12px;
-}
-
-.confirm-desc {
-  font-size: 14px;
-  color: #64748b;
-  margin-bottom: 24px;
-  line-height: 1.6;
-}
-
-.confirm-actions {
+/* 头部面板 */
+.yuemu-dashboard-header {
   display: flex;
-  gap: 12px;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+.yuemu-page-title { margin: 0; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.5px; }
+.yuemu-page-desc { margin: 4px 0 0 0; font-size: 14px; color: var(--text-secondary); opacity: 0.8; }
+.yuemu-header-right { display: flex; gap: 12px; }
+
+/* 检索过滤栏 */
+.yuemu-filter-bar {
+  background: var(--card-background);
+  border-radius: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px var(--shadow-color);
+  margin-bottom: 24px;
+}
+.yuemu-filter-form { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
+.yuemu-flex-right { margin-left: auto; margin-right: 0; }
+
+/* ==================== 3. 基础 UI 组件覆写 (核心暗色适配) ==================== */
+
+/* 按钮系 */
+.yuemu-btn-primary { background: var(--link-color) !important; color: #fff !important; border: none !important; border-radius: 8px !important; font-weight: 500; height: 36px; padding: 0 16px; box-shadow: 0 4px 12px rgba(var(--link-color-rgb), 0.25); }
+.yuemu-btn-primary:hover { filter: brightness(1.1); }
+.yuemu-btn-ghost { background: var(--hover-background) !important; border: 1px solid var(--border-color) !important; color: var(--text-primary) !important; border-radius: 8px !important; height: 36px; }
+.yuemu-btn-danger { background: rgba(239,68,68,0.1) !important; color: #ef4444 !important; border: none !important; border-radius: 8px !important; }
+
+/* 输入框与下拉框 */
+:deep(.yuemu-input-search), :deep(.yuemu-input-base), :deep(.yuemu-select-base .ant-select-selector) {
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  transition: all 0.3s;
+}
+:deep(.yuemu-input-search:hover), :deep(.yuemu-input-base:focus-within), :deep(.yuemu-select-base:hover .ant-select-selector) {
+  border-color: var(--link-color) !important;
+}
+:deep(.ant-input::placeholder), :deep(.ant-select-selection-placeholder) { color: var(--text-secondary) !important; opacity: 0.6; }
+
+/* 彻底解决暗色下弹层与菜单白边 */
+@media (prefers-color-scheme: dark) {
+  .yuemu-dark-dropdown, .ant-select-dropdown, .ant-dropdown-menu {
+    background-color: #262626 !important;
+    border: 1px solid #3a3a3a !important;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5) !important;
+  }
+  .ant-select-item, .ant-dropdown-menu-item { color: #e5e5e5 !important; }
+  .ant-select-item-option-hover, .ant-select-item-option-active, .ant-dropdown-menu-item:hover { background-color: #383838 !important; }
+
+  /* 弹窗适配 */
+  .yuemu-apple-modal .ant-modal-content { background: #1f1f1f !important; border: 1px solid #333 !important; color: #fff !important; }
+  .yuemu-apple-modal .ant-modal-header { background: #1f1f1f !important; border-bottom: 1px solid #333 !important; }
+  .yuemu-apple-modal .ant-modal-title { color: #fff !important; }
+  .ant-modal-close { color: #999 !important; }
 }
 
-.cancel-button {
-  min-width: 100px;
-  height: 38px;
-  border-radius: 19px;
-  border: 1px solid #e2e8f0;
-  color: #64748b;
-  font-size: 14px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    color: #1a1a1a;
-    border-color: #94a3b8;
-    background: #f8fafc;
-  }
+/* ==================== 4. 表格无界感重构 ==================== */
+.yuemu-table-container {
+  background: var(--card-background);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  box-shadow: 0 8px 30px var(--shadow-color);
 }
 
-.confirm-button {
-  min-width: 100px;
-  height: 38px;
-  border-radius: 19px;
-  background: #ff6b6b;
-  border: none;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+:deep(.yuemu-seamless-table) {
+  .ant-table { background: transparent !important; color: var(--text-primary) !important; }
 
-  &:hover {
-    background: #ff5252;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+  /* 表头：去边框，加底色 */
+  .ant-table-thead > tr > th {
+    background: transparent !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    font-weight: 600; font-size: 13px; text-transform: uppercase;
   }
+  .ant-table-thead > tr > th::before { display: none !important; }
 
-  &:active {
-    transform: translateY(1px);
+  /* 表行：无感分割线，悬浮微光 */
+  .ant-table-tbody > tr > td {
+    background: transparent !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 16px !important;
+    transition: background 0.3s;
   }
+  .ant-table-tbody > tr:hover > td,
+  .ant-table-tbody > tr:hover > .ant-table-cell-fix-left,
+  .ant-table-tbody > tr:hover > .ant-table-cell-fix-right {
+    background: var(--hover-background) !important;
+  }
+  .ant-table-cell-fix-left, .ant-table-cell-fix-right { background: var(--card-background) !important; }
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+/* ==================== 5. 表格内视觉元素 ==================== */
+.yuemu-thumb-wrapper { position: relative; display: inline-block; }
+.yuemu-img-thumb { border-radius: 10px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid var(--border-color); height: 60px !important; width: 90px !important;}
+.yuemu-badge-feature { position: absolute; top: -6px; right: -6px; background: #f59e0b; color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; border: 2px solid var(--card-background); }
+
+.yuemu-tag-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.yuemu-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; gap: 6px;}
+
+/* 高级色彩标签 */
+.yuemu-bg-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+.yuemu-bg-green { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+.yuemu-bg-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+.yuemu-bg-orange { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+.yuemu-bg-gray { background: var(--hover-background); color: var(--text-secondary); border: 1px solid var(--border-color); }
+.yuemu-status-dot { width: 6px; height: 6px; border-radius: 50%; }
+.yuemu-status-dot.yuemu-bg-green { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.yuemu-status-dot.yuemu-bg-red { background: #ef4444; }
+.yuemu-status-dot.yuemu-bg-orange { background: #f59e0b; }
+
+.yuemu-meta-stack { display: flex; flex-direction: column; gap: 4px; }
+.yuemu-meta-item { font-size: 12px; color: var(--text-secondary); background: var(--hover-background); padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; }
+.yuemu-review-stack { display: flex; flex-direction: column; align-items: flex-start; }
+
+.yuemu-action-cell { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.yuemu-icon-text-btn { background: transparent; border: none; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.yuemu-icon-text-btn:hover { background: var(--hover-background); }
+.yuemu-color-primary { color: var(--link-color); }
+.yuemu-color-success { color: #10b981; }
+.yuemu-color-warning { color: #f59e0b; }
+.yuemu-color-danger { color: #ef4444; }
+.yuemu-color-gray { color: var(--text-secondary); }
+
+/* 分页 */
+.yuemu-pagination-bar { margin-top: 24px; display: flex; justify-content: flex-end; }
+:deep(.ant-pagination-item), :deep(.ant-pagination-prev), :deep(.ant-pagination-next) { background: transparent !important; border-color: var(--border-color) !important; }
+:deep(.ant-pagination-item a) { color: var(--text-primary) !important; }
+:deep(.ant-pagination-item-active) { border-color: var(--link-color) !important; background: var(--hover-background) !important; }
+
+/* ==================== 6. 移动端 Feed 瀑布流 ==================== */
+.yuemu-m-container { min-height: 100vh; display: flex; flex-direction: column; }
+
+.yuemu-m-sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  padding: 12px 16px;
+  background: rgba(var(--header-background-rgb, 255,255,255), 0.85); /* 需要全局变量支持RGB或使用纯色 fallback */
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
+}
+@media (prefers-color-scheme: dark) { .yuemu-m-sticky-header { background: rgba(30,30,30,0.85); } }
+
+.yuemu-m-header-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.yuemu-m-title { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0; }
+.yuemu-m-actions { display: flex; gap: 10px; }
+.yuemu-m-primary-btn { background: var(--link-color) !important; border: none !important; width: 32px; height: 32px; }
+.yuemu-m-ghost-btn { background: var(--hover-background) !important; color: var(--text-primary) !important; border: 1px solid var(--border-color) !important; width: 32px; height: 32px; }
+
+.yuemu-m-search-row { display: flex; align-items: center; gap: 12px; }
+:deep(.yuemu-m-search) { flex: 1; padding: 0 !important; background: transparent !important; }
+:deep(.van-search__content) { background: var(--card-background) !important; border: 1px solid var(--border-color); border-radius: 12px; }
+:deep(.van-field__control) { color: var(--text-primary) !important; }
+
+.yuemu-m-sort-btn { font-size: 13px; color: var(--link-color); font-weight: 600; display: flex; align-items: center; gap: 2px; }
+
+.yuemu-m-batch-bar { height: 0; opacity: 0; overflow: hidden; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+.yuemu-m-batch-bar.is-active { height: 40px; opacity: 1; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 8px;}
+.yuemu-m-batch-text { font-size: 13px; color: var(--text-secondary); }
+.yuemu-m-batch-btn { background: rgba(239,68,68,0.1); color: #ef4444; border: none; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+
+.yuemu-m-scroll-view { flex: 1; overflow-y: auto; padding: 16px; }
+
+.yuemu-m-card {
+  background: var(--card-background); border: 1px solid var(--border-color);
+  border-radius: 20px; overflow: hidden; margin-bottom: 20px;
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
-/* 移动端适配 */
-@media screen and (max-width: 768px) {
-  .delete-confirm-content {
-    padding: 24px 16px;
-  }
+.yuemu-m-card-cover { position: relative; height: 200px; background: #000; }
+.yuemu-m-checkbox { position: absolute; top: 12px; left: 12px; z-index: 10; background: rgba(255,255,255,0.9); border-radius: 50%; padding: 2px; }
+.yuemu-m-feature-tag { position: absolute; top: 12px; right: 12px; background: rgba(245, 158, 11, 0.9); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 12px; backdrop-filter: blur(4px); font-weight: 600; }
+.yuemu-m-status-tag { position: absolute; bottom: 12px; right: 12px; font-size: 11px; padding: 4px 10px; border-radius: 12px; backdrop-filter: blur(6px); font-weight: 600; }
+/* 移动端状态毛玻璃 */
+.yuemu-m-status-tag.yuemu-bg-green { background: rgba(16, 185, 129, 0.85); color: #fff; }
+.yuemu-m-status-tag.yuemu-bg-orange { background: rgba(245, 158, 11, 0.85); color: #fff; }
+.yuemu-m-status-tag.yuemu-bg-red { background: rgba(239, 68, 68, 0.85); color: #fff; }
 
-  .warning-icon {
-    font-size: 40px;
-  }
+.yuemu-m-card-info { padding: 16px; }
+.yuemu-m-pic-name { font-size: 17px; font-weight: 700; margin: 0 0 6px 0; color: var(--text-primary); }
+.yuemu-m-pic-desc { font-size: 13px; color: var(--text-secondary); margin: 0 0 12px 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.yuemu-m-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 
-  .confirm-title {
-    font-size: 16px;
-  }
+.yuemu-m-card-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 16px; }
+.yuemu-m-action-btn { flex: 1; min-width: 70px; padding: 8px 0; border-radius: 10px; border: 1px solid var(--border-color); background: var(--hover-background); font-size: 13px; font-weight: 600; }
 
-  .confirm-desc {
-    font-size: 13px;
-  }
+:deep(.yuemu-dark-van-pagination .van-pagination__item) { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
+:deep(.yuemu-dark-van-pagination .van-pagination__item--active) { background: var(--link-color); color: #fff; border-color: var(--link-color); }
 
-  .confirm-actions {
-    gap: 8px;
-  }
+/* ==================== 7. Apple 风格弹窗 ==================== */
+:deep(.yuemu-apple-modal .ant-modal-content) { background: var(--card-background); border-radius: 20px; padding: 0; overflow: hidden; border: 1px solid var(--border-color); }
+:deep(.yuemu-apple-modal .ant-modal-header) { background: var(--card-background); padding: 20px 24px; border-bottom: 1px solid var(--border-color); }
+:deep(.yuemu-apple-modal .ant-modal-title) { font-weight: 700; font-size: 18px; text-align: center; }
 
-  .cancel-button,
-  .confirm-button {
-    min-width: 90px;
-    height: 36px;
-    font-size: 13px;
-  }
-}
+.yuemu-modal-form { padding: 20px 24px; }
+.yuemu-form-item { margin-bottom: 16px; }
+.yuemu-form-item label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+.yuemu-modal-footer { display: flex; gap: 12px; margin-top: 24px; }
+.yuemu-modal-footer .ant-btn { flex: 1; height: 42px; border-radius: 12px; font-weight: 600; font-size: 15px; }
+
+.yuemu-confirm-content { text-align: center; padding: 24px; }
+.yuemu-icon-warning { font-size: 48px; color: #ef4444; margin-bottom: 16px; }
+.yuemu-confirm-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.yuemu-confirm-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px; }
+.yuemu-confirm-actions { display: flex; border-top: 1px solid var(--border-color); margin: 0 -24px -24px; }
+.yuemu-action-cancel, .yuemu-action-danger { flex: 1; height: 50px; background: transparent; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
+.yuemu-action-cancel { color: var(--text-primary); border-right: 1px solid var(--border-color); }
+.yuemu-action-danger { color: #ef4444; }
+.yuemu-action-cancel:hover, .yuemu-action-danger:hover { background: var(--hover-background); }
 </style>

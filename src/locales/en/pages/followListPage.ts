@@ -1,0 +1,42 @@
+export default {
+  follow: 'Follow',
+  fans: 'Fans',
+  starGraph: 'Star Graph',
+  searchOptions: {
+    id: 'ID Search',
+    name: 'Username',
+    account: 'Account',
+    profile: 'Profile'
+  },
+  unfollow: 'Unfollow',
+  following: 'Following',
+  toFollow: 'Follow',
+  readingCoords: 'Reading interstellar coordinates...',
+  emptyFollowTitle: 'The universe is vast, you have not set off yet',
+  emptyFollowDesc: 'Go discover those shining souls',
+  emptyFansTitle: 'Your galaxy is still brewing',
+  emptyFansDesc: 'Post moments to emit your first ray of light to the universe',
+  startExplore: 'Start Exploring',
+  loading: 'Loading...',
+  endOfUniverse: '— End of the universe detected —',
+  graphTitle: {
+    myFollow: 'My Following Galaxy',
+    myFans: 'My Fans Galaxy',
+    taFollow: 'TA Following Galaxy',
+    taFans: 'TA Fans Galaxy'
+  },
+  scanning: 'Scanning star sector...',
+  detectMore: 'Detect more stars',
+  allNodesFound: 'All star nodes discovered',
+  searchPlaceholder: 'Search {target} by {type}...',
+  statFail: 'Failed to get stats:',
+  loadFail: 'Failed to load',
+  pleaseLogin: 'Please log in first',
+  followSuccess: 'Followed successfully',
+  cancelFollow: 'Unfollowed',
+  unfollowSuccess: 'Unfollowed successfully',
+  actionFail: 'Action failed',
+  invalidId: 'Please enter a valid user ID',
+  centerNode: 'Center Node',
+  buildingGalaxy: 'Building Galaxy...'
+};

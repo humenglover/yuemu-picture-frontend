@@ -1,0 +1,20 @@
+export default {
+  "fullGallerySync": "全量图库向量化同步",
+  "syncDescription": "将系统中所有未被删除的图片，通过阿里云通义千问多模态大模型提取特征，并同步至 Qdrant 向量数据库，以支持 '以图搜图' 等高级功能。",
+  "attention": "注意：",
+  "warningDesc": "该操作会扫描全表并高频调用大模型 API。已内置并发限流 (10 QPS) 保护额度。请勿频繁触发。",
+  "startGlobalBatch": "开始全局跑批",
+  "successStored": "成功入库",
+  "recognitionFailed": "识别失败",
+  "currentProgress": "当前进度",
+  "recheckBatch": "重新校对跑批",
+  "statusIdle": "准备就绪",
+  "statusSyncing": "正在拼命同步中...",
+  "statusSuccess": "同步跑批完成！",
+  "statusError": "同步异常中断",
+  "backgroundTaskRunning": "任务正在后台执行，关闭面板不影响跑批进度",
+  "batchTaskStarted": "后台跑批任务已启动！",
+  "startFailed": "启动失败",
+  "requestFailedColon": "请求失败: ",
+  "allPicturesVectorized": "所有图片均已向量化，无需重复同步！"
+};

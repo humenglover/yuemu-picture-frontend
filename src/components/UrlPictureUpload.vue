@@ -1,43 +1,56 @@
 <template>
-  <div class="url-upload-container">
-    <div class="preview-area" v-if="previewUrl">
-      <img :src="previewUrl" class="preview-image" />
-      <div class="preview-mask" @click="clearPreview">
-        <p class="change-text">点击更换图片</p>
+  <div class="yuemu-url-upload-container">
+    <div v-if="previewUrl" class="yuemu-preview-area">
+      <img :src="previewUrl" class="yuemu-preview-image" />
+      <div class="yuemu-preview-mask" @click="clearPreview">
+        <div class="yuemu-change-icon">
+          <i class="fa-solid fa-link-slash"></i>
+        </div>
+        <p class="yuemu-change-text">{{ t('components.urlPictureUpload.clickToChangeUrl') }}</p>
       </div>
     </div>
-    <div v-else class="url-input-box">
-      <div class="input-wrapper">
-        <a-input
-          v-model:value="url"
-          placeholder="请输入图片URL"
-          class="custom-input"
-          :disabled="loading"
-        >
-          <template #prefix>
-            <LinkOutlined class="url-icon" />
-          </template>
-        </a-input>
+
+    <div v-else class="yuemu-url-input-card">
+      <div class="yuemu-illustration-wrapper">
+        <img src="@/assets/illustrations/url-upload-illustration.png" :alt="t('components.urlPictureUpload.urlUploadIllustration')" class="yuemu-url-illustration" />
       </div>
-      <a-button
-        type="primary"
-        class="submit-button"
-        :loading="loading"
-        @click="handlePreview"
-        :disabled="!url"
-      >
-        预览图片
-      </a-button>
+
+      <div class="yuemu-input-section">
+        <p class="yuemu-primary-text">{{ t('components.urlPictureUpload.publishViaImageUrl') }}</p>
+        <div class="yuemu-url-input-group">
+          <div class="yuemu-input-wrapper">
+            <i class="fa-solid fa-link yuemu-prefix-icon"></i>
+            <input
+              v-model="url"
+              :placeholder="t('components.urlPictureUpload.placeholderPasteImageUrl')"
+              class="yuemu-modern-input"
+              :disabled="loading"
+              @keyup.enter="handlePreview"
+            />
+          </div>
+          <button
+            class="yuemu-submit-button"
+            :class="{ 'yuemu-loading': loading }"
+            :disabled="!url || loading"
+            @click="handlePreview"
+          >
+            <i v-if="loading" class="fa-solid fa-spinner fa-spin"></i>
+            <span v-else>{{ t('components.urlPictureUpload.fetchNow') }}</span>
+          </button>
+        </div>
+        <p class="yuemu-tip-text">{{ t('components.urlPictureUpload.supportHttpHttps') }}</p>
+      </div>
     </div>
-    <div class="tip-text">支持 http/https 链接的图片地址</div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { uploadPictureByUrlUsingPost } from '@/api/pictureController.ts'
-import { LinkOutlined } from '@ant-design/icons-vue'
+import { useI18n } from 'vue-i18n'
+import { uploadPictureByUrlUsingPost } from '@/api/pictureController'
+
+const { t } = useI18n()
 
 interface Props {
   picture?: API.PictureVO
@@ -46,11 +59,10 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const url = ref<string>()
+const url = ref<string>('')
 const loading = ref<boolean>(false)
 const previewUrl = ref<string>('')
 
-// 监听 picture 属性的变化
 watch(
   () => props.picture,
   (newPicture) => {
@@ -58,59 +70,48 @@ watch(
       previewUrl.value = newPicture.url
     }
   },
-  { immediate: true }, // 立即执行一次
+  { immediate: true },
 )
 
-/**
- * 上传图片
- * @param file
- */
 const handleSubmit = async () => {
+  if (!url.value) return
+
   loading.value = true
   try {
     const params: API.PictureUploadRequest = { fileUrl: url.value }
-    params.spaceId = props.spaceId
-    if (props.picture) {
-      params.id = props.picture.id
-    }
+    if (props.spaceId) params.spaceId = props.spaceId
+    if (props.picture?.id) params.id = props.picture.id
+
     const res = await uploadPictureByUrlUsingPost(params)
     if (res.data.code === 0 && res.data.data) {
-      message.success('图片上传成功')
-      // 将上传成功的图片信息传递给父组件
+      message.success(t('components.urlPictureUpload.fetchSuccess'))
       props.onSuccess?.(res.data.data)
     } else {
-      message.error('图片上传失败，' + res.data.message)
+      message.error(res.data.message || t('components.urlPictureUpload.fetchFailed'))
+      previewUrl.value = ''
+      url.value = ''
     }
-  } catch (error) {
-    console.error('图片上传失败', error)
-    message.error('图片上传失败，' + error.message)
+  } catch (error: any) {
+    message.error(error.message || t('components.urlPictureUpload.fetchFailedCrossDomainOrInvalid'))
+    previewUrl.value = ''
+    url.value = ''
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
 
-// 预览图片
 const handlePreview = async () => {
   if (!url.value) return
 
-  try {
-    // 创建一个 Image 对象来验证URL是否有效
-    const img = new Image()
-    img.src = url.value
-
-    await new Promise((resolve, reject) => {
-      img.onload = resolve
-      img.onerror = reject
-    })
-
-    previewUrl.value = url.value
-    // 自动开始上传
-    handleSubmit()
-  } catch (error) {
-    message.error('无效的图片地址')
+  if (!url.value.match(/^https?:\/\/.+/)) {
+    message.warning(t('components.urlPictureUpload.pleaseEnterValidLink'))
+    return
   }
+
+  previewUrl.value = url.value
+  await handleSubmit()
 }
 
-// 清除预览
 const clearPreview = () => {
   previewUrl.value = ''
   url.value = ''
@@ -118,146 +119,206 @@ const clearPreview = () => {
 </script>
 
 <style scoped>
-.url-upload-container {
-  padding: 20px;
+.yuemu-url-upload-container {
+  padding: 0;
   height: 100%;
+}
+
+.yuemu-url-input-card {
+  border-radius: 12px;
+  padding: 60px 40px;
+  width: 100%;
+  min-height: 440px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 32px;
+  transition: var(--theme-transition);
 }
 
-.url-input-box {
+.yuemu-url-input-card:hover {
+  border-color: #3b82f6;
+}
+
+.yuemu-illustration-wrapper {
+  width: 140px;
+  height: 140px;
+  transition: transform 0.3s ease;
+}
+
+.yuemu-url-input-card:hover .yuemu-illustration-wrapper {
+  transform: scale(1.02);
+}
+
+.yuemu-url-illustration {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: yuemu-illustrationFadeIn 1.2s ease-out forwards;
+}
+
+@keyframes yuemu-illustrationFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.yuemu-input-section {
+  width: 100%;
+  max-width: 600px;
   display: flex;
-  gap: 12px;
-  margin-bottom: 8px;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
-.input-wrapper {
+.yuemu-primary-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.yuemu-url-input-group {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+}
+
+.yuemu-input-wrapper {
   flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-:deep(.custom-input) {
-  border-radius: 12px;
-  border-color: #e2e8f0;
+.yuemu-prefix-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.yuemu-modern-input {
+  width: 100%;
   height: 44px;
-  transition: all 0.3s ease;
+  padding: 0 12px 0 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--card-background);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
 }
 
-:deep(.custom-input:hover) {
-  border-color: #ff8e53;
+.yuemu-modern-input:focus {
+  border-color: #3b82f6;
 }
 
-:deep(.custom-input:focus) {
-  border-color: #ff8e53;
-  box-shadow: 0 0 0 2px rgba(255, 142, 83, 0.1);
-}
-
-:deep(.url-icon) {
-  color: #94a3b8;
-  transition: color 0.3s ease;
-}
-
-:deep(.custom-input:hover .url-icon),
-:deep(.custom-input:focus .url-icon) {
-  color: #ff8e53;
-}
-
-.submit-button {
+.yuemu-submit-button {
   height: 44px;
   padding: 0 24px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 500;
-  background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
+  border-radius: 8px;
+  background: #3b82f6;
+  color: white;
   border: none;
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
-  transition: all 0.3s ease;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  font-size: 14px;
 }
 
-.submit-button:not(:disabled):hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.3);
+.yuemu-submit-button:hover:not(:disabled) {
+  background: #2563eb;
 }
 
-.submit-button:not(:disabled):active {
-  transform: translateY(1px);
+.yuemu-submit-button:disabled {
+  background: var(--hover-background);
+  color: var(--text-secondary);
+  cursor: not-allowed;
 }
 
-.submit-button:disabled {
-  background: #e2e8f0;
-  color: #94a3b8;
-  box-shadow: none;
+.yuemu-tip-text {
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
-.tip-text {
-  font-size: 13px;
-  color: #94a3b8;
-  text-align: center;
-}
-
-/* 响应式调整 */
-@media screen and (max-width: 768px) {
-  .url-upload-container {
-    padding: 16px;
-  }
-
-  .url-input-box {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .submit-button {
-    width: 100%;
-  }
-
-  .preview-area {
-    min-height: 200px; /* 移动端保持原来的高度 */
-  }
-}
-
-.preview-area {
+.yuemu-preview-area {
   width: 100%;
+  height: 440px;
   position: relative;
   overflow: hidden;
   border-radius: 12px;
-  margin-bottom: 8px;
-  min-height: 400px; /* PC端增加最小高度 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8fafc;
+  background: var(--background);
 }
 
-.preview-image {
+.yuemu-preview-image {
   width: 100%;
-  display: block;
-  max-height: 500px;
+  height: 100%;
   object-fit: contain;
 }
 
-.preview-mask {
+.yuemu-preview-mask {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+  color: white;
   cursor: pointer;
+  gap: 8px;
 }
 
-.preview-area:hover .preview-mask {
+.yuemu-preview-area:hover .yuemu-preview-mask {
   opacity: 1;
 }
 
-.change-text {
-  color: white;
-  font-size: 15px;
-  font-weight: 500;
+.yuemu-change-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.yuemu-change-text {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+@media screen and (max-width: 768px) {
+  .yuemu-url-input-card {
+    padding: 0 20px;
+    min-height: 300px;
+    gap: 24px;
+  }
+}
+
+/* 移动端强制移除点击时的悬停缩放，防止底层长按死锁 */
+@media (max-width: 768px) {
+  .yuemu-submit-button:active, .yuemu-submit-button:hover,
+  .yuemu-submit-button:active *, .yuemu-submit-button:hover *,
+  .ant-card-hoverable:active, .ant-card-hoverable:hover,
+  .ant-card-hoverable:active *, .ant-card-hoverable:hover *,
+  .yuemu-preview-area:active, .yuemu-preview-area:hover,
+  .yuemu-preview-area:active *, .yuemu-preview-area:hover *,
+  .yuemu-url-input-card:active, .yuemu-url-input-card:hover,
+  .yuemu-url-input-card:active *, .yuemu-url-input-card:hover * {
+    transform: none !important;
+  }
 }
 </style>

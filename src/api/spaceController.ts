@@ -32,6 +32,21 @@ export async function deleteSpaceUsingPost(
   })
 }
 
+/** deleteBatchSpace POST /api/space/delete/batch */
+export async function deleteBatchSpaceUsingPost(
+  body: API.DeleteRequest[],
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean_>('/api/space/delete/batch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** editSpace POST /api/space/edit */
 export async function editSpaceUsingPost(
   body: API.SpaceEditRequest,
@@ -77,6 +92,14 @@ export async function getSpaceVoByIdUsingGet(
   })
 }
 
+/** listAvailableSpacesForAI GET /api/space/list/ai */
+export async function listAvailableSpacesForAiUsingGet(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListSpaceVO_>('/api/space/list/ai', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
 /** listSpaceLevel GET /api/space/list/level */
 export async function listSpaceLevelUsingGet(options?: { [key: string]: any }) {
   return request<API.BaseResponseListSpaceLevel_>('/api/space/list/level', {
@@ -111,6 +134,29 @@ export async function listSpaceVoByPageUsingPost(
       'Content-Type': 'application/json',
     },
     data: body,
+    ...(options || {}),
+  })
+}
+
+/** setRecommendStatus POST /api/space/recommend */
+export async function setRecommendStatusUsingPost(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.setRecommendStatusUsingPOSTParams,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean_>('/api/space/recommend', {
+    method: 'POST',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  })
+}
+
+/** listRecommendedSpaces GET /api/space/recommended */
+export async function listRecommendedSpacesUsingGet(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListSpaceVO_>('/api/space/recommended', {
+    method: 'GET',
     ...(options || {}),
   })
 }

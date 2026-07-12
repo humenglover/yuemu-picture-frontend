@@ -1,0 +1,21 @@
+export default {
+  "delete": "删除",
+  "noDrafts": "暂无草稿",
+  "goPublish": "去发布",
+  "loadedAllDrafts": "已加载全部草稿",
+  "deleteSuccess": "删除成功",
+  "draftDataAbnormalCannotEdit": "草稿数据异常，无法编辑",
+  "pageJumpFailed": "页面跳转失败",
+  "untitledDraft": "无标题草稿",
+  "noDraftsAlt": "暂无草稿",
+  "loading": "加载中...",
+  "loadMore": "加载更多",
+  "fetchDraftsFailed": "获取草稿列表失败",
+  "fetchDraftsFailedColon": "获取草稿列表失败:",
+  "deleteFailed": "删除失败",
+  "deleteFailedColon": "删除草稿失败:",
+  "draftIdNotExistColon": "草稿ID不存在:",
+  "routeJumpSuccess": "路由跳转成功",
+  "routeJumpFailedColon": "路由跳转失败:",
+  "tagParseFailedColon": "标签解析失败:"
+};

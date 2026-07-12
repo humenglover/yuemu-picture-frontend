@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="16 16 68 68" width="100%" height="100%">
+  <style>
+    /* 统一的样式前缀 */
+    .yuemu-icon-stroke {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .yuemu-icon-fill {
+      fill: #ffffff;
+    }
+  </style>
+
+  <!-- 中心的融合相框 -->
+  <rect class="yuemu-icon-stroke" x="28" y="28" width="44" height="44" rx="6" />
+
+  <!-- 二维码左上角特征点 -->
+  <rect class="yuemu-icon-stroke" x="34" y="34" width="10" height="10" rx="2" />
+  <rect class="yuemu-icon-fill" x="37" y="37" width="4" height="4" rx="1" />
+  
+  <!-- 二维码右上角特征点 -->
+  <rect class="yuemu-icon-stroke" x="56" y="34" width="10" height="10" rx="2" />
+  <rect class="yuemu-icon-fill" x="59" y="37" width="4" height="4" rx="1" />
+
+  <!-- 相册底部的连绵山脉（适度下移，不超出圆角范围，且居中对称） -->
+  <path class="yuemu-icon-stroke" d="M 28 66 L 38 56 L 50 64 L 62 54 L 72 66" />
+  <!-- 相册的太阳/月亮 -->
+  <circle class="yuemu-icon-fill" cx="50" cy="50" r="3.5" />
+</svg>

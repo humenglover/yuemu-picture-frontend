@@ -1,0 +1,82 @@
+export default {
+  speedControl: 'Switch Speed',
+  stopScroll: 'Stop Scrolling',
+  stop: 'Stop',
+  actions: {
+    like: 'Like',
+    comment: 'Comment',
+    favorite: 'Favorite',
+    share: 'Share',
+    more: 'More'
+  },
+  anonymous: 'Anonymous',
+  followed: 'Following',
+  follow: 'Follow',
+  coverAlt: 'Cover Image',
+  contentDivider: 'Content',
+  commentsCount: '{count} Comments in Total',
+  endMessage: '- No more -',
+  replyPrefix: 'Reply {\'@\'}{user}',
+  addComment: 'Say something...',
+  send: 'Send',
+  delModal: {
+    title: 'Delete post?',
+    desc: 'This action cannot be undone',
+    cancel: 'Cancel',
+    confirm: 'Delete'
+  },
+  permTitle: 'Content Permissions',
+  untitled: 'Untitled Post',
+  moreActions: {
+    edit: 'Edit',
+    del: 'Delete',
+    pause: 'Pause',
+    scroll: 'Scroll',
+    analytics: 'Analytics',
+    report: 'Report',
+    perm: 'Permissions'
+  },
+  speeds: {
+    slow: 'Slow',
+    normal: 'Normal',
+    fast: 'Fast'
+  },
+  msgs: {
+    speedSwitched: 'Switched to: {speed}',
+    scrollPausedComments: 'Reached comments, auto-scroll paused',
+    scrollStoppedBottom: 'Reached bottom, auto-scroll stopped',
+    getDetailFail: 'Failed to get post details',
+    needLogin: 'Please login first',
+    followSuccess: 'Followed successfully',
+    unfollowSuccess: 'Unfollowed successfully',
+    opFail: 'Operation failed',
+    opFailRetry: 'Operation failed, try again later',
+    likeFail: 'Like failed',
+    shareSuccess: 'Shared successfully',
+    getCommentsFail: 'Failed to get comments',
+    commentFail: 'Comment failed',
+    commentFailRetry: 'Failed to post comment, please try again',
+    noPostId: 'Cannot get post ID',
+    delSuccess: 'Deleted successfully',
+    delFail: 'Delete failed',
+    unfavSuccess: 'Unfavorited successfully',
+    unfavFail: 'Unfavorite failed: {msg}',
+    unfavFailDefault: 'Unfavorite failed',
+    favSuccess: 'Favorited successfully',
+    favFail: 'Favorite failed: {msg}',
+    favFailDefault: 'Favorite failed'
+  },
+  emojiSearch: 'Search Emoji',
+  emojiCats: {
+    recent: 'Recent',
+    smileys: 'Smileys',
+    people: 'People',
+    nature: 'Nature',
+    foods: 'Food',
+    activity: 'Activity',
+    places: 'Places',
+    objects: 'Objects',
+    symbols: 'Symbols',
+    flags: 'Flags'
+  }
+};

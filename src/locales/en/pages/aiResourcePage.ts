@@ -1,0 +1,22 @@
+export default {
+  back: 'Go Back',
+  title: 'AI Resources',
+  subtitle: 'Manage images and audio assets generated during AI chats',
+  all: 'All',
+  images: 'Images',
+  audios: 'Audios',
+  emptyTitle: 'No resources found',
+  emptyDesc: 'Images or audio generated in AI chats will be saved here automatically',
+  badgeImage: 'Image',
+  badgeAudio: 'Audio',
+  imageAlt: 'Image resource',
+  audioAlt: 'Audio resource',
+  resourceExpired: 'Resource expired',
+  deleteTitle: 'Delete Resource',
+  loadMore: 'Load more...',
+  loading: 'Loading resources...',
+  fetchFailed: 'Failed to fetch resources: {msg}',
+  confirmDelete: 'Are you sure you want to delete this resource? This action cannot be undone.',
+  deleteSuccess: 'Deleted successfully',
+  deleteFailed: 'Delete failed'
+};

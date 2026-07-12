@@ -1,77 +1,133 @@
 <template>
-  <div class="global-loading" v-if="show">
-    <div class="loading-content">
-      <a-spin :indicator="indicator" />
-      <div class="loading-text">
-        <h3>加载中</h3>
-        <p>请稍候片刻...</p>
-      </div>
-    </div>
+  <div class="yuemu-global-loading" v-if="show">
+    <p class="yuemu-loading-title">{{ t('components.globalLoading.loadingResource') }}</p>
+    <div class="yuemu-loader"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { h } from 'vue'
-import { LoadingOutlined } from '@ant-design/icons-vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 defineProps<{
   show: boolean
 }>()
-
-const indicator = h(LoadingOutlined, {
-  style: {
-    fontSize: '24px',
-    color: '#ff8e53',
-  },
-})
 </script>
 
 <style scoped>
-.global-loading {
+.yuemu-global-loading {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(4px);
-  z-index: 9999;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.3s ease;
+  background: transparent;
+  z-index: 9999;
+  min-height: 100vh;
+  box-sizing: border-box;
+  animation: fadeIn 0.15s ease-out forwards;
 }
 
-.loading-content {
-  text-align: center;
-  padding: 32px;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.yuemu-loading-title {
+  font-size: 20px;
+  color: #bfdbfe;
+  margin-bottom: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  animation: titleFade 0.15s ease-out 0.05s forwards;
 }
 
-.loading-text {
-  margin-top: 16px;
+.yuemu-loader {
+  width: 64px;
+  height: 64px;
+  position: relative;
+  background: #eff6ff;
+  border-radius: 4px;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.9);
+  animation: yuemu-loaderShow 0.15s ease-out 0.05s forwards;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+}
 
-  h3 {
-    color: #1a1a1a;
-    font-size: 16px;
-    margin: 0 0 4px;
-  }
+.yuemu-loader:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40px;
+  height: 40px;
+  transform: rotate(45deg) translate(30%, 40%);
+  background: #93c5fd;
+  box-shadow: 32px -34px 0 5px #60a5fa;
+  animation: slide 2s infinite ease-in-out alternate;
+}
 
-  p {
-    color: #64748b;
-    font-size: 14px;
-    margin: 0;
-  }
+.yuemu-loader:after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  transform: rotate(0deg);
+  transform-origin: 35px 145px;
+  animation: rotate 2s infinite ease-in-out;
+}
+
+@keyframes slide {
+  0%, 100% { bottom: -35px }
+  25%, 75% { bottom: -2px }
+  20%, 80% { bottom: 2px }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(-15deg) }
+  25%, 75% { transform: rotate(0deg) }
+  100% { transform: rotate(25deg) }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes titleFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes yuemu-loaderShow {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .yuemu-loading-title {
+    font-size: 18px;
+    margin-bottom: 16px;
   }
-  to {
+
+  .yuemu-loader {
+    width: 56px;
+    height: 56px;
+    box-shadow: 0 3px 12px rgba(37, 99, 235, 0.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yuemu-global-loading, .yuemu-loading-title, .yuemu-loader {
+    animation: none;
     opacity: 1;
+    transform: none;
   }
 }
 </style>

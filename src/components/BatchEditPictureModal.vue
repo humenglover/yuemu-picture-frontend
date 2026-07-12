@@ -1,56 +1,55 @@
 <template>
-  <div class="batch-edit-picture-modal">
+  <div class="yuemu-batch-edit-picture-modal">
     <a-modal
-      v-model:visible="visible"
-      title="批量编辑图片"
+      v-model:open="visible"
+      :title="t('components.batchEdit.title')"
       :footer="false"
       @cancel="closeModal"
-      class="custom-modal"
+      class="yuemu-custom-modal"
       :width="500"
     >
-      <div class="modal-content">
-        <a-typography-paragraph class="tip-text"> * 只对当前页面的图片生效 </a-typography-paragraph>
+      <div class="yuemu-modal-content">
+        <a-typography-paragraph class="yuemu-tip-text"> {{ t('components.batchEdit.note') }} </a-typography-paragraph>
 
-        <!-- 批量创建表单 -->
         <a-form
           name="formData"
           layout="vertical"
           :model="formData"
           @finish="handleSubmit"
-          class="edit-form"
+          class="yuemu-edit-form"
         >
-          <a-form-item name="category" label="分类">
+          <a-form-item name="category" :label="t('components.batchEdit.category')">
             <a-auto-complete
               v-model:value="formData.category"
-              placeholder="请输入分类"
+              :placeholder="t('components.batchEdit.categoryPlaceholder')"
               :options="categoryOptions"
               allow-clear
-              class="custom-input"
+              class="yuemu-custom-input"
             />
           </a-form-item>
 
-          <a-form-item name="tags" label="标签">
+          <a-form-item name="tags" :label="t('components.batchEdit.tags')">
             <a-select
               v-model:value="formData.tags"
               mode="tags"
-              placeholder="请输入标签"
+              :placeholder="t('components.batchEdit.tagsPlaceholder')"
               :options="tagOptions"
               allow-clear
-              class="custom-select"
+              class="yuemu-custom-select"
             />
           </a-form-item>
 
-          <a-form-item name="nameRule" label="命名规则">
+          <a-form-item name="nameRule" :label="t('components.batchEdit.nameRule')">
             <a-input
               v-model:value="formData.nameRule"
-              placeholder="请输入命名规则，输入 {序号} 可动态生成"
+              :placeholder="t('components.batchEdit.nameRulePlaceholder')"
               allow-clear
-              class="custom-input"
+              class="yuemu-custom-input"
             />
           </a-form-item>
 
           <a-form-item>
-            <a-button type="primary" html-type="submit" class="submit-button"> 确认修改 </a-button>
+            <a-button type="primary" html-type="submit" class="yuemu-submit-button"> {{ t('components.batchEdit.submit') }} </a-button>
           </a-form-item>
         </a-form>
       </div>
@@ -65,6 +64,9 @@ import {
   listPictureTagCategoryUsingGet,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Props {
   pictureList: API.PictureVO[]
@@ -113,11 +115,10 @@ const handleSubmit = async (values: any) => {
   })
   // 操作成功
   if (res.data.code === 0 && res.data.data) {
-    message.success('操作成功')
     closeModal()
     props.onSuccess?.()
   } else {
-    message.error('操作失败，' + res.data.message)
+    message.error(t('components.batchEdit.opFailed') + res.data.message)
   }
 }
 
@@ -126,7 +127,6 @@ const tagOptions = ref<string[]>([])
 
 /**
  * 获取标签和分类选项
- * @param values
  */
 const getTagCategoryOptions = async () => {
   const res = await listPictureTagCategoryUsingGet()
@@ -144,7 +144,7 @@ const getTagCategoryOptions = async () => {
       }
     })
   } else {
-    message.error('获取标签分类列表失败，' + res.data.message)
+    message.error(t('components.batchEdit.fetchFailed') + res.data.message)
   }
 }
 
@@ -154,7 +154,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.custom-modal {
+.yuemu-custom-modal {
   :deep(.ant-modal-content) {
     padding: 0;
     border-radius: 16px;
@@ -176,15 +176,15 @@ onMounted(() => {
   }
 }
 
-.modal-content {
-  .tip-text {
+.yuemu-modal-content {
+  .yuemu-tip-text {
     color: #94a3b8;
     font-size: 13px;
     margin-bottom: 20px;
   }
 }
 
-.edit-form {
+.yuemu-edit-form {
   :deep(.ant-form-item-label) {
     padding-bottom: 8px;
 
@@ -195,7 +195,7 @@ onMounted(() => {
     }
   }
 
-  .custom-input {
+  .yuemu-custom-input {
     :deep(.ant-input),
     :deep(.ant-input-affix-wrapper) {
       border-radius: 8px;
@@ -211,7 +211,7 @@ onMounted(() => {
     }
   }
 
-  .custom-select {
+  .yuemu-custom-select {
     :deep(.ant-select-selector) {
       border-radius: 8px !important;
       border-color: #e2e8f0 !important;
@@ -238,7 +238,7 @@ onMounted(() => {
     }
   }
 
-  .submit-button {
+  .yuemu-submit-button {
     width: 100%;
     height: 40px;
     border-radius: 8px;
@@ -248,10 +248,13 @@ onMounted(() => {
     box-shadow: 0 2px 6px rgba(255, 107, 107, 0.2);
     transition: all 0.3s ease;
     margin-top: 8px;
+    color: white;
 
     &:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+      color: white;
+      opacity: 0.9;
     }
 
     &:active {
@@ -260,16 +263,27 @@ onMounted(() => {
   }
 }
 
-/* 响应式调整 */
 @media screen and (max-width: 768px) {
-  .edit-form {
+  .yuemu-edit-form {
     :deep(.ant-form-item-label) label {
       font-size: 13px;
     }
 
-    .submit-button {
+    .yuemu-submit-button {
       height: 36px;
     }
+  }
+}
+
+/* 移动端强制移除点击时的悬停缩放，防止底层长按死锁 */
+@media (max-width: 768px) {
+  .yuemu-submit-button:active, .yuemu-submit-button:hover,
+  .yuemu-submit-button:active *, .yuemu-submit-button:hover *,
+  .yuemu-custom-input:active, .yuemu-custom-input:hover,
+  .yuemu-custom-input:active *, .yuemu-custom-input:hover *,
+  .ant-card-hoverable:active, .ant-card-hoverable:hover,
+  .ant-card-hoverable:active *, .ant-card-hoverable:hover * {
+    transform: none !important;
   }
 }
 </style>

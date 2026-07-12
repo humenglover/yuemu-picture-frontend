@@ -17,6 +17,36 @@ export async function addSpaceUserUsingPost(
   })
 }
 
+/** auditSpaceUser POST /api/spaceUser/audit */
+export async function auditSpaceUserUsingPost(
+  body: API.SpaceUserAuditRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean_>('/api/spaceUser/audit', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** checkPendingApplication POST /api/spaceUser/checkPending */
+export async function checkPendingApplicationUsingPost(
+  body: API.SpaceUserQueryRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseSpaceUser_>('/api/spaceUser/checkPending', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** deleteSpaceUser POST /api/spaceUser/delete */
 export async function deleteSpaceUserUsingPost(
   body: API.DeleteRequest,
@@ -62,6 +92,21 @@ export async function getSpaceUserUsingPost(
   })
 }
 
+/** joinSpace POST /api/spaceUser/join */
+export async function joinSpaceUsingPost(
+  body: API.SpaceUserJoinRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean_>('/api/spaceUser/join', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** listSpaceUser POST /api/spaceUser/list */
 export async function listSpaceUserUsingPost(
   body: API.SpaceUserQueryRequest,
@@ -79,8 +124,53 @@ export async function listSpaceUserUsingPost(
 
 /** listMyTeamSpace POST /api/spaceUser/list/my */
 export async function listMyTeamSpaceUsingPost(options?: { [key: string]: any }) {
-  return request<API.BaseResponseListSpaceUserVO_>('/api/spaceUser/list/my', {
+  return request<API.BaseResponseListSpaceVO_>('/api/spaceUser/list/my', {
     method: 'POST',
+    ...(options || {}),
+  })
+}
+
+/** listRecommendedMembers POST /api/spaceUser/list/recommended */
+export async function listRecommendedMembersUsingPost(
+  body: API.SpaceUserQueryRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseListSpaceUserVO_>('/api/spaceUser/list/recommended', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** quitSpace POST /api/spaceUser/quit */
+export async function quitSpaceUsingPost(
+  body: API.DeleteRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean_>('/api/spaceUser/quit', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** setRecommendedMember POST /api/spaceUser/setRecommended */
+export async function setRecommendedMemberUsingPost(
+  body: API.SpaceUserRecommendRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean_>('/api/spaceUser/setRecommended', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   })
 }

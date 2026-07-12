@@ -1,0 +1,22 @@
+export default {
+  "spaceDetail": "空间详情",
+  "creatorColon": "创建者：",
+  "admin": "管理员",
+  "normalUser": "普通用户",
+  "usedSpace": "已用空间",
+  "totalSpace": "总空间",
+  "pictureCount": "图片数量",
+  "maxCount": "最大数量",
+  "spaceId": "空间ID",
+  "spaceType": "空间类型",
+  "privateSpace": "私有空间",
+  "teamSpace": "团队空间",
+  "normalVersion": "普通版",
+  "proVersion": "专业版",
+  "flagshipVersion": "旗舰版",
+  "spaceLevel": "空间等级",
+  "createTime": "创建时间",
+  "recentUpdate": "最近更新",
+  "copiedSpaceId": "已复制空间ID",
+  "copyFailedManualCopy": "复制失败，请手动复制"
+};

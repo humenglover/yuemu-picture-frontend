@@ -1,0 +1,20 @@
+export default {
+  "tacticalRadarT13": "Tactical Ranging Radar // T-13",
+  "trackingStatus": "Tracking Status",
+  "realTimeCoordinates": ">> Real-time Coordinates",
+  "mouseX": "X-Axis: {x} px",
+  "mouseY": "Y-Axis: {y} px",
+  "measurementData": ">> Measurement Data",
+  "startXY": "Start X: {x} | Y: {y}",
+  "distanceStr": "Distance: {d} px",
+  "clickSetStartPoint": "[ Click or touch screen to set start point ]",
+  "gridDensity": "Grid Density",
+  "high": "High",
+  "medium": "Medium",
+  "low": "Low",
+  "radarScan": "Radar Scan",
+  "measurementCommand": "Measurement Command",
+  "dataReset": "Data Reset",
+  "running": "Running",
+  "closed": "Closed"
+};

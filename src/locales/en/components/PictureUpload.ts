@@ -1,0 +1,20 @@
+export default {
+  "processing": "Processing...",
+  "clickToChange": "Click to change",
+  "uploadingPleaseWait": "Uploading, please wait...",
+  "processFileFailedRetry": "Process file failed, please retry",
+  "pleaseSelectPictureFile": "Please select a picture file",
+  "pictureSizeExceedsLimit": "Picture size cannot exceed 20MB",
+  "pictureTooLarge": "Picture too large, may affect loading speed",
+  "uploadIllustration": "Upload illustration",
+  "clickToUploadAmazing": "Click to upload amazing",
+  "clickOrDragToUpload": "Click or drag to upload",
+  "cannotCreateCanvas": "Cannot create canvas context",
+  "imageCompressFailed": "Image compress failed",
+  "imageLoadFailed": "Image load failed",
+  "fileReadFailed": "File read failed",
+  "uploadFailedWithColon": "Image upload failed: ",
+  "checkFormatAndSize": "Please check image format and size",
+  "uploadFailedWithColon2": "Upload failed: ",
+  "pleaseTryAgainLater": "Please try again later"
+};

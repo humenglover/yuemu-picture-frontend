@@ -1,0 +1,22 @@
+export default {
+  "spaceDetail": "Space Detail",
+  "creatorColon": "Creator: ",
+  "admin": "Admin",
+  "normalUser": "Normal User",
+  "usedSpace": "Used Space",
+  "totalSpace": "Total Space",
+  "pictureCount": "Picture Count",
+  "maxCount": "Max Count",
+  "spaceId": "Space ID",
+  "spaceType": "Space Type",
+  "privateSpace": "Private Space",
+  "teamSpace": "Team Space",
+  "normalVersion": "Normal Version",
+  "proVersion": "Pro Version",
+  "flagshipVersion": "Flagship Version",
+  "spaceLevel": "Space Level",
+  "createTime": "Create Time",
+  "recentUpdate": "Recent Update",
+  "copiedSpaceId": "Copied Space ID",
+  "copyFailedManualCopy": "Copy failed, please copy manually"
+};

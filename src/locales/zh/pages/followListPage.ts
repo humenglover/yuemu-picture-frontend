@@ -1,0 +1,42 @@
+export default {
+  follow: '关注',
+  fans: '粉丝',
+  starGraph: '星空图谱',
+  searchOptions: {
+    id: 'ID检索',
+    name: '用户名',
+    account: '账号',
+    profile: '搜简介'
+  },
+  unfollow: '取关',
+  following: '已关注',
+  toFollow: '关注',
+  readingCoords: '正在读取星际坐标...',
+  emptyFollowTitle: '宇宙浩瀚，你还未启程',
+  emptyFollowDesc: '去发现那些闪闪发光的灵魂吧',
+  emptyFansTitle: '你的星系仍在酝酿之中',
+  emptyFansDesc: '发布动态，向宇宙发射你的第一缕光',
+  startExplore: '开启探索',
+  loading: '加载中...',
+  endOfUniverse: '— 探测到了宇宙的尽头 —',
+  graphTitle: {
+    myFollow: '我的关注星系',
+    myFans: '我的粉丝星系',
+    taFollow: 'TA的关注星系',
+    taFans: 'TA的粉丝星系'
+  },
+  scanning: '正在扫描星域...',
+  detectMore: '探测更多星体',
+  allNodesFound: '已探明所有星系节点',
+  searchPlaceholder: '搜索{target}的{type}...',
+  statFail: '获取统计失败:',
+  loadFail: '加载失败',
+  pleaseLogin: '请先登录',
+  followSuccess: '关注成功',
+  cancelFollow: '取消关注',
+  unfollowSuccess: '已取消关注',
+  actionFail: '操作失败',
+  invalidId: '请输入有效的用户ID',
+  centerNode: '中心节点',
+  buildingGalaxy: '构建星系中...'
+};

@@ -1,0 +1,23 @@
+export default {
+  "loading": "Loading...",
+  "markAsRead": "Mark as read",
+  "contentInvalid": "Content invalid",
+  "noRecord": "No {title} record",
+  "commentTitle": "Comment",
+  "likeTitle": "Like",
+  "shareTitle": "Share",
+  "systemNotifyTitle": "System Notification",
+  "messageTitle": "Message",
+  "commentAction": "commented on you",
+  "likeAction": "liked your",
+  "shareAction": "shared content",
+  "picApproved": "Pic Approved",
+  "picRejected": "Pic Rejected",
+  "postApproved": "Post Approved",
+  "postRejected": "Post Rejected",
+  "picFeatured": "Pic Featured",
+  "postFeatured": "Post Featured",
+  "systemNotifyDefault": "System Notification",
+  "yuemuAssistant": "Yuemu Assistant",
+  "unknownUser": "Unknown user"
+};

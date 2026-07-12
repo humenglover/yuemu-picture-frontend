@@ -1,0 +1,17 @@
+export default {
+    noNotes: '暂无笔记',
+    goPublish: '快去发布你的第一条笔记吧',
+    draft: '草稿',
+    feature: '精选',
+    unnamedNote: '未命名笔记',
+    reviewPendingMsg: '您的笔记正在审核中，请耐心等待...',
+    reviewApprovedMsg: '恭喜！您的笔记已通过审核',
+    reviewRejectedMsg: '抱歉，您的笔记未通过审核',
+    reviewPending: '审核中',
+    reviewApproved: '审核通过',
+    reviewRejected: '审核未通过',
+    reviewStatus: '审核状态',
+  notePicture: '笔记图片',
+  userAvatar: '用户头像',
+  unknownUser: '未知用户',
+};

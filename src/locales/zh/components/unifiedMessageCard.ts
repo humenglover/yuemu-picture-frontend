@@ -1,0 +1,23 @@
+export default {
+  "loading": "加载中...",
+  "markAsRead": "标记为已读",
+  "contentInvalid": "内容已失效",
+  "noRecord": "暂无{title}记录",
+  "commentTitle": "评论",
+  "likeTitle": "点赞",
+  "shareTitle": "分享",
+  "systemNotifyTitle": "系统通知",
+  "messageTitle": "消息",
+  "commentAction": "评论了你",
+  "likeAction": "赞了你",
+  "shareAction": "分享了内容",
+  "picApproved": "图片通过",
+  "picRejected": "图片退回",
+  "postApproved": "帖子通过",
+  "postRejected": "帖子退回",
+  "picFeatured": "精选图片",
+  "postFeatured": "精选帖子",
+  "systemNotifyDefault": "系统通知",
+  "yuemuAssistant": "悦木小助手",
+  "unknownUser": "未知用户"
+};

@@ -1,0 +1,21 @@
+export default {
+    title: 'One-click Post',
+    postContent: 'Post Content',
+    postContentPlaceholder: 'e.g. Write a post about a summer beach trip...',
+    category: 'Category',
+    categoryHint: 'Helps with layout and images',
+    style: 'Generation Style',
+    styleHint: 'Advanced custom cover',
+    generating: 'Generating...',
+    startGenerate: 'Start Generation',
+    defaultCategory: 'Default Category',
+    daily: 'Daily',
+    fashion: 'Fashion',
+    food: 'Food',
+    travel: 'Travel',
+    photography: 'Photography',
+    smartMatch: 'Smart Match',
+    minimalist: 'Minimalist Journal',
+    polaroid: 'Polaroid Texture',
+    magazine: 'Magazine Cover'
+};

@@ -1,107 +1,141 @@
-﻿<template>
-  <div id="globalFooter">
-    <div v-if="device === DEVICE_TYPE_ENUM.PC" class="pc-footer">
-      <div class="wave-container">
-        <div class="wave wave1"></div>
-        <div class="wave wave2"></div>
-        <div class="wave wave3"></div>
-      </div>
-      <div class="footer-content">
-        <p>
-          © 2024 鹿梦. All rights reserved. <span style="width: 10px"></span>
-          <a href="https://beian.miit.gov.cn/" target="_blank">陇ICP备2024012699号</a>
-        </p>
+<template>
+  <div id="yuemu-globalFooter">
+    <!-- PC端：横向布局、无界毛玻璃质感、高度压缩 -->
+    <div v-if="device === DEVICE_TYPE_ENUM.PC" class="yuemu-pc-footer">
+      <div class="yuemu-pc-footer-inner">
+
+        <!-- 左侧：版权信息 -->
+        <div class="yuemu-footer-left">
+          <span class="yuemu-brand">{{ t('components.globalFooter.brandName') }}</span>
+          <span class="yuemu-copyright">© {{ currentYear }} All rights reserved.</span>
+        </div>
+
+        <!-- 中间：精简版免责声明 -->
+        <div class="yuemu-footer-center">
+          <span class="yuemu-disclaimer-text">
+            {{ t('components.globalFooter.disclaimer') }}
+            <a class="yuemu-mail-link" href="mailto:109484028@qq.com">109484028@qq.com</a>
+          </span>
+        </div>
+
+        <!-- 右侧：备案信息 -->
+        <div class="yuemu-footer-right">
+          <a class="yuemu-beian-link" href="https://beian.miit.gov.cn/" target="_blank">
+            <i class="fas fa-shield-alt yuemu-shield-icon"></i>
+            {{ getBeianNumber() }}
+          </a>
+        </div>
+
       </div>
     </div>
 
-    <van-tabbar v-else v-model="active" class="mobile-tabbar" :safe-area-inset-bottom="true">
-      <van-tabbar-item to="/">
-        <template #icon="props">
-          <div class="custom-icon">
-            <van-icon name="wap-home" :class="{ 'icon-active': props.active }" />
-          </div>
-        </template>
-        <span :class="['tab-text', { 'text-active': active === 0 }]">首页</span>
-      </van-tabbar-item>
+    <!-- 移动端：全宽底部导航栏 -->
+    <div v-else class="yuemu-mobile-bottom-bar" :class="{ 'is-hidden': isHidden }">
+      <svg width="0" height="0" style="position: absolute; pointer-events: none;">
+        <filter id="yuemu-gooey" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <feColorMatrix in="blur" mode="matrix" values="
+                1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 25 -10" result="goo" />
+          <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+        </filter>
+      </svg>
 
-      <van-tabbar-item @click="showUploadOptions">
-        <template #icon>
-          <div class="add-button">
-            <van-icon name="plus" />
+      <div class="yuemu-navbar-wrapper">
+        <div class="yuemu-shadow-layer">
+          <div class="yuemu-bg-layer">
+            <div class="yuemu-navbar-base"></div>
+            <div class="yuemu-center-base-circle"></div>
+            <div class="yuemu-indicator-circle" :style="{ transform: `translateX(${indicatorX}px)` }"></div>
           </div>
-        </template>
-      </van-tabbar-item>
-
-      <van-tabbar-item to="/my">
-        <template #icon="props">
-          <div class="custom-icon">
-            <van-icon name="manager" :class="{ 'icon-active': props.active }" />
-          </div>
-        </template>
-        <span :class="['tab-text', { 'text-active': active === 2 }]">我的</span>
-      </van-tabbar-item>
-    </van-tabbar>
-
-    <van-action-sheet
-      v-model:show="showActionSheet"
-      :actions="actions"
-      cancel-text="取消"
-      close-on-click-action
-      :round="true"
-      class="custom-popup"
-      position="center"
-      @select="onSelect"
-    >
-      <template #description>
-        <div class="action-sheet-header">
-          <div class="header-icon">
-            <van-icon name="photograph" />
-          </div>
-          <div class="title">选择上传位置</div>
-          <div class="subtitle">选择将图片上传到公共图库或个人空间</div>
         </div>
-      </template>
-    </van-action-sheet>
+
+        <ul class="yuemu-nav">
+          <li class="yuemu-item" :class="{ 'yuemu-active': indicatorIndex === 0 }" @click="handleTabChange(0, '/')">
+            <span class="yuemu-icon">
+              <i class="fas fa-home"></i>
+            </span>
+            <span class="yuemu-text">{{ t('nav.home') }}</span>
+          </li>
+
+          <li class="yuemu-item" :class="{ 'yuemu-active': indicatorIndex === 1 }" @click="handleTabChange(1, '/forum')">
+            <span class="yuemu-icon">
+              <i class="fas fa-compass"></i>
+            </span>
+            <span class="yuemu-text">{{ t('nav.forum') }}</span>
+          </li>
+
+          <li class="yuemu-item yuemu-center-action" @click="handleAddClick">
+            <div class="yuemu-m-publish-btn">
+              <i class="fas fa-plus"></i>
+            </div>
+          </li>
+
+          <li class="yuemu-item" :class="{ 'yuemu-active': indicatorIndex === 3 }" @click="handleTabChange(3, '/chat-list')">
+            <span class="yuemu-icon">
+              <i class="fas fa-comment-dots"></i>
+              <span v-if="unreadCounts.totalUnread > 0" class="yuemu-m-badge">
+                {{ unreadCounts.totalUnread > 99 ? '99+' : unreadCounts.totalUnread }}
+              </span>
+            </span>
+            <span class="yuemu-text">{{ t('nav.chat') }}</span>
+          </li>
+
+          <li class="yuemu-item" :class="{ 'yuemu-active': indicatorIndex === 4 }" @click="handleTabChange(4, '/my')">
+            <span class="yuemu-icon">
+              <i class="fas fa-user"></i>
+              <span v-if="messageCenterUnreadCount > 0" class="yuemu-m-badge">
+                {{ messageCenterUnreadCount > 99 ? '99+' : messageCenterUnreadCount }}
+              </span>
+            </span>
+            <span class="yuemu-text">{{ t('user.profile') }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <UploadActionSheet v-model="showActionSheet" />
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, onMounted } from 'vue'
-import { DEVICE_TYPE_ENUM } from '@/constants/device.ts'
-import { getDeviceType } from '@/utils/device.ts'
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue'
+import { DEVICE_TYPE_ENUM } from '@/constants/device'
+import { getDeviceType } from '@/utils/device'
 import router from '@/router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
-import { listSpaceVoByPageUsingPost } from '@/api/spaceController'
-import { message } from 'ant-design-vue'
+import '@lottiefiles/lottie-player'
+import UploadActionSheet from './UploadActionSheet.vue'
+import { getCurrentYear } from '@/utils/date'
+import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
-// 定义用于存储设备类型的响应式变量
+const { t } = useI18n()
+
+const props = defineProps<{
+  unreadCounts: {
+    totalUnread: number
+    privateUnread: number
+    friendUnread: number
+  },
+  messageCenterUnreadCount: {
+    type: Number,
+    default: 0
+  }
+}>()
+
 const device = ref<string>('')
-
-// 用于跟踪当前活动的底部标签页，初始化为 0，对应第一个tabbar项（可根据实际默认高亮项调整）
 const active = ref(0)
-
-// 上传选项相关
 const showActionSheet = ref(false)
 const loginUserStore = useLoginUserStore()
 
-// 动作面板选项
-const actions = [
-  {
-    name: '上传到公共图库',
-    color: '#ff8e53',
-    subname: '您的图片将在审核通过后展示给所有用户',
-    icon: 'photo-o',
-  },
-  {
-    name: '上传到个人空间',
-    color: '#ff6b6b',
-    subname: '仅您自己可以查看和管理',
-    icon: 'user-o',
-  },
-]
+const isHidden = ref(false)
+let lastScrollTop = 0
+const scrollThreshold = 50
 
-// 显示上传选项
-const showUploadOptions = () => {
+const handleAddClick = () => {
   if (!loginUserStore.loginUser.id) {
     router.push('/user/login')
     return
@@ -109,472 +143,384 @@ const showUploadOptions = () => {
   showActionSheet.value = true
 }
 
-// 处理选项选择
-const onSelect = async (action: any) => {
-  if (action.name === '上传到公共图库') {
-    router.push('/add_picture')
-  } else {
-    try {
-      // 获取用户的第一个空间
-      const res = await listSpaceVoByPageUsingPost({
-        userId: loginUserStore.loginUser.id,
-        current: 1,
-        pageSize: 1,
-      })
-      if (res.data.code === 0) {
-        // 如果有空间，则进入上传页面
-        if (res.data.data?.records?.length > 0) {
-          const space = res.data.data.records[0]
-          router.push({
-            path: '/add_picture',
-            query: {
-              spaceId: space.id,
-            },
-          })
-        } else {
-          // 如果没有空间，则跳转到创建空间页面
-          router.push('/add_space')
-          message.warn('请先创建空间')
-        }
-      } else {
-        message.error('加载我的空间失败，' + res.data.message)
+const route = useRoute()
+
+watch(() => route.path, (newPath) => {
+  switch (newPath) {
+    case '/':
+    case '/home':
+      active.value = 0
+      break
+    case '/forum':
+      active.value = 1
+      break
+    case '/chat-list':
+      active.value = 3
+      break
+    case '/my':
+      active.value = 4
+      break
+    default:
+      if (newPath.startsWith('/forum')) {
+        active.value = 1
+      } else if (newPath.startsWith('/chat-list')) {
+        active.value = 3
+      } else if (newPath.startsWith('/my')) {
+        active.value = 4
       }
-    } catch (error: any) {
-      console.error('获取空间信息失败：', error)
-      message.error('获取空间信息失败，请稍后重试')
+      break
+  }
+}, { immediate: true })
+
+watch(() => route.path, (newPath) => {
+  nextTick(() => {
+    const savedPosition = sessionStorage.getItem(`${newPath}_scrollPosition`)
+    if (savedPosition) {
+      window.scrollTo({
+        top: parseInt(savedPosition),
+        behavior: 'auto'
+      })
     }
+  })
+})
+
+const handleScroll = () => {
+  if (device.value === DEVICE_TYPE_ENUM.PC) return
+
+  const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop
+
+  if (Math.abs(currentScrollTop - lastScrollTop) > scrollThreshold) {
+    isHidden.value = currentScrollTop > lastScrollTop
+    lastScrollTop = currentScrollTop
   }
 }
 
-// 页面加载时获取设备类型并获取数据，同时设置初始高亮项
-onMounted(async () => {
-  device.value = await getDeviceType()
-  const currentRoute = router.currentRoute.value
-  const currentPath = currentRoute.path
-  if (currentPath === '/') {
-    active.value = 0
-  } else if (currentPath === '/add_picture') {
-    active.value = 1
-  } else if (currentPath === '/my') {
-    active.value = 2
-  }
+const indicatorIndex = ref(0)
+const indicatorX = ref(0)
+
+const updateIndicator = () => {
+  if (device.value === DEVICE_TYPE_ENUM.PC) return
+  const container = document.querySelector('.yuemu-nav')
+  const items = document.querySelectorAll('.yuemu-nav .yuemu-item')
+  if (!container || !items.length) return
+
+  const activeEl = items[indicatorIndex.value] as HTMLElement
+  if (!activeEl) return
+
+  const navRect = container.getBoundingClientRect()
+  const elRect = activeEl.getBoundingClientRect()
+
+  const offsetLeft = elRect.left - navRect.left
+  const centerX = offsetLeft + (elRect.width / 2)
+
+  indicatorX.value = centerX - 34 // 68px width / 2
+}
+
+watch(indicatorIndex, () => {
+  nextTick(updateIndicator)
 })
 
-// 监听路由变化，更新高亮菜单项对应的active值
-router.afterEach((to) => {
-  const currentPath = to.path
-  if (currentPath === '/') {
-    active.value = 0
-  } else if (currentPath === '/add_picture') {
-    active.value = 1
-  } else if (currentPath === '/my') {
-    active.value = 2
-  }
+watch(active, (val) => {
+  indicatorIndex.value = val
+}, { immediate: true })
+
+onMounted(async () => {
+  device.value = await getDeviceType()
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('resize', updateIndicator)
+  setTimeout(updateIndicator, 100)
 })
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', updateIndicator)
+  showActionSheet.value = false
+})
+
+const currentYear = computed(() => getCurrentYear())
+
+const handleTabChange = (index: number, path: string) => {
+  if (active.value === index && route.path === path) {
+    return
+  }
+  const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
+  sessionStorage.setItem(`${route.path}_scrollPosition`, currentScrollPosition.toString())
+
+  active.value = index
+  router.replace(path)
+}
+
+const getBeianNumber = () => {
+  const env = import.meta.env.VITE_APP_ENV || 'development'
+  if (env === 'production') {
+    return '陇ICP备2024012699号-3'
+  } else {
+    return '陇ICP备2024012699号-1'
+  }
+}
 </script>
 
 <style scoped>
-#globalFooter {
-  z-index: 0;
-}
-/* PC端页脚样式 */
-.pc-footer {
+#yuemu-globalFooter {
+  z-index: 100;
   position: relative;
-  height: 24px;
-  text-align: center;
-  padding: 4px 0;
-  background: linear-gradient(to bottom, transparent, rgba(255, 142, 83, 0.03));
-  overflow: hidden;
-  z-index: 1021;
+  line-height: 1;
 }
 
-.wave-container {
-  position: absolute;
-  top: -8px;
-  left: 0;
+/* ================== PC 端：极简纤薄无边框设计 ================== */
+.yuemu-pc-footer {
   width: 100%;
-  height: 20px;
-  overflow: hidden;
-}
-
-.wave {
-  position: absolute;
-  left: 0;
-  width: 200%;
-  height: 100%;
-  background-repeat: repeat-x;
-  background-size: 50% 100%;
-  transform-origin: center bottom;
-}
-
-.wave1 {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 800 88.7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%23ff8e5308'/%3E%3C/svg%3E");
-  animation: wave 15s linear infinite;
-  z-index: 3;
-  opacity: 0.8;
-}
-
-.wave2 {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 800 88.7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%23ff6b6b08'/%3E%3C/svg%3E");
-  animation: wave 10s linear infinite;
-  z-index: 2;
-  opacity: 0.6;
-}
-
-.wave3 {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 800 88.7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%23ff8e5305'/%3E%3C/svg%3E");
-  animation: wave 7s linear infinite;
-  z-index: 1;
-  opacity: 0.4;
-}
-
-@keyframes wave {
-  0% {
-    transform: translateX(0) translateZ(0) scaleY(1);
-  }
-  50% {
-    transform: translateX(-25%) translateZ(0) scaleY(0.95);
-  }
-  100% {
-    transform: translateX(-50%) translateZ(0) scaleY(1);
-  }
-}
-
-.footer-content {
+  background: var(--header-background, rgba(255, 255, 255, 0.65));
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  /* 重点修改：将原来的 24px 大幅压缩到 12px，让单行文字更加精致细长 */
+  padding: 12px 0;
+  transition: background-color 0.4s ease;
   position: relative;
-  z-index: 4;
-  padding: 2px 0;
-}
-
-.footer-content p {
-  color: #8d8a8a;
-  margin-bottom: 1px;
-  font-size: 12px;
-  line-height: 1.2;
-}
-
-.footer-content a {
-  color: #666;
-  text-decoration: none;
-  position: relative;
-  transition: color 0.3s ease;
-  font-size: 11px;
-  line-height: 1.2;
-}
-
-.footer-content a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, #ff8e53, #ff6b6b);
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.3s ease;
-}
-
-.footer-content a:hover {
-  color: #ff8e53;
-}
-
-.footer-content a:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
-}
-
-/* 移动端底部导航栏样式 */
-.mobile-tabbar {
-  :deep(.van-tabbar) {
-    height: 50px;
-    border-top: none;
-    box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.05);
-  }
-
-  :deep(.van-tabbar-item) {
-    color: #94a3b8;
-    font-size: 10px;
-  }
-
-  .add-button {
-    position: relative;
-    z-index: 2;
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: -40px auto 0;
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-    border: 4px solid #fff;
-
-    .van-icon {
-      font-size: 24px;
-      color: white;
-    }
-  }
-
-  .custom-icon {
-    margin-bottom: 4px;
-
-    .van-icon {
-      font-size: 20px;
-    }
-  }
-
-  .icon-active {
-    color: #ff8e53;
-  }
-
-  .text-active {
-    color: #ff8e53;
-  }
-}
-
-:deep(.van-tabbar-item) {
-  padding: 6px 0 !important;
-  height: 52px !important;
-}
-
-:deep(.van-tabbar-item__icon) {
-  margin-bottom: 3px !important;
-  height: auto !important;
-}
-
-:deep(.van-tabbar-item__text) {
-  font-size: 12px !important;
-  line-height: 1 !important;
-  margin-top: 1px !important;
-}
-
-/* 自定义图标样式 */
-.custom-icon {
-  font-size: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1px;
-}
-
-/* 中间的上传按钮 */
-.add-button {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: -25px;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.25);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.add-button .van-icon {
-  font-size: 22px;
-  color: white;
-}
-
-/* 激活状态的图标和文字 */
-.icon-active {
-  color: #ff8e53;
-  transform: scale(1.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.text-active {
-  color: #ff8e53;
-  font-weight: 500;
-}
-
-/* 点击效果 */
-.add-button:active {
-  transform: scale(0.9) rotate(-45deg);
-}
-
-/* 标签文字样式 */
-.tab-text {
-  font-size: 12px;
-  margin-top: 2px;
-  padding-bottom: 2px;
-  display: block;
-}
-
-:deep(.van-tabbar-item--active) {
-  background-color: transparent;
-}
-
-/* 添加渐变背景 */
-:deep(.van-tabbar-item)::after {
-  content: '';
-  position: absolute;
   bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, #ff8e53, #ff6b6b);
-  opacity: 0;
-  transition: opacity 0.3s;
-  border-radius: 2px 2px 0 0;
+  box-shadow: 0 -4px 30px var(--header-shadow, rgba(0, 0, 0, 0.05));
 }
 
-:deep(.van-tabbar-item--active)::after {
+@media (prefers-color-scheme: dark) { .yuemu-pc-footer { background: rgba(25, 25, 25, 0.65);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.15); } }
+
+.yuemu-pc-footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  font-size: 13px;
+  color: var(--text-secondary, #64748b);
+}
+
+@media (prefers-color-scheme: dark) { .yuemu-pc-footer-inner { color: #94a3b8; } }
+
+.yuemu-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.yuemu-brand {
+  font-weight: 600;
+  color: var(--text-primary, #334155);
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+@media (prefers-color-scheme: dark) { .yuemu-brand { color: #e2e8f0; } }
+
+.yuemu-footer-center {
+  flex: 1;
+  text-align: center;
+  padding: 0 20px;
+  opacity: 0.85;
+}
+
+.yuemu-mail-link, .yuemu-beian-link {
+  color: #64748b;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) { .yuemu-mail-link,
+@media (prefers-color-scheme: dark) { .yuemu-beian-link {
+ color: #94a3b8; 
+} } }
+
+.yuemu-mail-link:hover, .yuemu-beian-link:hover {
+  color: #2563eb;
   opacity: 1;
 }
 
-/* 弹框样式 */
-.custom-popup {
-  --van-action-sheet-max-height: none !important;
-  z-index: 9999;
-  :deep(.van-action-sheet__content) {
-    padding: 20px;
-    border-radius: 20px;
-    background: linear-gradient(to bottom, #fff9f6, #fff);
-    width: 300px;
-    position: fixed;
-    left: 50%;
-    bottom: 120px;
-    transform: translateX(-50%);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    animation: slideUpIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+@media (prefers-color-scheme: dark) { .yuemu-mail-link:hover,
+@media (prefers-color-scheme: dark) { .yuemu-beian-link:hover {
+ color: #60a5fa; 
+} } }
 
-  :deep(.van-overlay) {
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-  }
-
-  /* 优化小三角形 */
-  :deep(.van-action-sheet__content)::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid #fff;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-  }
+.yuemu-footer-right {
+  display: flex;
+  align-items: center;
+  opacity: 0.85;
 }
 
-.action-sheet-header {
-  padding: 20px 16px 12px;
-  text-align: center;
-  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+.yuemu-shield-icon {
+  margin-right: 6px;
+  opacity: 0.8;
 }
 
-.header-icon {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 16px;
-  background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
-  border-radius: 16px;
+/* ================== 移动端（果冻导航） ================== */
+.yuemu-mobile-bottom-bar {
+  position: fixed;
+  bottom: 0; left: 0; width: 100%;
+  z-index: 1999;
+  transition: transform 0.3s ease;
+  background: transparent;
+  /* 移除原有的左右 padding，实现真正的通栏底部导航 */
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
+}
+.yuemu-mobile-bottom-bar.is-hidden {
+  transform: translateY(calc(100% + 40px));
+}
+
+.yuemu-navbar-wrapper {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  margin-top: 10px;
+}
+
+.yuemu-shadow-layer {
+  position: absolute;
+  top: 0; left: 0; width: 100%;
+  height: calc(100% + 30px); /* 向下延展，把滤镜产生的底部圆角藏在屏幕外 */
+  filter: drop-shadow(0 -1px 4px rgba(0, 0, 0, 0.04));
+  z-index: 1;
+}
+
+@media (prefers-color-scheme: dark) { .yuemu-shadow-layer { filter: drop-shadow(0 -1px 4px rgba(0, 0, 0, 0.2)); } }
+
+.yuemu-bg-layer {
+  position: absolute;
+  top: 0; left: 0; width: 100%;
+  height: calc(100% + 30px); /* 向下延展 */
+  filter: url('#yuemu-gooey');
+}
+
+.yuemu-navbar-base {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: var(--card-background, #ffffff);
+  /* 顶部设置适中圆角（SVG滤镜会视觉放大），底部直角 */
+  border-radius: 12px 12px 0 0;
+}
+
+.yuemu-center-base-circle {
+  display: none;
+}
+
+.yuemu-indicator-circle {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: 68px;
+  height: 44px;
+  background-color: var(--card-background, #ffffff);
+  border-radius: 50%;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.yuemu-nav {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 50px;
+  margin: 0; padding: 0 10px;
+  display: flex;
+  justify-content: space-around;
+  list-style: none;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.yuemu-item {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.yuemu-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 22px;
+  height: 22px;
+  font-size: 18px;
+  color: var(--text-secondary, #64748b);
+  transition: transform 0.5s cubic-bezier(0.5, -0.3, 0.25, 1.3), color 0.5s;
+  position: relative;
+}
+
+.yuemu-text {
+  position: absolute;
+  bottom: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--link-color, #1677ff);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: transform 0.5s cubic-bezier(0.5, -0.3, 0.25, 1.3), opacity 0.5s;
+}
+
+/* 激活状态特效 */
+.yuemu-item.yuemu-active .yuemu-icon {
+  transform: translateY(-16px);
+  color: var(--link-color, #1677ff);
+}
+
+.yuemu-item.yuemu-active .yuemu-text {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 独立发布的悬浮按钮 */
+.yuemu-center-action {
+  flex: 0 0 76px;
+  position: relative;
+  height: 100%;
+}
+
+.yuemu-m-publish-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4096ff 0%, #1677ff 100%);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: iconPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 10px rgba(22, 119, 255, 0.3);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+  font-size: 20px;
+  z-index: 10;
 }
 
-.header-icon .van-icon {
-  font-size: 24px;
-  color: white;
+.yuemu-center-action:active .yuemu-m-publish-btn {
+  transform: translate(-50%, -50%) scale(0.92);
+  box-shadow: 0 4px 6px rgba(22, 119, 255, 0.2);
 }
 
-.action-sheet-header .title {
-  font-size: 16px;
-  font-weight: 500;
-  color: #1a1a1a;
-  margin-bottom: 8px;
-  animation: fadeIn 0.4s ease-out 0.1s both;
-}
-
-.action-sheet-header .subtitle {
-  font-size: 13px;
-  color: #64748b;
-  animation: fadeIn 0.4s ease-out 0.2s both;
-}
-
-:deep(.van-action-sheet__item) {
-  margin: 8px 0;
-  padding: 16px !important;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transform: translateY(20px);
-  opacity: 0;
-  animation: fadeInUp 0.3s ease-out forwards;
-}
-
-:deep(.van-action-sheet__item:nth-child(2)) {
-  animation-delay: 0.1s;
-}
-
-:deep(.van-action-sheet__cancel) {
-  font-size: 14px !important;
-  color: #64748b !important;
-  margin-top: 8px;
-  border-radius: 12px;
-}
-
-/* 动画关键帧 */
-@keyframes popIn {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes iconPop {
-  from {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* 添加新的动画 */
-@keyframes slideUpIn {
-  from {
-    transform: translate(-50%, 20px);
-    opacity: 0;
-  }
-  to {
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
+/* 徽标 */
+.yuemu-m-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background-color: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: bold;
+  height: 16px;
+  min-width: 16px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 2px solid var(--card-background, #ffffff);
+  line-height: 1;
+  z-index: 2;
 }
 </style>

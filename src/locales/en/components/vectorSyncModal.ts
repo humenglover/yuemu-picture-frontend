@@ -1,0 +1,20 @@
+export default {
+  "fullGallerySync": "Full Gallery Vector Synchronization",
+  "syncDescription": "Extract features of all non-deleted images in the system using Alibaba Cloud Qwen multimodal LLM, and sync to Qdrant vector database to support advanced features like 'Search by Image'.",
+  "attention": "Attention:",
+  "warningDesc": "This operation scans the entire table and calls the LLM API at high frequency. A concurrency limit (10 QPS) is built-in to protect quota. Do not trigger frequently.",
+  "startGlobalBatch": "Start Global Batch",
+  "successStored": "Successfully Stored",
+  "recognitionFailed": "Recognition Failed",
+  "currentProgress": "Current Progress",
+  "recheckBatch": "Recheck Batch",
+  "statusIdle": "Ready",
+  "statusSyncing": "Syncing hard...",
+  "statusSuccess": "Sync batch completed!",
+  "statusError": "Sync unexpectedly interrupted",
+  "backgroundTaskRunning": "Task is running in background, closing panel will not affect batch progress",
+  "batchTaskStarted": "Background batch task started!",
+  "startFailed": "Start failed",
+  "requestFailedColon": "Request failed: ",
+  "allPicturesVectorized": "All pictures are already vectorized, no need to resync!"
+};

@@ -1,0 +1,20 @@
+export default {
+  title: '加入悦木',
+  emailPlaceholder: '注册邮箱',
+  codePlaceholder: '验证码',
+  getCode: '获取验证码',
+  passwordPlaceholder: '设置密码 (8位以上)',
+  confirmPasswordPlaceholder: '确认密码',
+  inviteCodePlaceholder: '邀请码 (可选)',
+  hasAccount: '已有账号？',
+  loginNow: '立即登录',
+  wechatRegister: '微信快速注册',
+  createAccount: '创建账号',
+  fillRequired: '请填写所有必填项',
+  passwordLength: '密码长度不能小于 8 位',
+  passwordNotMatch: '两次输入的密码不一致',
+  codeSent: '验证码已发送',
+  codeSendFail: '验证码发送失败：',
+  registerSuccess: '注册成功',
+  registerFail: '注册失败，'
+};

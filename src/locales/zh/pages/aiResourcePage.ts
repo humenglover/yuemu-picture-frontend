@@ -1,0 +1,22 @@
+export default {
+  back: '返回上一页',
+  title: 'AI 资源库',
+  subtitle: '集中管理 AI 聊天过程中生成的图片和音频资产',
+  all: '全部',
+  images: '图片',
+  audios: '音频',
+  emptyTitle: '暂无任何资源',
+  emptyDesc: '在 AI 对话中生成的图片或音频会自动保存在这里',
+  badgeImage: '图像',
+  badgeAudio: '语音',
+  imageAlt: '图片资源',
+  audioAlt: '音频资源',
+  resourceExpired: '资源已失效',
+  deleteTitle: '删除资源',
+  loadMore: '加载更多...',
+  loading: '正在加载资源...',
+  fetchFailed: '获取资源失败：{msg}',
+  confirmDelete: '确定要删除这个资源吗？删除后不可恢复。',
+  deleteSuccess: '删除成功',
+  deleteFailed: '删除失败'
+};

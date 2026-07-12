@@ -1,0 +1,21 @@
+export default {
+    title: '一键成帖',
+    postContent: '发布内容',
+    postContentPlaceholder: '例如：我要写一篇关于夏日海边旅行的帖子，配文要有少女心...',
+    category: '所属分类',
+    categoryHint: '有助于排版和配图',
+    style: '生成风格',
+    styleHint: '高级定制封面',
+    generating: '正在生成...',
+    startGenerate: '开始生成',
+    defaultCategory: '默认分类',
+    daily: '日常',
+    fashion: '穿搭',
+    food: '美食',
+    travel: '旅行',
+    photography: '摄影',
+    smartMatch: '智能匹配',
+    minimalist: '极简留白手帐',
+    polaroid: '拍立得质感',
+    magazine: '高定杂志封面'
+};

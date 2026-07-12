@@ -1,0 +1,23 @@
+export default {
+  "running": "运行中",
+  "standby": "待机",
+  "completedCycles": "已完成周期: {count}",
+  "restoreModeTitle": ">>> 修复模式 <<<",
+  "resetBtn": "重置",
+  "configBtn": "配置",
+  "taskListLog": "任务清单.LOG",
+  "delete": "删除",
+  "inputNewTask": "+ 录入新任务...",
+  "workDurationMin": "工作时长 (分)",
+  "restDurationMin": "休息时长 (分)",
+  "taskDesc": "任务描述",
+  "confirmExec": "确认执行",
+  "cancelBtn": "取消",
+  "focusModeTitle": ">>> 专注模式 <<<",
+  "terminateProgram": "终止程序",
+  "startProgram": "启动程序",
+  "parameterAdjustment": "参数调整",
+  "newTaskList": "新建任务档案",
+  "inputCommand": "输入指令...",
+  "noTasks": "当前无任务。专注当下。"
+};

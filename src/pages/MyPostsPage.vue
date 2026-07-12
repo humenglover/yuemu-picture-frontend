@@ -1,712 +1,350 @@
 <template>
-  <div id="MyPostsPage">
-    <!-- 搜索区域 -->
-    <template v-if="device !== DEVICE_TYPE_ENUM.PC">
-      <div class="mobile-search-container">
-        <!-- 标题和进度条 -->
-        <div class="header-section">
-          <div class="title">我的发布</div>
-          <a-tooltip :title="`共发布 ${total} 张图片`">
-            <a-progress
-              type="circle"
-              :size="30"
-              :percent="100"
-              class="progress"
-            />
-          </a-tooltip>
-        </div>
-        <!-- 搜索区域 -->
-        <div class="search-section">
-          <a-input
-            v-model:value="searchParams.searchText"
-            placeholder="搜索图片"
-            allow-clear
-            class="mobile-search-input"
-            @pressEnter="doSearch"
-          >
-            <template #suffix>
-              <SearchOutlined class="search-icon" @click="doSearch" />
-            </template>
-          </a-input>
-          <a-select
-            v-model:value="searchParams.reviewStatus"
-            placeholder="审核状态"
-            :options="PIC_REVIEW_STATUS_OPTIONS"
-            allow-clear
-            class="mobile-status-select"
-            @change="doSearch"
+  <div id="SearchCategoryPage">
+    <div class="search-header">
+      <div class="searchbar-wrapper">
+        <div class="searchbar">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            v-model="searchText"
+            type="text"
+            class="search-input"
+            :placeholder="$t('pages.myPostsPage.searchPlaceholder')"
+            @keyup.enter="handleSearch"
           />
+          <div class="clear-btn" v-if="searchText" @click="searchText = ''">
+            <i class="fas fa-times"></i>
+          </div>
         </div>
-      </div>
-    </template>
-
-    <!-- PC端搜索表单 -->
-    <template v-else>
-      <div class="search-and-button-container">
-        <a-form layout="inline" :model="searchParams" @finish="doSearch">
-          <!-- PC端搜索选项 -->
-          <a-form-item label="关键词">
-            <a-input
-              v-model:value="searchParams.searchText"
-              placeholder="从名称和简介搜索"
-              allow-clear
-              class="compact-input"
-            />
-          </a-form-item>
-          <a-form-item label="类型">
-            <a-input
-              v-model:value="searchParams.category"
-              placeholder="请输入类型"
-              allow-clear
-              class="compact-input"
-            />
-          </a-form-item>
-          <a-form-item label="标签">
-            <a-input
-              v-model:value="searchParams.tags"
-              placeholder="请输入标签"
-              allow-clear
-              class="compact-input"
-            />
-          </a-form-item>
-          <!-- PC端审核状态选择 -->
-          <a-form-item v-if="device === DEVICE_TYPE_ENUM.PC" name="reviewStatus" label="审核状态">
-            <a-select
-              v-model:value="searchParams.reviewStatus"
-              class="compact-select"
-              placeholder="请选择审核状态"
-              :options="PIC_REVIEW_STATUS_OPTIONS"
-              allow-clear
-            />
-          </a-form-item>
-          <!-- PC端搜索按钮 -->
-          <a-form-item v-if="device === DEVICE_TYPE_ENUM.PC">
-            <a-button type="primary" html-type="submit" class="action-button search-button">
-              <SearchOutlined />
-              搜索
-            </a-button>
-          </a-form-item>
-        </a-form>
-      </div>
-    </template>
-
-    <!-- 图片列表 -->
-    <div v-if="device === DEVICE_TYPE_ENUM.PC">
-      <PictureList
-        :dataList="dataList"
-        :loading="loading"
-        :showOp="true"
-        :onReload="fetchData"
-        :isMyPosts="true"
-      />
-      <!-- PC端分页 -->
-      <div class="pagination-wrapper">
-        <a-pagination
-          v-model:current="searchParams.current"
-          v-model:pageSize="searchParams.pageSize"
-          :page-size-options="['6', '12', '18', '24', '30']"
-          :total="total"
-          :show-total="(total) => `共 ${total} 条`"
-          @change="onPageChange"
-          show-size-changer
-          show-quick-jumper
-          class="custom-pagination"
-        >
-          <template #buildOptionText="props">
-            <span>{{ props.value }}张/页</span>
-          </template>
-        </a-pagination>
+        <div class="search-btn" @click="handleSearch">{{ $t('pages.myPostsPage.search') }}</div>
       </div>
     </div>
-    <div v-else>
-      <van-pull-refresh
-        v-model="loading"
-        class="pull-refresh-container"
-        @refresh="onRefresh"
-        :distance="80"
-        :head-height="60"
+
+    <div class="category-grid">
+      <div
+        class="category-item"
+        :class="{ active: activeCategory === 'picture' }"
+        @click="handleCategoryChange('picture')"
       >
-        <MobilePictureList
-          :dataList="dataList"
-          :loading="loading"
-          :showOp="true"
-          :onReload="fetchData"
-          :isMyPosts="true"
-        />
-      </van-pull-refresh>
-      <!-- 移动端分页 -->
-      <div class="mobile-pagination">
-        <div class="page-info">
-          <span>第 {{ searchParams.current }} 页</span>
-          <span class="separator">/</span>
-          <span>共 {{ Math.ceil(total / searchParams.pageSize) }} 页</span>
-        </div>
-        <div class="page-actions">
-          <a-button
-            class="page-button prev"
-            :disabled="searchParams.current === 1"
-            @click="() => onPageChange(searchParams.current - 1, searchParams.pageSize)"
-          >
-            上一页
-          </a-button>
-          <a-button
-            class="page-button next"
-            :disabled="searchParams.current >= Math.ceil(total / searchParams.pageSize)"
-            @click="() => onPageChange(searchParams.current + 1, searchParams.pageSize)"
-          >
-            下一页
-          </a-button>
-        </div>
+        <i class="fas fa-image category-icon"></i>
+        <span class="category-text">{{ $t('pages.myPostsPage.picture') }}</span>
       </div>
+      <div
+        class="category-item"
+        :class="{ active: activeCategory === 'post' }"
+        @click="handleCategoryChange('post')"
+      >
+        <i class="fas fa-file-alt category-icon"></i>
+        <span class="category-text">{{ $t('pages.myPostsPage.post') }}</span>
+      </div>
+    </div>
+
+    <div class="content-area" v-if="hasSearched">
+      <div v-if="loading" class="loading-container">
+        <i class="fas fa-spinner fa-spin loading-icon-large"></i>
+        <p class="loading-text">{{ $t('pages.myPostsPage.searching') }}</p>
+      </div>
+
+      <template v-else>
+        <div v-if="activeCategory === 'picture'">
+          <BigPictureList
+            v-if="dataList.length > 0"
+            :dataList="dataList"
+            :showOp="true"
+            :isMyPosts="true"
+          />
+          <div v-else class="empty-container">
+            <div class="empty-icon">
+              <i class="fas fa-image"></i>
+            </div>
+            <p class="empty-text">{{ $t('pages.myPostsPage.noPicFound') }}</p>
+            <div class="empty-tip">{{ $t('pages.myPostsPage.tryOtherKeyword') }}</div>
+          </div>
+        </div>
+
+        <div v-else>
+          <PostList
+            v-if="dataList.length > 0"
+            :dataList="dataList"
+            :showOp="true"
+            :isMyPosts="true"
+            :showStatus="true"
+          />
+          <div v-else class="empty-container">
+            <div class="empty-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <p class="empty-text">{{ $t('pages.myPostsPage.noPostFound') }}</p>
+            <div class="empty-tip">{{ $t('pages.myPostsPage.tryOtherKeyword') }}</div>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n';
+
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { listPictureVoByPageUsingPost } from '@/api/pictureController'
-import PictureList from '@/components/PictureList.vue'
-import PictureSearchForm from '@/components/PictureSearchForm.vue'
+import { listMyPostsUsingPost } from '@/api/postController'
 import MobilePictureList from '@/components/MobilePictureList.vue'
-import { getDeviceType } from '@/utils/device'
-import { DEVICE_TYPE_ENUM } from '@/constants/device'
+import BigPictureList from '@/components/BigPictureList.vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
-import { SearchOutlined } from '@ant-design/icons-vue'
-import { PIC_REVIEW_STATUS_OPTIONS } from '@/constants/picture'
 
+const { t } = useI18n();
+
+const router = useRouter()
 const loginUserStore = useLoginUserStore()
-const device = ref(DEVICE_TYPE_ENUM.PC)
 
-// 数据列表
-const dataList = ref<API.PictureVO[]>([])
-const total = ref<number>(0)
-const loading = ref<boolean>(false)
+const activeCategory = ref('picture')
+const searchText = ref('')
+const dataList = ref<any[]>([])
+const loading = ref(false)
+const hasSearched = ref(false)
 
-// 搜索参数
-const searchParams = reactive<API.PictureQueryRequest>({
-  current: 1,
-  pageSize: 12,
-  sortField: 'createTime',
-  sortOrder: 'descend',
-  userId: loginUserStore.loginUser?.id,
-})
+const handleCategoryChange = (category: 'picture' | 'post') => {
+  activeCategory.value = category
+}
 
-// 获取数据
-const fetchData = async () => {
+const handleSearch = async () => {
+  if (!searchText.value.trim()) {
+    message.warning(t('pages.myPostsPage.emptyKeyword'))
+    return
+  }
+
+  hasSearched.value = true
   loading.value = true
+
   try {
-    const res = await listPictureVoByPageUsingPost(searchParams)
-    if (res.data.code === 0 && res.data.data) {
-      dataList.value = res.data.data.records ?? []
-      total.value = res.data.data.total ?? 0
+    const params = {
+      current: 1,
+      pageSize: 36,
+      userId: loginUserStore.loginUser?.id,
+      searchText: searchText.value.trim()
+    }
+
+    let res
+    if (activeCategory.value === 'picture') {
+      res = await listPictureVoByPageUsingPost({
+        ...params,
+        reviewStatus: undefined,
+        enableSemanticSearch: true
+      })
     } else {
-      message.error('获取数据失败，' + res.data.message)
+      res = await listMyPostsUsingPost(params)
+    }
+
+    if (res.data.code === 0) {
+      dataList.value = res.data.data?.records || []
+    } else {
+      message.error(t('pages.myPostsPage.searchFail').replace('{msg}', res.data.message))
+      dataList.value = []
     }
   } catch (e: any) {
-    message.error('获取数据失败，' + e.message)
-  }
-  loading.value = false
-}
-
-// 分页变化
-const onPageChange = (page: number, pageSize: number) => {
-  searchParams.current = page
-  searchParams.pageSize = pageSize
-  fetchData()
-}
-
-// 搜索
-const onSearch = (params: API.PictureQueryRequest) => {
-  searchParams.current = 1
-  Object.assign(searchParams, params)
-  fetchData()
-}
-
-// 下拉刷新
-const isRefreshing = ref(false)
-const onRefresh = async () => {
-  if (isRefreshing.value) return
-  isRefreshing.value = true
-  try {
-    // 重置所有搜索参数
-    Object.assign(searchParams, {
-      current: 1,
-      pageSize: 12,
-      sortField: 'createTime',
-      sortOrder: 'descend',
-      userId: loginUserStore.loginUser?.id,
-      searchText: undefined,
-      category: undefined,
-      tags: undefined,
-      reviewStatus: undefined
-    })
-    await fetchData()
-    message.success('刷新成功')
-  } catch (e: any) {
-    message.error('刷新失败：' + e.message)
+    message.error(t('pages.myPostsPage.searchFail').replace('{msg}', e.message))
+    dataList.value = []
   } finally {
-    isRefreshing.value = false
+    loading.value = false
   }
 }
 
-// 页面加载时获取设备类型和数据
-onMounted(async () => {
-  device.value = await getDeviceType()
-  fetchData()
-})
-
-// 添加搜索方法
-const doSearch = () => {
-  searchParams.current = 1
-  fetchData()
+const handleBack = () => {
+  router.back()
 }
 </script>
 
 <style scoped>
-#MyPostsPage {
-  margin-bottom: 16px;
-  margin-left: -20px !important;
-  margin-right: -20px !important;
+#SearchCategoryPage {
+  background-color: var(--background);
+  max-width: 1400px;
+  margin: auto;
+  box-sizing: border-box;
+  padding: 0 16px;
+  transition: var(--theme-transition);
 }
 
-/* 搜索区域样式 */
-.search-and-button-container {
-  margin-bottom: 16px;
-  padding: 16px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+.search-header {
+  padding: 10px 0;
+  max-width: 800px;
+  margin: auto;
+  margin-top: 24px;
+  border-bottom: 1px solid var(--header-border);
 }
 
-:deep(.ant-form) {
+.searchbar-wrapper {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
   align-items: center;
-
-  .ant-form-item {
-    margin: 0;
-  }
-
-  .ant-form-item-label {
-    padding-right: 6px;
-    font-size: 13px;
-    color: #666;
-  }
-}
-
-/* 紧凑型输入框样式 */
-.compact-input {
-  width: 140px !important;
-  height: 32px;
-  border-radius: 6px;
-}
-
-/* 紧凑型下拉框样式 */
-.compact-select {
-  width: 120px !important;
-}
-
-/* 搜索按钮样式 */
-.search-button {
-  background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
-  border: none;
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
-  transition: all 0.3s ease;
-}
-
-.search-button:hover {
-  background: linear-gradient(135deg, #ffa06d 0%, #ff8585 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-}
-
-.search-button:active {
-  background: linear-gradient(135deg, #ff7a39 0%, #ff5151 100%);
-  transform: translateY(0);
-}
-
-/* 响应式调整 */
-@media screen and (max-width: 768px) {
-  .search-and-button-container {
-    padding: 12px;
-    border-radius: 0;
-    margin: 0 -12px 16px;
-  }
-
-  :deep(.ant-form) {
-    gap: 8px;
-  }
-
-  .compact-input,
-  .compact-select {
-    width: 110px !important;
-  }
-}
-
-/* 移动端分页器样式 */
-.mobile-pagination {
-  margin-top: 20px;
-  padding: 16px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.page-info {
-  text-align: center;
-  margin-bottom: 12px;
-  color: #666;
-  font-size: 14px;
-}
-
-.separator {
-  margin: 0 8px;
-  color: #999;
-}
-
-.page-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.page-button {
-  flex: 1;
-  height: 36px;
-  border-radius: 8px;
-  font-size: 14px;
-  border: none;
-  transition: all 0.3s ease;
-}
-
-.page-button.prev {
-  background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
-  color: white;
-}
-
-.page-button.next {
-  background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
-  color: white;
-}
-
-.page-button:not(:disabled):hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-}
-
-.page-button:disabled {
-  background: #f5f5f5;
-  color: #999;
-}
-
-/* 响应式调整 */
-@media screen and (max-width: 768px) {
-  #MyPostsPage {
-    padding: 0;
-    margin: 0 auto;
-  }
-
-  .search-form {
-    gap: 8px;
-  }
-
-  .custom-input {
-    min-width: 140px;
-  }
-
-  .mobile-pagination {
-    margin: 16px 0 0;
-    border-radius: 0;
-  }
-}
-
-/* 移动端搜索栏样式 */
-.mobile-search-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 16px;
-  background: white;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* 标题区域样式 */
-.header-section {
+.searchbar {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f1f5f9;
-  background-color: #fff6f3;
-  margin: -16px -16px 12px -16px;
-  padding: 16px;
-  border-radius: 8px 8px 0 0;
+  background-color: var(--search-btn-bg);
+  border: 1px solid var(--search-btn-border);
+  border-radius: 30px;
+  padding: 8px 16px;
+  height: 36px;
+  transition: var(--theme-transition);
 }
 
-.title {
-  font-size: 18px;
-  font-weight: 500;
-  color: #345750;
-}
-
-.progress {
-  margin-right: 4px;
-}
-
-/* 搜索区域样式 */
-.search-section {
-  display: flex;
-  gap: 8px;
-}
-
-.mobile-search-input {
-  flex: 2;
-
-  :deep(.ant-input) {
-    border-radius: 6px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    height: 36px;
-    font-size: 14px;
-    padding: 0 12px;
-
-    &:hover {
-      border-color: #ff8e53;
-      background: #fff6f3;
-    }
-
-    &:focus {
-      border-color: #ff8e53;
-      box-shadow: 0 0 0 2px rgba(255, 142, 83, 0.1);
-      background: white;
-    }
-  }
-
-  :deep(.ant-input-suffix) {
-    cursor: pointer;
-  }
+.searchbar:focus-within {
+  background-color: var(--hover-background);
 }
 
 .search-icon {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 16px;
-  padding: 4px;
-  transition: all 0.3s;
-
-  &:hover {
-    color: #ff8e53;
-  }
+  margin-right: 8px;
+  flex-shrink: 0;
 }
 
-.mobile-status-select {
+.search-input {
   flex: 1;
-  min-width: 100px;
-
-  :deep(.ant-select-selector) {
-    height: 36px !important;
-    line-height: 36px !important;
-    border-radius: 6px !important;
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
-
-    .ant-select-selection-item {
-      line-height: 34px !important;
-      font-size: 14px;
-    }
-  }
-
-  :deep(.ant-select-selection-placeholder) {
-    line-height: 34px !important;
-    font-size: 14px;
-  }
-
-  &:hover {
-    :deep(.ant-select-selector) {
-      border-color: #ff8e53 !important;
-      background: #fff6f3 !important;
-    }
-  }
-
-  &:focus {
-    :deep(.ant-select-selector) {
-      border-color: #ff8e53 !important;
-      box-shadow: 0 0 0 2px rgba(255, 142, 83, 0.1) !important;
-      background: white !important;
-    }
-  }
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+  color: var(--text-primary);
+  height: 100%;
+  line-height: 1;
 }
 
-/* 响应式调整 */
-@media screen and (max-width: 768px) {
-  .mobile-search-container {
-    margin: 0 0 16px;
-    border-radius: 0;
-  }
-
-  #MyPostsPage {
-    padding: 0;
-    margin: 0 auto;
-  }
-
-  .header-section {
-    border-radius: 0;
-  }
-
-  /* 确保下拉刷新和图片列表容器宽度一致 */
-  .pull-refresh-container {
-    margin: 0;
-    background: #f8fafc;
-  }
+.search-input::placeholder {
+  color: var(--text-secondary);
+  font-size: 15px;
 }
 
-/* 分页器样式美化 */
-.pagination-wrapper {
-  margin-top: 8px;
-  padding: 16px 24px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+.clear-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--hover-background);
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  flex-shrink: 0;
+  transition: var(--theme-transition);
 }
 
-:deep(.custom-pagination) {
-  .ant-pagination-total-text {
-    color: #64748b;
-    margin-right: 12px;
-  }
-
-  .ant-pagination-prev,
-  .ant-pagination-next,
-  .ant-pagination-item,
-  .ant-pagination-jump-prev,
-  .ant-pagination-jump-next {
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    margin-right: 8px;
-
-    &:hover {
-      border-color: #ff8e53;
-      a {
-        color: #ff8e53;
-      }
-    }
-  }
-
-  .ant-pagination-item-active {
-    background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
-    border: none;
-
-    a {
-      color: white !important;
-    }
-
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
-    }
-  }
-
-  .ant-pagination-options {
-    .ant-select {
-      .ant-select-selector {
-        border-radius: 8px !important;
-        transition: all 0.3s ease;
-        height: 32px !important;
-        padding: 0 11px !important;
-
-        .ant-select-selection-item {
-          line-height: 30px !important;
-          color: #64748b;
-        }
-
-        &:hover {
-          border-color: #ff8e53 !important;
-          background: #fff6f3;
-        }
-      }
-
-      &.ant-select-focused .ant-select-selector {
-        border-color: #ff8e53 !important;
-        box-shadow: 0 0 0 2px rgba(255, 142, 83, 0.1) !important;
-      }
-    }
-
-    .ant-pagination-options-quick-jumper {
-      color: #64748b;
-      margin-left: 16px;
-
-      input {
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        height: 32px;
-        width: 50px;
-        text-align: center;
-        margin: 0 8px;
-
-        &:hover {
-          border-color: #ff8e53;
-          background: #fff6f3;
-        }
-
-        &:focus {
-          border-color: #ff8e53;
-          box-shadow: 0 0 0 2px rgba(255, 142, 83, 0.1);
-        }
-      }
-    }
-  }
+.clear-btn:hover {
+  background-color: var(--border-color);
 }
 
-/* 下拉选择器样式 */
-:deep(.ant-select-dropdown) {
-  border-radius: 8px;
-  overflow: hidden;
-  padding: 4px;
-
-  .ant-select-item {
-    transition: all 0.3s ease;
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin: 2px 0;
-
-    &:hover {
-      background: #fff6f3;
-      color: #ff8e53;
-    }
-
-    &-option-selected {
-      background: #fff6f3 !important;
-      color: #ff8e53 !important;
-      font-weight: 500;
-    }
-
-    &-option-active {
-      background: #fff6f3 !important;
-      color: #ff8e53 !important;
-    }
-  }
+.search-btn {
+  color: var(--text-other);
+  background-color: var(--nav-item-active-text);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: var(--theme-transition);
+  border: 1px solid var(--search-btn-border);
 }
 
-/* 响应式调整 */
-@media screen and (max-width: 768px) {
-  .pagination-wrapper {
-    margin: 8px -12px 0;
-    padding: 12px;
-    border-radius: 0;
-
-    :deep(.ant-pagination-options-quick-jumper) {
-      display: none;
-    }
-  }
+.search-btn:hover {
+  background-color: var(--link-hover-color);
+  transform: scale(1.02);
 }
 
-/* 下拉刷新容器样式 */
-.pull-refresh-container {
-  margin: 0;
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 24px 0;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100px;
+  background-color: var(--card-background);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: var(--theme-transition);
+  box-shadow: 0 2px 4px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.category-item.active {
+  background-color: var(--nav-item-active);
+  color: var(--nav-item-active-text);
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.category-icon {
+  font-size: 28px;
+}
+
+.category-text {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.content-area {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.loading-icon-large {
+  font-size: 28px;
+  color: var(--nav-item-active-text);
+}
+
+.loading-text {
+  margin-top: 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+.empty-text {
+  font-size: 18px;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.empty-tip {
+  font-size: 14px;
+  color: var(--text-secondary);
 }
 </style>

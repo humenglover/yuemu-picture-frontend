@@ -1,0 +1,20 @@
+export default {
+  "noPictures": "No pictures",
+  "text1": "快去上传一些精彩的照片吧 (｡•́︿•̀｡)",
+  "pendingReview": "Pending Review",
+  "approved": "Approved",
+  "rejected": "Rejected",
+  "picturePendingReview": "Your picture is under review, please wait patiently...",
+  "pictureApproved": "Congratulations! Your picture has been approved",
+  "deleteSuccess": "Delete success",
+  "text2": "删除失败",
+  "confirmDelete": "Confirm Delete",
+  "confirmDeletePictureWarning": "Are you sure you want to delete this picture? This action cannot be undone!",
+  "reviewFailedMsg": "Sorry, your picture did not pass the review",
+  "ok": "OK",
+  "cancel": "Cancel",
+  "reviewing": "Reviewing",
+  "reviewPassed": "Passed",
+  "reviewFailed": "Rejected",
+  "reviewStatus": "Review Status"
+};

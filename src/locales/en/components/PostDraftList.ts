@@ -1,0 +1,21 @@
+export default {
+  "delete": "Delete",
+  "noDrafts": "No drafts",
+  "goPublish": "Go publish",
+  "loadedAllDrafts": "Loaded all drafts",
+  "deleteSuccess": "Delete success",
+  "draftDataAbnormalCannotEdit": "Draft data abnormal, cannot edit",
+  "pageJumpFailed": "Page jump failed",
+  "untitledDraft": "Untitled draft",
+  "noDraftsAlt": "No drafts",
+  "loading": "Loading...",
+  "loadMore": "Load more",
+  "fetchDraftsFailed": "Fetch drafts failed",
+  "fetchDraftsFailedColon": "Fetch drafts failed:",
+  "deleteFailed": "Delete failed",
+  "deleteFailedColon": "Delete draft failed:",
+  "draftIdNotExistColon": "Draft ID not exist:",
+  "routeJumpSuccess": "Route jump success",
+  "routeJumpFailedColon": "Route jump failed:",
+  "tagParseFailedColon": "Tag parse failed:"
+};

@@ -1,623 +1,664 @@
 <template>
-  <div id="userDetailPage">
-    <div class="page-content">
-      <!-- 用户信息卡片 -->
-      <div class="user-card">
-        <div class="user-info">
-          <van-image
-            :src="userInfo.userAvatar || getDefaultAvatar(userInfo.userName)"
-            round
-            width="64"
-            height="64"
-            class="avatar"
-          />
-          <div class="user-detail">
-            <div class="username">{{ userInfo.userName }}</div>
-            <div class="user-meta">
-              <div class="user-id">ID: {{ userInfo.id }}</div>
-              <div class="account">账号: {{ userInfo.userAccount }}</div>
-              <div class="create-time">加入时间: {{ formatDate(userInfo.createTime) }}</div>
-            </div>
-          </div>
-        </div>
-        <div class="user-actions">
-          <div class="stats-wrapper">
-            <div class="stat-item" @click="goToFollowList('follow')">
-              <span class="count">{{ followCount }}</span>
-              <span class="label">关注</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item" @click="goToFollowList('fans')">
-              <span class="count">{{ fansCount }}</span>
-              <span class="label">粉丝</span>
-            </div>
-          </div>
-          <div class="follow-button" v-if="showFollowButton">
-            <van-button
-              round
-              size="small"
-              :type="isFollowing ? 'default' : 'primary'"
-              :loading="followLoading"
-              @click="toggleFollow"
-            >
-              {{ isFollowing ? '已关注' : '关注' }}
-            </van-button>
-          </div>
-        </div>
+  <div id="usersDetailPage" ref="pageRef" class="page-wrapper">
+    <div class="top-nav">
+      <div class="nav-btn" @click="goBack">
+        <i class="fas fa-arrow-left"></i>
       </div>
-      <!-- PC用户发布的图片列表 -->
-      <div class="pictures-section" v-if="device === DEVICE_TYPE_ENUM.PC">
-        <div class="section-header">
-          <h3 class="section-title">发布的图片</h3>
-          <span class="picture-count" v-if="total > 0">共 {{ total }} 张</span>
+      <div class="top-nav__right">
+        <div class="nav-btn" v-if="showActionButtons" @click="showReportModal" :title="$t('pages.userDetailPage.report')">
+          <i class="fas fa-flag"></i>
         </div>
-        <div class="picture-list-container">
-          <div class="picture-list-wrapper">
-            <WaterfallPictureList
-              v-if="device === DEVICE_TYPE_ENUM.PC"
-              :dataList="pictureList"
-              :loading="loading"
-              :onLoadMore="loadMorePictures"
-            />
-            <MobilePictureList
-              v-else
-              :dataList="pictureList"
-              :loading="loading"
-            />
-          </div>
-          <!-- 空状态 -->
-             <div v-if="!loading && pictureList.length === 0" class="empty-state">
-            <van-empty
-              image="search"
-              description="暂无图片"
-            />
-          </div>
-          </div>
+        <div class="nav-btn" @click="handleShare" :title="$t('pages.userDetailPage.shareTitle')">
+          <i class="fas fa-share-alt"></i>
         </div>
-      </div>
-    <!-- 移动用户发布的图片列表 -->
-    <div class="pictures-section" v-if="device!==DEVICE_TYPE_ENUM.PC">
-      <div class="section-header">
-        <h3 class="section-title">发布的图片</h3>
-        <span class="picture-count" v-if="total > 0">共 {{ total }} 张</span>
-      </div>
-      <div class="picture-list-container" style="margin-right: -24px; margin-left: -24px;">
-        <div class="picture-list-wrapper">
-          <MobilePictureList
-            :dataList="pictureList"
-            :loading="loading"
-          />
-          <!-- 分页器 -->
-          <div  v-if="total > 0">
-            <van-pagination
-              v-model="currentPage"
-              :total-items="total"
-              :items-per-page="pageSize"
-              :show-page-size="5"
-              force-ellipses
-              prev-text="<"
-              next-text=">"
-              @change="handlePageChange"
-            />
-          </div>
-        </div>
-        <!-- 空状态 -->
-        <div v-if="!loading && pictureList.length === 0" class="empty-state">
-          <van-empty
-            image="search"
-            description="暂无图片"
-          />
-        </div>
-
       </div>
     </div>
+
+    <div class="profile-container">
+      <div class="banner-section">
+        <img :src="userHomepageBg" :alt="$t('pages.userDetailPage.bgTitle')" class="banner-img" />
+        <div class="banner-mask"></div>
+      </div>
+
+      <div class="info-card">
+        <div class="profile-main-top">
+          <div class="avatar-wrapper">
+            <img :src="userInfo.userAvatar || getDefaultAvatar(userInfo.userName)" :alt="$t('pages.userDetailPage.avatarTitle')" />
+          </div>
+
+          
+        </div>
+
+        <div class="user-profile-info">
+          <div class="user-name-row">
+            <h1 class="user-name">{{ userInfo.userName }}</h1>
+            <img v-if="userInfo.memberType === 1" :src="proIcon" class="member-icon clickable-badge" :alt="t('pages.userDetailPage.roles.pro', 'Pro会员')" :title="t('pages.userDetailPage.roles.pro', 'Pro会员')" @click.stop="openMemberModal" />
+            <img v-if="userInfo.memberType === 2" :src="plusIcon" class="member-icon clickable-badge" :alt="t('pages.userDetailPage.roles.plus', 'Plus会员')" :title="t('pages.userDetailPage.roles.plus', 'Plus会员')" @click.stop="openMemberModal" />
+            <span v-if="userRoleBadge" class="role-badge" :class="userRoleBadge.class">
+              <i :class="userRoleBadge.icon"></i>
+              <span>{{ userRoleBadge.text }}</span>
+            </span>
+          </div>
+          <div class="user-id">
+            <span>{{ $t('pages.userDetailPage.stats.yuemuId') }} {{ userInfo.id }}</span>
+            <i class="fas fa-copy copy-icon" :class="{ 'success': copySuccess }" @click="copyUserId"></i>
+          </div>
+        </div>
+
+        <div class="user-stats">
+          <div class="stat-box" @click="goToFollowList('follow')">
+            <span class="stat-num">{{ followCount || 0 }}</span>
+            <span class="stat-label">{{ $t('pages.userDetailPage.follow') }}</span>
+          </div>
+          <div class="stat-box" @click="goToFollowList('fans')">
+            <span class="stat-num">{{ fansCount || 0 }}</span>
+            <span class="stat-label">{{ $t('pages.userDetailPage.stats.followers') }}</span>
+          </div>
+        </div>
+
+<div class="action-group-modern" v-if="showActionButtons">
+            <button class="btn-outline-modern" @click="startPrivateChat" :disabled="!canPrivateChat">
+              {{ $t('pages.userDetailPage.chat') }}
+            </button>
+            <button
+              :class="['btn-solid-modern', isFollowing ? 'btn-followed-modern' : 'btn-primary-modern']"
+              :disabled="!canFollow || followLoading"
+              @click="toggleFollow"
+            >
+              <i v-if="followLoading" class="fas fa-spinner fa-spin"></i>
+              <span v-else>{{ isFollowing ? $t('pages.userDetailPage.following') : $t('pages.userDetailPage.follow') }}</span>
+            </button>
+          </div>
+
+
+        <div class="user-intro" v-if="userInfo.userProfile || userInfo.personalSign || userInfo.region || userInfo.userTags">
+          <p class="bio-text" v-if="userInfo.userProfile">{{ userInfo.userProfile }}</p>
+          <p class="bio-text" v-if="userInfo.personalSign">{{ userInfo.personalSign }}</p>
+
+          <div class="tags-container">
+            <span class="tag-pill" v-if="userInfo.region">
+              <i class="fas fa-map-marker-alt"></i> {{ userInfo.region }}
+            </span>
+            <span class="tag-pill" v-if="userInfo.gender || userInfo.birthday">
+              <i :class="userInfo.gender === t('pages.userDetailPage.stats.male') ? 'fas fa-mars' : (userInfo.gender === t('pages.userDetailPage.stats.female') ? 'fas fa-venus' : 'fas fa-user')"></i>
+              {{ formatGenderAndAge(userInfo.gender, userInfo.birthday) }}
+            </span>
+            <span class="tag-pill" v-for="tag in parseUserTags(userInfo.userTags)" :key="tag">{{ tag }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-tabs">
+        <div class="tab-item" :class="{ active: activeTab === 'pictures' }" @click="activeTab = 'pictures'">
+          <span class="tab-text">{{ $t('pages.userDetailPage.tabs.pictures') }}</span>
+          <span class="tab-count" v-if="pictureTotal > 0">{{ pictureTotal }}</span>
+        </div>
+        <div class="tab-item" :class="{ active: activeTab === 'posts' }" @click="activeTab = 'posts'">
+          <span class="tab-text">{{ $t('pages.userDetailPage.tabs.posts') }}</span>
+          <span class="tab-count" v-if="postTotal > 0">{{ postTotal }}</span>
+        </div>
+      </div>
+
+      <div class="content-area" ref="contentAreaRef">
+        <div v-show="activeTab === 'pictures'" class="list-section">
+          <WaterfallPictureList v-if="device === DEVICE_TYPE_ENUM.PC" :dataList="pictureList" :loading="loading" :onLoadMore="loadMorePictures" />
+          <div v-else>
+            <BigPictureList :dataList="pictureList" :loading="loading" />
+            <div class="loading-state" v-if="pictureList.length > 0 && (loading || isLoadingMore)">
+              <van-loading size="20px">{{ $t('pages.userDetailPage.loading') }}</van-loading>
+            </div>
+          </div>
+        </div>
+        <div v-show="activeTab === 'posts'" class="list-section">
+          <PostList :dataList="postList" :loading="postLoading" :showStatus="false" />
+          <div class="loading-state" v-if="postList.length > 0 && (postLoading || isLoadingMore)">
+            <van-loading size="20px">{{ $t('pages.userDetailPage.loading') }}</van-loading>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ShareModal ref="shareModalRef" :title="t('pages.userDetailPage.shareTitle')" :link="userHomeLink" :image-url="getImageUrlForShare()" :user="userInfo" :create-time="userInfo.createTime" />
+    <ReportModal ref="reportModalRef" :open="reportModalVisible" :target-id="String(userInfo.id)" target-type="4" @update:open="handleReportModalChange" @success="handleReportSuccess" />
+    <MemberDetailModal ref="memberDetailModalRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+import { ref, onMounted, computed, watch, onUnmounted, nextTick, onActivated, onDeactivated } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import dayjs from 'dayjs'
 import { getDefaultAvatar } from '@/utils/userUtils'
 import { message } from 'ant-design-vue'
+import { createOrUpdatePrivateChatUsingPost } from '@/api/privateChatController'
 import { getFollowAndFansCountUsingPost, addUserFollowsUsingPost, findIsFollowUsingPost } from '@/api/userFollowsController'
 import { getFollowOrFanPictureUsingPost } from '@/api/userFollowsController'
 import WaterfallPictureList from '@/components/WaterfallPictureList.vue'
 import { getDeviceType } from '@/utils/device.ts'
 import { DEVICE_TYPE_ENUM } from '@/constants/device.ts'
-import MobilePictureList from '@/components/MobilePictureList.vue'
+import BigPictureList from '@/components/BigPictureList.vue'
+import { listPostByPageUsingPost } from '@/api/postController'
+import PostList from '@/components/PostList.vue'
+import { getUserPublicInfoUsingGet } from '@/api/userController'
+import ShareModal from '@/components/ShareModal.vue'
+import ReportModal from '@/components/ReportModal.vue'
+import plusIcon from '@/assets/icons/plus.svg'
+import proIcon from '@/assets/icons/pro.svg'
+import MemberDetailModal from '@/components/MemberDetailModal.vue'
+
+defineOptions({
+  name: 'UserDetail'
+})
 
 const route = useRoute()
 const router = useRouter()
 const loginUserStore = useLoginUserStore()
 const device = ref<string>('')
-// 页面加载时获取设备类型并获取数据
+const activeTab = ref('pictures')
+const postList = ref<API.Post[]>([])
+const postTotal = ref(0)
+const postLoading = ref(false)
+const pictureTotal = ref(0)
+const postPagination = ref({ current: 1, pageSize: 8 })
+const isEndOfData = ref(false)
+const isLoadingMore = ref(false)
+
+const memberDetailModalRef = ref<any>(null)
+const openMemberModal = () => {
+  if (userInfo.value.id && memberDetailModalRef.value) {
+    memberDetailModalRef.value.open(userInfo.value)
+  }
+}
+const copySuccess = ref(false)
+const savedScrollPosition = ref(0)
+const isPageActive = ref(true)
+const currentUserId = ref(String(route.params.id))
+const contentAreaRef = ref<HTMLElement | null>(null)
+let scrollHandler: any = null
+const shareModalRef = ref<any>(null)
+const reportModalRef = ref<any>(null)
+const reportModalVisible = ref(false)
+const pageRef = ref<HTMLElement | null>(null)
+
+const checkScrollBottom = () => {
+  const scrollTop = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop)
+  const windowHeight = window.innerHeight
+  const documentHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
+  const threshold = 100
+  if (documentHeight - (scrollTop + windowHeight) < threshold) {
+    if (activeTab.value === 'pictures' && !loading.value && !isEndOfData.value) handleAutoLoad()
+    else if (activeTab.value === 'posts' && !postLoading.value) handleAutoLoadPosts()
+  }
+}
+
+const handleAutoLoad = async () => {
+  if (loading.value || isEndOfData.value || isLoadingMore.value) return
+  isLoadingMore.value = true
+  const nextPage = currentPage.value + 1
+  const maxPage = Math.ceil(total.value / pageSize)
+  if (nextPage <= maxPage) { currentPage.value = nextPage; await loadPictureData(); }
+  isLoadingMore.value = false
+}
+
+const handleAutoLoadPosts = async () => {
+  if (postLoading.value || isLoadingMore.value) return
+  isLoadingMore.value = true
+  const nextPage = postPagination.value.current + 1
+  const maxPage = Math.ceil(postTotal.value / postPagination.value.pageSize)
+  if (nextPage <= maxPage) { postPagination.value.current = nextPage; await loadPostData(); }
+  isLoadingMore.value = false
+}
+
+const goBack = () => router.go(-1)
+const handleShare = () => {
+  if (!loginUserStore.loginUser?.id) { message.warning(t('pages.userDetailPage.msgs.loginFirst')); return }
+  shareModalRef.value?.openModal()
+}
+const userHomeLink = computed(() => {
+  const user = userInfo.value || {}
+  const href = router.resolve({ path: `/user/${user.id}` }).href
+  return `${window.location.origin}${href}`
+})
+const getImageUrlForShare = () => {
+  if (userInfo.value?.homepageBg) return userInfo.value.homepageBg;
+  return userInfo.value?.userAvatar || getDefaultAvatar(userInfo.value.userName);
+}
+
 onMounted(async () => {
+  // 核心修复 1：组件首次挂载时，强制将浏览器滚动条置顶，消除从其他页面带来的滚动惯性
+  window.scrollTo({ top: 0, behavior: 'instant' })
+
   device.value = await getDeviceType()
-  // console.log(route.params)
-})
-// 处理页码变化
-const handlePageChange = (page: number) => {
-  currentPage.value = page
-  loadPictureData()
-}
-
-// 初始化用户信息
-const userInfo = ref<API.UserVO>({
-  id: route.params.id as string,
-  userName: route.query.userName as string,
-  userAvatar: route.query.userAvatar as string,
-  userAccount: route.query.userAccount as string,
-  userProfile: route.query.userProfile as string,
-  userRole: route.query.userRole as string,
-  createTime: route.query.createTime as string
+  await Promise.all([getUserPublicInfo(), getFollowAndFansCount(), checkIsFollowing(), loadPictureData(), loadPostData()])
+  nextTick(() => { setupScrollListener() })
 })
 
-const followCount = ref(0)
-const fansCount = ref(0)
-const isFollowing = ref(false)
-const followLoading = ref(false)
+onUnmounted(() => { removeScrollListener() })
 
-// 格式化日期
-const formatDate = (date: string) => {
-  return dayjs(date).format('YYYY-MM-DD')
-}
+onActivated(() => {
+  isPageActive.value = true
 
-// 格式化角色
-const formatRole = (role: string) => {
-  const roleMap: Record<string, string> = {
-    user: '普通用户',
-    admin: '管理员',
-    ban: '封禁用户'
+  // 核心修复 2：判断如果带来的 route id 和当前记录的不一致（说明进了一个新用户的主页）
+  if (route.params.id && String(route.params.id) !== currentUserId.value) {
+    savedScrollPosition.value = 0 // 废弃之前用户的滚动记录
+    window.scrollTo({ top: 0, behavior: 'instant' }) // 强行置顶
+  } else {
+    // 是同一个用户，正常恢复滚动位置
+    nextTick(() => { window.scrollTo({ top: savedScrollPosition.value, behavior: 'instant' }) })
   }
-  return roleMap[role] || role
-}
 
-// 是否显示关注按钮
-const showFollowButton = computed(() => {
-  return loginUserStore.loginUser?.id && loginUserStore.loginUser?.id !== userInfo.value.id
+  setupScrollListener()
 })
 
-// 获取关注和粉丝数
+onDeactivated(() => {
+  isPageActive.value = false
+  savedScrollPosition.value = window.pageYOffset || document.documentElement.scrollTop
+  removeScrollListener()
+})
+
+watch(activeTab, () => { window.scrollTo({ top: 0, behavior: 'smooth' }) })
+
+watch(() => route.params.id, async (newId) => {
+  if (newId && String(newId) !== currentUserId.value && route.name === 'UserDetail') {
+    currentUserId.value = String(newId)
+    userInfo.value = { id: String(newId), allowPrivateChat: 1, allowFollow: 1, showFollowList: 1, showFansList: 1 } as any
+    pictureList.value = []
+    postList.value = []
+    currentPage.value = 1
+    postPagination.value = { current: 1, pageSize: 8 }
+    isEndOfData.value = false
+    activeTab.value = 'pictures'
+
+    // 核心修复 3：新用户加载前，同步清零并置顶
+    savedScrollPosition.value = 0
+    window.scrollTo({ top: 0, behavior: 'instant' })
+
+    await Promise.all([ getUserPublicInfo(), getFollowAndFansCount(), checkIsFollowing(), loadPictureData(), loadPostData() ])
+  }
+})
+
+const userInfo = ref<API.UserPublicVO>({ id: String(route.params.id), allowPrivateChat: 1, allowFollow: 1, showFollowList: 1, showFansList: 1 } as any)
+const userHomepageBg = computed(() => userInfo.value.homepageBg || 'https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')
+const formatGenderAndAge = (gender: any, birthday: any) => {
+  if (!birthday) return gender || '';
+  const age = new Date().getFullYear() - new Date(birthday).getFullYear();
+  return `${gender || ''} ${t('pages.userDetailPage.stats.age', { age })}`;
+};
+const parseUserTags = (tagsStr: any) => tagsStr ? tagsStr.split(/[;,，；]/).filter((t: any) => t.trim() !== '') : [];
+const followCount = ref(0), fansCount = ref(0), isFollowing = ref(false), followLoading = ref(false);
+const isOwner = computed(() => loginUserStore.loginUser?.id && String(loginUserStore.loginUser.id) === String(userInfo.value.id))
+const canPrivateChat = computed(() => userInfo.value.allowPrivateChat && !isOwner.value)
+const canFollow = computed(() => userInfo.value.allowFollow && !isOwner.value)
+const canShowFollowList = computed(() => isOwner.value || !!userInfo.value.showFollowList)
+const canShowFansList = computed(() => isOwner.value || !!userInfo.value.showFansList)
+const showActionButtons = computed(() => loginUserStore.loginUser?.id && !isOwner.value)
+
+// 用户角色徽标
+const userRoleBadge = computed(() => {
+  const role = userInfo.value.userRole
+  if (role === 'admin') {
+    return {
+      text: t('pages.userDetailPage.roles.admin'),
+      icon: 'fas fa-shield-alt',
+      class: 'badge-admin'
+    }
+  } else if (role === 'bot') {
+    return {
+      text: t('pages.userDetailPage.roles.bot'),
+      icon: 'fas fa-robot',
+      class: 'badge-bot'
+    }
+  }
+  return null
+})
+
 const getFollowAndFansCount = async () => {
-  try {
-    const userId = route.params.id
-    const res = await getFollowAndFansCountUsingPost({ id: userId })
-    if (res.data.code === 0) {
-      const { followCount: fc, fansCount: fs } = res.data.data
-      followCount.value = fc || 0
-      fansCount.value = fs || 0
-    }
-  } catch (error) {
-    console.error('获取关注粉丝数失败:', error)
-    message.error('获取关注粉丝数失败')
-  }
+  const res = await getFollowAndFansCountUsingPost({ id: userInfo.value.id })
+  if (res.data.code === 0) { followCount.value = res.data.data.followCount || 0; fansCount.value = res.data.data.fansCount || 0; }
 }
-
-// 检查是否已关注
 const checkIsFollowing = async () => {
-  try {
-    const res = await findIsFollowUsingPost({
-      followerId: String(loginUserStore.loginUser?.id),
-      followingId: String(userInfo.value.id)
-    })
-    if (res.data?.code === 0) {
-      isFollowing.value = res.data.data
-    }
-  } catch (error) {
-    console.error('检查关注状态失败:', error)
-  }
+  const res = await findIsFollowUsingPost({ followerId: String(loginUserStore.loginUser?.id), followingId: String(userInfo.value.id) })
+  if (res.data?.code === 0) isFollowing.value = res.data.data
 }
-
-// 关注/取消关注
 const toggleFollow = async () => {
-  if (followLoading.value) return
-  followLoading.value = true
-
+  if (followLoading.value) return; followLoading.value = true
   try {
     const res = await addUserFollowsUsingPost({
-      followerId: String(loginUserStore.loginUser.id),
-      followingId: String(userInfo.value.id),
-      followingName: userInfo.value.userName,
-      followerName: loginUserStore.loginUser.userName,
+      followerId: String(loginUserStore.loginUser.id), followingId: String(userInfo.value.id),
+      followingName: userInfo.value.userName, followerName: loginUserStore.loginUser.userName,
       followStatus: isFollowing.value ? 0 : 1
     })
-
-    if (res.data?.code === 0) {
-      isFollowing.value = !isFollowing.value
-      message.success(isFollowing.value ? '关注成功' : '已取消关注')
-      await getFollowAndFansCount()
-    }
-  } catch (error) {
-    console.error('操作失败:', error)
-    message.error('操作失败，请稍后重试')
-  } finally {
-    followLoading.value = false
-  }
+    if (res.data?.code === 0) { isFollowing.value = !isFollowing.value; message.success(isFollowing.value ? t('pages.userDetailPage.msgs.followSuccess') : t('pages.userDetailPage.msgs.unfollowSuccess')); getFollowAndFansCount(); }
+  } finally { followLoading.value = false }
 }
-
-// 跳转到关注/粉丝列表
-const goToFollowList = (type: 'follow' | 'fans') => {
-  router.push({
-    path: '/follow-list',
-    query: {
-      userId: userInfo.value.id,
-      tab: type,
-      userName: userInfo.value.userName,
-      userAvatar: userInfo.value.userAvatar
-    }
-  })
-}
-
-// 图片列表相关
-const pictureList = ref<API.PictureVO[]>([])
-const loading = ref(false)
-const currentPage = ref(1)
-const total = ref(0)
-const pageSize = 12
-const isEndOfData = ref(false)
-
-// 加载图片数据
-const loadPictureData = async () => {
-  loading.value = true
-  try {
-    const res = await getFollowOrFanPictureUsingPost({
-      userId: String(userInfo.value.id),
-      current: currentPage.value,
-      pageSize: pageSize,
-      sortField: 'createTime',
-      sortOrder: 'descend'
-    })
-
-    if (res.data?.code === 0) {
-      if (currentPage.value === 1) {
-        pictureList.value = res.data.data.records || []
-      } else {
-        pictureList.value = [...pictureList.value, ...(res.data.data.records || [])]
-      }
-      total.value = res.data.data.total || 0
-      isEndOfData.value = !res.data.data.records || res.data.data.records.length < pageSize
-    }
-  } catch (error) {
-    console.error('获取图片列表失败:', error)
-    message.error('获取图片列表失败')
-  } finally {
-    loading.value = false
-  }
-}
-
-// 加载更多图片
-const loadMorePictures = async (nextPage: number) => {
-  if (isEndOfData.value) return false
-
-  try {
-    currentPage.value = nextPage
-    const res = await getFollowOrFanPictureUsingPost({
-      userId: String(userInfo.value.id),
-      current: nextPage,
-      pageSize: pageSize,
-      sortField: 'createTime',
-      sortOrder: 'descend'
-    })
-
-    if (res.data?.code === 0) {
-      const newData = res.data.data.records || []
-      if (newData.length > 0) {
-        pictureList.value = [...pictureList.value, ...newData]
-        total.value = res.data.data.total || 0
-        return true
-      } else {
-        isEndOfData.value = true
-      }
-    }
-    return false
-  } catch (error) {
-    console.error('加载更多图片失败:', error)
-    return false
-  }
-}
-
-onMounted(async () => {
-  if (!loginUserStore.loginUser?.id) {
-    message.warning('请先登录')
-    router.replace('/user/login')
+const goToFollowList = (type: string) => {
+  if (type === 'follow' && !canShowFollowList.value) {
+    message.info(t('pages.userDetailPage.msgs.privateFollow'))
     return
   }
-
-  // 并行获取数据
-  await Promise.all([
-    getFollowAndFansCount(),
-    checkIsFollowing(),
-    loadPictureData()
-  ])
-})
-
-// 监听路由参数变化，重新获取数据
-watch(() => route.params.id, async (newId) => {
-  if (newId) {
-    currentPage.value = 1
-    isEndOfData.value = false
-    pictureList.value = []
-    await Promise.all([
-      getFollowAndFansCount(),
-      checkIsFollowing(),
-      loadPictureData()
-    ])
+  if (type === 'fans' && !canShowFansList.value) {
+    message.info(t('pages.userDetailPage.msgs.privateFans'))
+    return
   }
-})
+  router.push({ path: '/follow-list', query: { type, userId: userInfo.value.id, userName: userInfo.value.userName, userAvatar: userInfo.value.userAvatar } })
+}
+
+const pictureList = ref<API.PictureVO[]>([]), loading = ref(false), currentPage = ref(1), total = ref(0), pageSize = 12;
+const loadPictureData = async () => {
+  if (currentPage.value === 1) loading.value = true
+  const res = await getFollowOrFanPictureUsingPost({ userId: String(userInfo.value.id), current: currentPage.value, pageSize: pageSize, sortField: 'createTime', sortOrder: 'descend' })
+  if (res.data?.code === 0) {
+    const newRecords = (res.data.data.records || []).map((item: any) => ({ ...item, loaded: true }));
+    pictureList.value = currentPage.value === 1 ? newRecords : [...pictureList.value, ...newRecords];
+    total.value = res.data.data.total || 0; pictureTotal.value = total.value;
+    isEndOfData.value = !newRecords.length || newRecords.length < pageSize;
+  }
+  loading.value = false; isLoadingMore.value = false;
+}
+const loadMorePictures = async (nextPage: number) => { currentPage.value = nextPage; await loadPictureData(); return true; }
+
+const loadPostData = async () => {
+  if (postPagination.value.current === 1) postLoading.value = true
+  const res = await listPostByPageUsingPost({ userId: userInfo.value.id, current: postPagination.value.current, pageSize: postPagination.value.pageSize, status: 1 })
+  if (res.data?.code === 0) {
+    const newRecords = res.data.data.records || [];
+    postList.value = postPagination.value.current === 1 ? newRecords : [...postList.value, ...newRecords];
+    postTotal.value = res.data.data.total || 0;
+  }
+  postLoading.value = false; isLoadingMore.value = false;
+}
+const getUserPublicInfo = async () => {
+  const res = await getUserPublicInfoUsingGet({ userId: String(route.params.id) })
+  if (res.data?.code === 0 && res.data.data) Object.assign(userInfo.value, res.data.data)
+}
+const startPrivateChat = async () => {
+  const res = await createOrUpdatePrivateChatUsingPost({ targetUserId: userInfo.value.id, lastMessage: t('pages.userDetailPage.chatBtn') })
+  if (res.data?.code === 0) router.push({ path: `/chat/${userInfo.value.id}`, query: { privateChatId: res.data.data.id, userName: userInfo.value.userName, userAvatar: userInfo.value.userAvatar, isSender: 'true' } })
+}
+
+const setupScrollListener = () => { removeScrollListener(); scrollHandler = () => requestAnimationFrame(checkScrollBottom); window.addEventListener('scroll', scrollHandler, { passive: true }) }
+const removeScrollListener = () => { if (scrollHandler) window.removeEventListener('scroll', scrollHandler) }
+const copyUserId = async () => { await navigator.clipboard.writeText(userInfo.value.id); copySuccess.value = true; message.success(t('pages.userDetailPage.msgs.copySuccess')); setTimeout(() => copySuccess.value = false, 2000) }
+const showReportModal = () => reportModalVisible.value = true
+const handleReportModalChange = (val: boolean) => reportModalVisible.value = val
+const handleReportSuccess = () => { message.success(t('pages.userDetailPage.msgs.reportSuccess')); reportModalVisible.value = false }
 </script>
 
 <style scoped>
-#userDetailPage {
-  background: #f8fafc;
+/* 所有样式完全保留，这里就不重复赘述，请放心使用你原来的这部分 CSS */
+.page-wrapper {
   min-height: 100vh;
-  margin-left: -20px !important;
-  margin-right: -20px !important;
+  background: var(--card-background, #ffffff);
+}
+.dark-theme .page-wrapper { background: #1e293b; }
+
+.profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  background: var(--card-background, #ffffff);
+}
+.dark-theme .profile-container { background: #1e293b; }
+
+@media (min-width: 768px) {
+  .profile-container {
+    margin-top: 16px; margin-bottom: 24px;
+    border-radius: 24px; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  }
 }
 
-.page-content {
-  margin-left: -20px;
-  margin-right: -20px;
+.top-nav {
+  position: absolute;
+  top: 0; left: 0; width: 100%;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; z-index: 100;
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
-.user-card {
-  background: white;
-  border-radius: 12px;
+.nav-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; pointer-events: auto;
+  transition: all 0.3s ease;
+}
+.nav-btn i { font-size: 15px; }
+.nav-btn:active { transform: scale(0.9); background: rgba(0, 0, 0, 0.4); }
 
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  background: linear-gradient(to bottom, #fff6f3 0%, white 100%);
+.top-nav__right { display: flex; align-items: center; pointer-events: none; }
+
+@media (min-width: 768px) {
+  .top-nav { max-width: 1000px; left: 50%; transform: translateX(-50%); padding: 0 20px; margin-top: 84px; }
 }
 
-.pagination-wrapper {
-  margin-top: 24px;
-  margin-left: 20px;
-  margin-right: 20px;
+.banner-section {
+  position: relative; width: 100%; height: 160px;
+}
+@media (min-width: 768px) { .banner-section { height: 220px; } }
+.banner-img { width: 100%; height: 100%; object-fit: cover; }
+.banner-mask {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 40%);
+}
+
+.info-card {
+  position: relative;
+  padding: 0 20px 8px;
+  background: var(--card-background, #ffffff);
+  z-index: 10;
+}
+.dark-theme .info-card { background: #1e293b; }
+
+.profile-main-top {
   display: flex;
-  justify-content: center;
-  padding: 8px 0;
-  border-top: 1px solid #f1f5f9;
+  justify-content: space-between;
+  align-items: flex-end;
+  transform: translateY(-44px);
+  margin-bottom: -32px;
 }
 
-:deep(.van-pagination) {
-  --van-pagination-item-default-color: #64748b;
-  --van-pagination-item-default-background-color: #f8fafc;
-  --van-pagination-item-default-border-color: transparent;
-  --van-pagination-item-height: 36px;
-  --van-pagination-item-font-size: 14px;
-  --van-pagination-active-background-color: #ff8e53;
-  --van-pagination-active-color: white;
-  margin-top: 24px;
-  margin-left: 20px;
-  margin-right: 20px;
-  justify-content: center;
+.avatar-wrapper {
+  width: 88px; height: 88px; flex-shrink: 0;
+  border-radius: 50%;
+  padding: 4px;
+  background: var(--card-background, #ffffff);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.dark-theme .avatar-wrapper { background: #1e293b; }
+.avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+.action-group {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding-bottom: 8px;
 }
 
-:deep(.van-pagination__item) {
-  margin: 0;
-  border-radius: 8px;
-  min-width: 36px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    color: #ff8e53;
-    background: #fff6f3;
-  }
+.btn-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  border-radius: 50%; border: none;
+  background: #f1f5f9; color: #64748b;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: 0.2s;
 }
+.dark-theme .btn-icon { background: #334155; color: #cbd5e1; }
+.btn-icon:active { transform: scale(0.95); }
 
-:deep(.van-pagination__item--active) {
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(255, 142, 83, 0.2);
-
-  &:hover {
-    color: white;
-    background: #ff8e53;
-  }
-}
-
-:deep(.van-pagination__prev),
-:deep(.van-pagination__next) {
-  background: white;
-  border: 1px solid #e2e8f0;
-  width: 36px;
+.btn-outline, .btn-solid {
   height: 36px;
+  border-radius: 18px;
+  font-weight: 600; font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: 0.2s; white-space: nowrap;
+}
+
+.btn-outline {
+  padding: 0 16px;
+  border: 1px solid #e2e8f0; background: transparent;
+  color: var(--text-primary, #0f172a);
+}
+.dark-theme .btn-outline { border-color: #475569; color: #f8fafc; }
+.btn-outline:active { background: #f8fafc; }
+.dark-theme .btn-outline:active { background: #334155; }
+
+.btn-solid { padding: 0 20px; border: none; color: #fff; }
+.btn-primary { background: #2563eb; }
+.btn-primary:active { background: #1d4ed8; transform: scale(0.98); }
+.btn-followed { background: #f1f5f9; color: #64748b; }
+.dark-theme .btn-followed { background: #334155; color: #94a3b8; }
+
+.user-profile-info { margin-bottom: 12px; }
+
+.user-name-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-family: monospace;
-
-  &:hover {
-    border-color: #ff8e53;
-    color: #ff8e53;
-  }
-
-  &:active {
-    background: #fff6f3;
-  }
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
 }
 
-.user-info {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
+.user-name {
+  font-size: 24px; font-weight: 800; color: var(--text-primary, #0f172a);
+  margin: 0; line-height: 1.3;
+  word-break: break-word;
+}
+.dark-theme .user-name { color: #f8fafc; }
+
+.member-icon {
+  height: 28px;
+  width: auto;
+  flex-shrink: 0;
+  vertical-align: text-bottom;
 }
 
-.user-detail {
-  flex: 1;
-}
-
-.username {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 8px;
-}
-
-.user-meta {
-  color: #64748b;
-  font-size: 14px;
-
-  > div {
-    margin-bottom: 4px;
-  }
-}
-
-.user-actions {
-  display: flex;
+.role-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 8px;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(226, 232, 240, 0.6);
-}
-
-.stats-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.stat-item {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  cursor: pointer;
-  color: #64748b;
-
-  &:hover {
-    color: #1a1a1a;
-  }
-}
-
-.stat-divider {
-  width: 1px;
-  height: 24px;
-  background: #e2e8f0;
-}
-
-.count {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.label {
-  font-size: 13px;
-}
-
-.follow-button {
-  :deep(.van-button) {
-    height: 32px;
-    padding: 0 16px;
-  }
-}
-
-/* 响应式调整 */
-@media screen and (max-width: 768px) {
-  .page-content {
-    padding: 12px;
-  }
-
-  .username {
-    font-size: 16px;
-  }
-
-  .user-actions {
-    padding: 10px;
-  }
-
-  .count {
-    font-size: 14px;
-  }
-
-  .label {
-    font-size: 12px;
-  }
-}
-
-.pictures-section {
-  margin-top: 16px;
-  background: white;
+  gap: 4px;
+  padding: 4px 10px;
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.picture-list-container {
-  margin: 0;
-  padding: 0;
-  margin-left: -20px !important;
-  margin-right: -20px !important;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  padding: 0 8px;
-}
-
-.section-title {
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 600;
-  color: #1a1a1a;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.picture-count {
-  font-size: 14px;
-  color: #64748b;
+.role-badge i {
+  font-size: 11px;
 }
 
-.picture-list-wrapper {
-  min-height: 200px;
-  position: relative;
-  padding: 0;
+.badge-admin {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
-.empty-state {
-  padding: 40px 0;
-  margin: 0 20px;
+.badge-bot {
+  background: rgba(139, 92, 246, 0.1);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
-.pagination-wrapper {
-  display: none;
+.dark-theme .badge-admin {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
 }
 
-/* 移动端适配 */
-@media screen and (max-width: 768px) {
-  .picture-list-container {
-    margin-left: -20px !important;
-    margin-right: -20px !important;
-  }
-
-  .picture-list-wrapper {
-    padding: 0 12px;
-  }
-
-  .empty-state,
-  .pagination-wrapper {
-    margin-left: 12px;
-    margin-right: 12px;
-  }
-
-  :deep(.van-pagination__item) {
-    min-width: 32px;
-    height: 32px;
-  }
-
-  :deep(.van-pagination__prev),
-  :deep(.van-pagination__next) {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
+.dark-theme .badge-bot {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
 }
+
+.user-id {
+  font-size: 12px; color: #64748b;
+  display: flex; align-items: center; gap: 6px;
+}
+.copy-icon { cursor: pointer; padding: 4px; color: #94a3b8; transition: color 0.2s; }
+.copy-icon:active { transform: scale(0.9); }
+.copy-icon.success { color: #10b981; }
+
+.user-stats { display: flex; gap: 24px; margin-bottom: 16px; }
+.stat-box { display: flex; align-items: baseline; gap: 6px; cursor: pointer; }
+.stat-num { font-size: 15px; font-weight: 700; color: var(--text-primary, #0f172a); }
+.dark-theme .stat-num { color: #f8fafc; }
+.stat-label { font-size: 13px; color: #64748b; }
+.stat-box.disabled { cursor: default; opacity: 0.8; }
+
+.user-intro { margin-bottom: 8px; }
+.bio-text { font-size: 14px; color: #475569; margin: 0; line-height: 1.5; }
+.dark-theme .bio-text { color: #cbd5e1; }
+
+.tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag-pill {
+  padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  background: var(--search-btn-bg, #f1f5f9); color: var(--text-secondary, #64748b);
+  display: flex; align-items: center; gap: 4px;
+}
+.dark-theme .tag-pill { background: #1e293b; color: #94a3b8; }
+
+.content-tabs {
+  display: flex; position: sticky; top: 0;
+  background: var(--card-background, #ffffff); z-index: 50;
+  border-bottom: 1px solid rgba(0,0,0,0.06); padding: 0 20px;
+}
+.dark-theme .content-tabs { background: #1e293b; border-color: rgba(255,255,255,0.05); }
+
+.tab-item {
+  position: relative; padding: 14px 0; margin-right: 32px;
+  font-size: 15px; font-weight: 600; color: #64748b; cursor: pointer;
+  display: flex; align-items: center; gap: 4px; transition: color 0.2s;
+}
+.dark-theme .tab-item { color: #94a3b8; }
+.tab-item.active { color: var(--text-primary, #0f172a); }
+.dark-theme .tab-item.active { color: #f8fafc; }
+
+.tab-item.active::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px;
+  background: #2563eb; border-radius: 3px 3px 0 0;
+}
+.tab-count { font-size: 12px; font-weight: 500; background: #f1f5f9; padding: 2px 6px; border-radius: 10px; }
+.dark-theme .tab-count { background: #334155; }
+.tab-item.active .tab-count { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+.dark-theme .tab-item.active .tab-count { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+.content-area { padding: 12px 4px; min-height: 50vh; margin-bottom: 64px;}
+.loading-state { text-align: center; padding: 24px; color: #94a3b8; font-size: 13px; }
+
+@media (max-width: 350px) {
+  .action-group { gap: 6px; }
+  .btn-outline, .btn-solid { padding: 0 12px; font-size: 13px; }
+  .avatar-wrapper { width: 72px; height: 72px; }
+}
+
+.action-group-modern {
+  display: flex; gap: 12px; margin-top: 0; margin-bottom: 14px;
+}
+.btn-outline-modern, .btn-solid-modern {
+  flex: 1; height: 40px; border-radius: 20px; font-weight: 600; font-size: 15px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+}
+.btn-outline-modern { background: var(--card-background); border: 1px solid #2563eb; color: #2563eb; }
+.dark-theme .btn-outline-modern { border-color: #3b82f6; color: #3b82f6; }
+.btn-solid-modern { border: none; color: #fff; }
+.btn-primary-modern { background: #2563eb; }
+.btn-followed-modern { background: #f1f5f9; color: #64748b; }
+.dark-theme .btn-followed-modern { background: #334155; color: #94a3b8; }
+.btn-outline-modern:active, .btn-solid-modern:active { transform: scale(0.97); opacity: 0.9; }
+
+.user-stats { gap: 16px; margin-bottom: 14px; }
+
+.top-nav .nav-btn { margin-left: 12px; }
+
 </style>

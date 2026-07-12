@@ -1,0 +1,55 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 全局阴影 -->
+    <filter id="pro-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1e3a8a" flood-opacity="0.15"/>
+    </filter>
+    
+    <!-- 内部光晕 -->
+    <filter id="pro-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="15" result="blur" />
+    </filter>
+
+    <!-- 背景玻璃渐变 -->
+    <linearGradient id="pro-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#eff6ff" stop-opacity="0.4" />
+    </linearGradient>
+
+    <!-- 边框高光 -->
+    <linearGradient id="pro-border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+
+  <!-- 底部毛玻璃圆角矩形 -->
+  <rect x="20" y="20" width="160" height="160" rx="42" fill="url(#pro-bg)" filter="url(#pro-shadow)"/>
+  
+  <!-- 边框高光层 -->
+  <rect x="20" y="20" width="160" height="160" rx="42" fill="none" stroke="url(#pro-border)" stroke-width="2"/>
+
+  <!-- 背景蓝色光晕 -->
+  <circle cx="100" cy="85" r="40" fill="#3b82f6" opacity="0.3" filter="url(#pro-glow)"/>
+
+  <!-- 钻石主体 (通过不同明暗的蓝色块拼接出 3D 切割质感) -->
+  <g stroke="#ffffff" stroke-width="0.5" stroke-linejoin="round">
+    <!-- 顶部中心切面 (高光区) -->
+    <polygon points="70,55 130,55 100,75" fill="#93c5fd" />
+    <!-- 顶部左侧切面 -->
+    <polygon points="50,75 70,55 100,75" fill="#60a5fa" />
+    <!-- 顶部右侧切面 -->
+    <polygon points="150,75 130,55 100,75" fill="#3b82f6" />
+    <!-- 底部左侧切面 -->
+    <polygon points="50,75 100,125 100,75" fill="#2563eb" />
+    <!-- 底部右侧切面 (暗部) -->
+    <polygon points="150,75 100,125 100,75" fill="#1d4ed8" />
+  </g>
+
+  <!-- 左侧边缘的高光强化 (让钻石看起来更晶莹剔透) -->
+  <polygon points="50,75 70,55 72,55 52,75" fill="#ffffff" opacity="0.6" />
+  <polygon points="50,75 100,125 98,125 48,75" fill="#ffffff" opacity="0.3" />
+
+  <!-- 徽标文字 -->
+  <text x="100" y="155" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="16" font-weight="800" fill="#2563eb" text-anchor="middle" letter-spacing="3">PRO</text>
+</svg>

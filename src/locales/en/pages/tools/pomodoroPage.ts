@@ -1,0 +1,22 @@
+export default {
+  "running": "Running",
+  "standby": "Standby",
+  "completedCycles": "Completed Cycles: {count}",
+  "restoreModeTitle": ">>> Restore Mode <<<",
+  "resetBtn": "Reset",
+  "configBtn": "Config",
+  "taskListLog": "Task List.LOG",
+  "delete": "Delete",
+  "inputNewTask": "+ Input new task...",
+  "workDurationMin": "Work Duration (min)",
+  "restDurationMin": "Rest Duration (min)",
+  "taskDesc": "Task Description",
+  "confirmExec": "Confirm Exec",
+  "cancelBtn": "Cancel",
+  "focusModeTitle": ">>> Focus Mode <<<",
+  "terminateProgram": "Terminate Program",
+  "startProgram": "Start Program",
+  "parameterAdjustment": "Parameter Adjustment",
+  "newTaskList": "New Task List",
+  "inputCommand": "Input Command..."
+};

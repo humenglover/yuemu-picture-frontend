@@ -1,23 +1,29 @@
+import i18n from '@/locales';
+const t = i18n.global.t;
+
 export const PIC_REVIEW_STATUS_ENUM = {
   REVIEWING: 0,
   PASS: 1,
   REJECT: 2,
 }
 
-/**
- * 图片审核状态文案
- */
 export const PIC_REVIEW_STATUS_MAP = {
-  0: '待审核',
-  1: '通过',
-  2: '拒绝',
+  get 0() { return t('constants.picture.reviewing') },
+  get 1() { return t('constants.picture.pass') },
+  get 2() { return t('constants.picture.reject') },
 }
 
-/**
- * 图片审核下拉表单选项
- */
 export const PIC_REVIEW_STATUS_OPTIONS = [
-  { label: '待审核', value: 0 },
-  { label: '已通过', value: 1 },
-  { label: '已拒绝', value: 2 },
+  { get label() { return PIC_REVIEW_STATUS_MAP[0] }, value: 0 },
+  { get label() { return PIC_REVIEW_STATUS_MAP[1] }, value: 1 },
+  { get label() { return PIC_REVIEW_STATUS_MAP[2] }, value: 2 },
 ]
+
+export const PICTURE_EDIT_MESSAGE_TYPE_ENUM = {
+  INFO: "INFO",
+  ERROR: "ERROR",
+  ENTER_EDIT: "ENTER_EDIT",
+  EXIT_EDIT: "EXIT_EDIT",
+  EDIT_ACTION: "EDIT_ACTION",
+} as const;
+

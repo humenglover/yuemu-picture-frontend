@@ -1,0 +1,20 @@
+export default {
+  title: 'Invite Program',
+  myCode: 'My Invite Code',
+  copyLink: 'Copy Link',
+  generating: 'Generating...',
+  loadFailRetry: 'Failed, click to retry',
+  inviteDesc: 'Share with friends, unlock premium perks upon their registration.',
+  inviteDetails: 'Details',
+  leaderboard: 'Leaderboard',
+  emptyInvite: 'No invite records, go invite friends!',
+  unknownUser: 'Unknown User',
+  valid: 'Valid',
+  invalid: 'Invalid',
+  emptyRank: 'No ranking data',
+  people: ' people',
+  loading: 'Loading...',
+  noMore: '- End of list -',
+  copySuccess: 'Link copied, go share with friends!',
+  errGetCode: 'Failed to get invite code'
+};

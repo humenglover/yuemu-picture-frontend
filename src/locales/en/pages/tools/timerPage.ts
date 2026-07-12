@@ -1,0 +1,22 @@
+export default {
+  "stopwatchClock": "Stopwatch · Clock",
+  "countdownTimer": "Countdown · Timer",
+  "minuteUnit": "m",
+  "secondUnit": "s",
+  "lap": "Lap",
+  "resetBtn": "Reset",
+  "startEng": "Start",
+  "pauseClock": "Pause",
+  "lapArchive": "Lap Archive",
+  "historyTimer": "History Timer",
+  "clearAll": "Clear",
+  "reuse": "Reuse",
+  "pleaseTurnDial": "Please turn dial first",
+  "timeIsUp": "Time is up!",
+  "recoveredHistoryTime": "Recovered history time",
+  "text_a3e3b883": "开始",
+  "text_8d63ef38": "暂停",
+  "text_cc42dd31": "开启",
+  "text_dcfe57bd": "Lap {0}",
+  "text_53601793": "10) timerHistory.value.pop()\n    localStorage.setItem('retro_timer_history', JSON.stringify(timerHistory.value))\n  }\n\n  startTimer(() => {\n    if (countdownTime.value > 0) {\n      countdownTime.value -= 10\n    } else {\n      stopTimer()\n      message.success('时辰已到！')\n    }\n  })\n}\n\nconst pauseCountdown = () => stopTimer()\nconst resetCountdown = () => resetTimer()\nconst useHistoryTime = (item: TimerHistoryItem) => {\n  if (isRunning.value) return\n  countdownTime.value = item.duration\n  message.info('已恢复历史时间')\n}\n\nconst clearCurrentRecords = () => {\n  if (mode.value === 'stopwatch') laps.value = []\n  else {\n    timerHistory.value = []\n    localStorage.removeItem('retro_timer_history')\n  }\n}\n\nonUnmounted(() => stopTimer())"
+};

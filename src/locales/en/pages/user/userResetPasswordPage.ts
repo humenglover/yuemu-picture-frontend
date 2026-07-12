@@ -1,0 +1,20 @@
+export default {
+  title: 'Reset Password',
+  subtitle: 'Please enter your registered email',
+  emailPlaceholder: 'Enter email',
+  codePlaceholder: 'Email Code',
+  getCode: 'Get Code',
+  newPasswordPlaceholder: 'Enter new password',
+  confirmPasswordPlaceholder: 'Confirm password',
+  rememberPassword: 'Remember your password?',
+  backToLogin: 'Back to Login',
+  resetBtn: 'Reset Password',
+  fillRequired: 'Please fill in all required fields',
+  passwordLength: 'Password must be at least 8 characters',
+  passwordNotMatch: 'Passwords do not match',
+  codeSent: 'Code sent',
+  sendFail: 'Failed to send',
+  networkError: 'Network error, please try again later',
+  resetSuccess: 'Password reset successful',
+  resetFail: 'Reset failed'
+};

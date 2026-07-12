@@ -1,0 +1,17 @@
+export default {
+    noNotes: 'No Notes',
+    goPublish: 'Go publish your first note',
+    draft: 'Draft',
+    feature: 'Feature',
+    unnamedNote: 'Unnamed Note',
+    reviewPendingMsg: 'Your note is under review, please wait...',
+    reviewApprovedMsg: 'Congratulations! Your note has been approved',
+    reviewRejectedMsg: 'Sorry, your note was rejected',
+    reviewPending: 'Under Review',
+    reviewApproved: 'Approved',
+    reviewRejected: 'Rejected',
+    reviewStatus: 'Review Status',
+  notePicture: 'Note picture',
+  userAvatar: 'User avatar',
+  unknownUser: 'Unknown user',
+};

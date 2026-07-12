@@ -20,6 +20,81 @@ export function downloadImage(url?: string, fileName?: string) {
   if (!url) {
     return
   }
+
+  // 兼容 HBuilderX (HTML5+) App 运行环境
+  if (typeof window !== 'undefined' && (window as any).plus) {
+    const plus = (window as any).plus;
+
+    // 如果是 Base64 数据流（如 canvas 导出的图片）
+    if (url.startsWith('data:image/')) {
+      plus.nativeUI.showWaiting('正在保存...');
+      const bitmap = new plus.nativeObj.Bitmap('share_img');
+      bitmap.loadBase64Data(
+        url,
+        function () {
+          bitmap.save(
+            '_doc/share_' + Date.now() + '.jpg',
+            { overwrite: true, quality: 100 },
+            function (i: any) {
+              plus.gallery.save(
+                i.target,
+                function () {
+                  plus.nativeUI.closeWaiting();
+                  plus.nativeUI.toast('已成功保存到系统相册');
+                  bitmap.clear();
+                },
+                function (e: any) {
+                  plus.nativeUI.closeWaiting();
+                  plus.nativeUI.toast('保存到相册失败');
+                  bitmap.clear();
+                }
+              );
+            },
+            function (e: any) {
+              plus.nativeUI.closeWaiting();
+              plus.nativeUI.toast('保存文件失败');
+              bitmap.clear();
+            }
+          );
+        },
+        function (e: any) {
+          plus.nativeUI.closeWaiting();
+          plus.nativeUI.toast('处理图像失败');
+        }
+      );
+      return;
+    }
+
+    // 常规网络图片下载
+    plus.nativeUI.showWaiting('正在下载...');
+    const dtask = plus.downloader.createDownload(
+      url,
+      {},
+      function (d: any, status: number) {
+        if (status === 200) {
+          // 下载成功，保存到相册
+          plus.gallery.save(
+            d.filename,
+            function () {
+              plus.nativeUI.closeWaiting();
+              plus.nativeUI.toast('已成功保存到系统相册');
+            },
+            function (e: any) {
+              plus.nativeUI.closeWaiting();
+              plus.nativeUI.toast('保存到相册失败: ' + JSON.stringify(e));
+            }
+          );
+        } else {
+          plus.nativeUI.closeWaiting();
+          plus.nativeUI.toast('下载失败');
+        }
+      }
+    );
+    dtask.start();
+    return;
+  }
+
+  // 普通 Web 端
   saveAs(url, fileName)
 }
 

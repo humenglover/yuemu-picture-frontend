@@ -1,0 +1,20 @@
+export default {
+  title: '重置密码',
+  subtitle: '请输入您的注册邮箱',
+  emailPlaceholder: '请输入邮箱',
+  codePlaceholder: '邮箱验证码',
+  getCode: '获取验证码',
+  newPasswordPlaceholder: '请输入新密码',
+  confirmPasswordPlaceholder: '请确认密码',
+  rememberPassword: '记起密码了？',
+  backToLogin: '返回登录',
+  resetBtn: '重置密码',
+  fillRequired: '请填写所有必填项',
+  passwordLength: '密码长度不能小于 8 位',
+  passwordNotMatch: '两次输入的密码不一致',
+  codeSent: '验证码已发送',
+  sendFail: '发送失败',
+  networkError: '网络错误，请稍后重试',
+  resetSuccess: '密码重置成功',
+  resetFail: '重置失败'
+};
