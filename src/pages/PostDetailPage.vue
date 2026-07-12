@@ -74,6 +74,15 @@
             <span v-for="tag in post?.tagList" :key="tag" class="xhs-tag"># {{ tag }}</span>
           </div>
 
+          <div class="yuemu-sponsor-ad-wrapper" style="margin: 32px 0;" v-if="$enableAds">
+            <div class="yuemu-sponsor-ad-label" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; padding-left: 2px;">
+              <i class="fas fa-ad" style="margin-right: 6px; color: #52c41a;"></i> {{ $t('components.bigPicture.sponsoredTitle') || '精选赞助内容' }}
+            </div>
+            <div style="position: relative; width: 100%; height: 140px;">
+              <GlobalAdBanner margin="0" :fillHeight="true" />
+            </div>
+          </div>
+
           <div class="end-divider">- THE END -</div>
         </div>
       </div>
@@ -169,6 +178,15 @@
             <div class="tags-wrapper" v-if="post?.category || (post?.tagList && post.tagList.length > 0)">
               <span v-if="post?.category" class="xhs-category">{{ post?.category }}</span>
               <span v-for="tag in post?.tagList" :key="tag" class="xhs-tag"># {{ tag }}</span>
+            </div>
+
+            <div class="yuemu-sponsor-ad-wrapper" style="margin: 32px 0;" v-if="$enableAds">
+              <div class="yuemu-sponsor-ad-label" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; padding-left: 2px;">
+                <i class="fas fa-ad" style="margin-right: 6px; color: #52c41a;"></i> {{ $t('components.bigPicture.sponsoredTitle') || '精选赞助内容' }}
+              </div>
+              <div style="position: relative; width: 100%; height: 100px;">
+                <GlobalAdBanner margin="0" :fillHeight="true" />
+              </div>
             </div>
 
             <div class="end-divider">- THE END -</div>
@@ -379,6 +397,7 @@ import ImagePreview from '@/components/ImagePreview.vue'
 import { getPostByIdUsingGet, deletePostUsingPost } from '@/api/postController'
 import { addUserFollowsUsingPost, findIsFollowUsingPost } from '@/api/userFollowsController'
 import { addCommentUsingPost, queryCommentUsingPost } from '@/api/commentsController'
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
 import { doLikeUsingPost } from '@/api/likeRecordController'
 import { doShareUsingPost } from '@/api/shareRecordController'
 import { addFavoriteRecordUsingPost, cancelFavoriteUsingPost } from '@/api/favoriteRecordController'

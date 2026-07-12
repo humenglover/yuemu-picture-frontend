@@ -26,6 +26,10 @@ app.use(Antd)
 app.use(VueCropper)
 app.use(i18n)
 
+// 注入全局广告控制配置
+app.config.globalProperties.$enableAds = __ENABLE_ADS__
+app.provide('enableAds', __ENABLE_ADS__)
+
 // 初始化安全防护
 // createSecurityShield()
 

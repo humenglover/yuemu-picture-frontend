@@ -294,7 +294,10 @@ const getForumCategoryI18n = (category: string) => {
   return FORUM_CATEGORY_MAP[category] || category
 };
 
-import { ref, onMounted, watch, onUnmounted, onActivated, onDeactivated, computed } from 'vue'
+import { ref, onMounted, watch, onUnmounted, onActivated, onDeactivated, computed, provide } from 'vue'
+
+// 在论坛页启用所有广告，但受全局环境变量控制
+provide('enableAds', typeof __ENABLE_ADS__ !== 'undefined' ? __ENABLE_ADS__ : true)
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { listPostByPageUsingPost, getFollowPostsUsingPost, listPostTagCategoryUsingGet, listPostVoByRecommendUsingPost } from '@/api/postController'

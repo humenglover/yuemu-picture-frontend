@@ -42,6 +42,7 @@ export default {
   failGetDeepFeatures: 'Failed to get deep image features',
   btnConfirm: 'Confirm',
   btnCancel: 'Cancel',
+  sensitiveWarning: 'Tip: AI detected people in the image. Please ensure you have authorization from the relevant right holders and comply with portrait and copyright laws.',
 
   aiWritingStatusInit: 'Analyzing picture...',
   aiWritingStatusPreparing: 'AI is preparing...',

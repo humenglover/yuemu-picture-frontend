@@ -21,6 +21,7 @@ import ExternalLinkModal from './ExternalLinkModal';
 import FollowUserList from './FollowUserList';
 import GlobalFooter from './GlobalFooter';
 import GlobalHeader from './GlobalHeader';
+import globalAd from './globalAd';
 import GlobalLoading from './GlobalLoading';
 import GlobalSider from './GlobalSider';
 import GlowingVine from './GlowingVine';
@@ -92,6 +93,7 @@ export default {
   followUserList: FollowUserList,
   globalFooter: GlobalFooter,
   globalHeader: GlobalHeader,
+  globalAd: globalAd,
   globalLoading: GlobalLoading,
   globalSider: GlobalSider,
   glowingVine: GlowingVine,

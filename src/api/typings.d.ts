@@ -13,6 +13,7 @@ declare namespace API {
     isDelete?: number
     isExpired?: number
     isLiked?: number
+    isNeedAudit?: number
     isShared?: number
     likeCount?: number
     maxSubmissionsPerUser?: number
@@ -44,6 +45,7 @@ declare namespace API {
     content?: string
     coverUrl?: string
     expireTime?: string
+    isNeedAudit?: number
     maxSubmissionsPerUser?: number
     maxVotesPerUser?: number
     spaceId?: number
@@ -62,6 +64,7 @@ declare namespace API {
     coverUrl?: string
     expireTime?: string
     id?: number
+    isNeedAudit?: number
     maxSubmissionsPerUser?: number
     maxVotesPerUser?: number
     spaceId?: number
@@ -990,6 +993,12 @@ declare namespace API {
   type BaseResponseReportVO_ = {
     code?: number
     data?: ReportVO
+    message?: string
+  }
+
+  type BaseResponseSeoDailyNewResponse_ = {
+    code?: number
+    data?: SeoDailyNewResponse
     message?: string
   }
 
@@ -3683,6 +3692,11 @@ declare namespace API {
   type sendUsingPOSTParams = {
     /** query */
     query?: string
+  }
+
+  type SeoDailyNewResponse = {
+    pictures?: number[]
+    posts?: number[]
   }
 
   type SessionDeleteRequest = {

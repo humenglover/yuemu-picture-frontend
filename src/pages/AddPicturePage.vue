@@ -159,7 +159,7 @@
                   </span>
                 </div>
                 <div v-if="!aiTagLoading && picture?.aiLabels && hasSensitiveLabel(picture.aiLabels)" class="yuemu-ai-alert">
-                  <i class="fa-solid fa-shield-halved"></i> {{ getSensitiveWarning() }}
+                  <i class="fa-solid fa-shield-halved"></i> {{ t('pages.addPicturePage.sensitiveWarning') }}
                 </div>
               </div>
             </div>
@@ -441,7 +441,7 @@ import ImageCropper from '@/components/ImageCropper.vue'
 import ImageOutPainting from '@/components/ImageOutPainting.vue'
 import ImagePreview from '@/components/ImagePreview.vue'
 import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { translateLabels, hasSensitiveLabel, getSensitiveWarning } from '@/utils/yoloUtils'
+import { translateLabels, hasSensitiveLabel } from '@/utils/yoloUtils'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'

@@ -1026,6 +1026,24 @@ const router = createRouter({
       }
     },
     {
+      path: '/privacy-center',
+      name: 'PrivacyCenter',
+      component: () => import('@/views/PrivacyCenterView.vue'),
+      meta: {
+        keepAlive: true,
+        title: '隐私中心 - Privacy Center'
+      }
+    },
+    {
+      path: '/privacy',
+      name: 'PrivacyPolicy',
+      component: () => import('@/views/PrivacyPolicyView.vue'),
+      meta: {
+        keepAlive: true,
+        title: '隐私政策 - Privacy Policy'
+      }
+    },
+    {
       path: '/ranking',
       name: 'Ranking',
       component: () => import('@/pages/RankingPage.vue'),
@@ -1038,6 +1056,9 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
+    }
+    if (to.hash) {
+      return { el: to.hash, behavior: 'smooth' }
     }
     if (shouldSaveScrollPosition(to.path)) {
       const savedScrollPosition = sessionStorage.getItem(`scroll_${to.path}`)

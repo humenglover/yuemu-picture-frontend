@@ -24,71 +24,96 @@
               v-for="post in column"
               :key="post.id"
               class="yuemu-masonry-item"
-              @click="handlePostClick(post)"
+              :class="{ 'is-ad-item': (post as any).isAd }"
+              @click="!(post as any).isAd && handlePostClick(post)"
             >
-              <div class="yuemu-note-card">
-                <div v-if="props.showStatus && post.status !== 1" class="yuemu-status-dot-wrap" @click.stop="handleStatusClick(post)">
-                  <div class="yuemu-status-dot" :class="['yuemu-status-' + post.status]"></div>
-                </div>
-                <div class="yuemu-note-image-wrapper">
-                  <div
-                    class="yuemu-aspect-ratio-box"
-                    :style="{ paddingTop: `${getPaddingTop(post)}%` }"
-                  >
-                    <div v-if="!post.imageLoaded" class="yuemu-skeleton-wrapper">
-                      <div class="yuemu-skeleton-image"></div>
-                    </div>
-                    <div v-if="post.coverUrl && !post.hdImageLoaded" class="yuemu-blur-image-wrapper">
-                      <img
-                        :src="getThumbnailUrl(post.coverUrl)"
-                        :alt="post.title || ''"
-                        class="yuemu-blur-image"
-                        @load="handleBlurImageLoad(post)"
-                      >
-                    </div>
-                    <img
-                      v-show="!loading"
-                      v-if="post.coverUrl"
-                      :src="post.coverUrl"
-                      :alt="post.title || ''"
-                      class="yuemu-note-image"
-                      :class="{ 'yuemu-loaded': post.hdImageLoaded }"
-                      @load="handleImageLoad(post, $event)"
-                      @error="handleImageError(post)"
-                    />
-                    <img
-                      v-show="!loading"
-                      v-else
-                      :src="getPostCover(post)"
-                      :alt="post.title || ''"
-                      class="yuemu-note-image yuemu-text-cover"
-                      :class="{ 'yuemu-loaded': post.imageLoaded }"
-                      @load="handleImageLoad(post, $event)"
-                      @error="handleImageError(post)"
-                    />
+              <div class="yuemu-note-card" :class="{ 'yuemu-ad-card': (post as any).isAd }">
+                <template v-if="!(post as any).isAd">
+                  <div v-if="props.showStatus && post.status !== 1" class="yuemu-status-dot-wrap" @click.stop="handleStatusClick(post)">
+                    <div class="yuemu-status-dot" :class="['yuemu-status-' + post.status]"></div>
                   </div>
-                </div>
-                <div class="yuemu-note-info">
-                  <div class="yuemu-author-section">
-                    <img
-                      class="yuemu-author-avatar"
-                      :src="post.user?.userAvatar || getDefaultAvatar(post.user?.userName || '')"
-                      :alt="post.user?.userName || ''"
-                      :class="{ 'yuemu-loaded': post.avatarLoaded }"
-                      @load="() => { post.avatarLoaded = true }"
+                  <div class="yuemu-note-image-wrapper">
+                    <div
+                      class="yuemu-aspect-ratio-box"
+                      :style="{ paddingTop: `${getPaddingTop(post)}%` }"
                     >
-                    <span class="yuemu-author-name">{{ post.user?.userName || t('components.postList.unknownUser') }}</span>
-                    <span class="yuemu-view-count">
-                      <EyeOutlined class="yuemu-view-icon" />
-                      {{ formatNumber(Number(post.viewCount) || 0) }}
-                    </span>
+                      <div v-if="!post.imageLoaded" class="yuemu-skeleton-wrapper">
+                        <div class="yuemu-skeleton-image"></div>
+                      </div>
+                      <div v-if="post.coverUrl && !post.hdImageLoaded" class="yuemu-blur-image-wrapper">
+                        <img
+                          :src="getThumbnailUrl(post.coverUrl)"
+                          :alt="post.title || ''"
+                          class="yuemu-blur-image"
+                          @load="handleBlurImageLoad(post)"
+                        >
+                      </div>
+                      <img
+                        v-show="!loading"
+                        v-if="post.coverUrl"
+                        :src="post.coverUrl"
+                        :alt="post.title || ''"
+                        class="yuemu-note-image"
+                        :class="{ 'yuemu-loaded': post.hdImageLoaded }"
+                        @load="handleImageLoad(post, $event)"
+                        @error="handleImageError(post)"
+                      />
+                      <img
+                        v-show="!loading"
+                        v-else
+                        :src="getPostCover(post)"
+                        :alt="post.title || ''"
+                        class="yuemu-note-image yuemu-text-cover"
+                        :class="{ 'yuemu-loaded': post.imageLoaded }"
+                        @load="handleImageLoad(post, $event)"
+                        @error="handleImageError(post)"
+                      />
+                    </div>
                   </div>
-                  <div class="yuemu-note-title">{{ post.title || t('components.postList.untitled') }}</div>
-                  <div class="yuemu-post-meta">
-                    <span v-if="post.category" class="yuemu-category-tag">#{{ post.category }}</span>
-                    <span class="yuemu-post-time">{{ formatTime(post.createTime) }}</span>
+                  <div class="yuemu-note-info">
+                    <div class="yuemu-author-section">
+                      <img
+                        class="yuemu-author-avatar"
+                        :src="post.user?.userAvatar || getDefaultAvatar(post.user?.userName || '')"
+                        :alt="post.user?.userName || ''"
+                        :class="{ 'yuemu-loaded': post.avatarLoaded }"
+                        @load="() => { post.avatarLoaded = true }"
+                      >
+                      <span class="yuemu-author-name">{{ post.user?.userName || t('components.postList.unknownUser') }}</span>
+                      <span class="yuemu-view-count">
+                        <EyeOutlined class="yuemu-view-icon" />
+                        {{ formatNumber(Number(post.viewCount) || 0) }}
+                      </span>
+                    </div>
+                    <div class="yuemu-note-title">{{ post.title || t('components.postList.untitled') }}</div>
+                    <div class="yuemu-post-meta">
+                      <span v-if="post.category" class="yuemu-category-tag">#{{ post.category }}</span>
+                      <span class="yuemu-post-time">{{ formatTime(post.createTime) }}</span>
+                    </div>
                   </div>
-                </div>
+                </template>
+                <template v-else>
+                  <div class="yuemu-note-image-wrapper">
+                    <div
+                      class="yuemu-aspect-ratio-box"
+                      :style="{ paddingTop: `${getPaddingTop(post)}%` }"
+                    >
+                      <div class="yuemu-inline-ad-wrapper" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+                        <GlobalAdBanner class="yuemu-inline-ad" format="vertical" margin="0" :fillHeight="true" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="yuemu-note-info">
+                    <div class="yuemu-author-section">
+                      <div class="yuemu-author-avatar yuemu-loaded" style="background: #52c41a; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px;">
+                        <i class="fas fa-ad"></i>
+                      </div>
+                      <span class="yuemu-author-name" style="color: var(--text-secondary);">{{ t('components.bigPicture.sponsored') || '赞助商广告' }}</span>
+                      <span class="yuemu-view-count" style="color: var(--text-secondary); display: none;"></span>
+                    </div>
+                    <div class="yuemu-note-title" style="color: var(--text-secondary);">{{ t('components.bigPicture.sponsoredTitle') || '精选赞助内容' }}</div>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
@@ -143,7 +168,7 @@ import { getDefaultAvatar } from '@/utils/userUtils'
 import { formatTime } from '@/utils/dateUtils'
 import { likePostUsingPost } from '@/api/postController'
 import { getTextCover } from '@/utils/textCoverGenerator'
-import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, nextTick, watch, inject } from 'vue'
 import { throttle } from 'lodash'
 import emptyImage from '@/assets/illustrations/empty.png'
 const router = useRouter()
@@ -173,6 +198,7 @@ const masonryRef = ref(null)
 const gridRef = ref(null)
 const showRejectModal = ref(false)
 const showReviewModal = ref(false)
+const enableAds = inject('enableAds', false)
 const currentPost = ref(null)
 const isScrollLoading = ref(false)
 const triggerUpdate = ref(0)
@@ -274,13 +300,32 @@ const columns = computed<PostWithLoadState[][]>(() => {
   const columnCount = getColumnCount()
   const cols: PostWithLoadState[][] = Array.from({ length: columnCount }, () => [])
   if (props.loading || !props.dataList || props.dataList.length === 0) return cols
+
+  // 核心：像拼积木一样将广告对象作为真实数据插入瀑布流数组
+  const list: PostWithLoadState[] = []
+  let adCounter = 0
+  for (let i = 0; i < props.dataList.length; i++) {
+    list.push(props.dataList[i])
+    // 在第 4 个帖子后插入一张广告，之后每隔 10 个插入
+    if (enableAds && (i === 3 || (i > 3 && (i - 3) % 10 === 0))) {
+      adCounter++
+      list.push({
+        id: 'ad-slot-' + adCounter,
+        isAd: true,
+        imageAspectRatio: 0.8, // 偏竖屏长方形 (1:1.25)
+        title: '',
+        content: '',
+      } as any)
+    }
+  }
+
   if (streamLayout.value === 'grid') {
-    props.dataList.forEach((item, index) => {
+    list.forEach((item, index) => {
       cols[index % columnCount].push(item)
     })
   } else {
     const columnHeights = new Array(columnCount).fill(0)
-    props.dataList.forEach((item) => {
+    list.forEach((item) => {
       let minHeightIndex = 0
       for (let i = 1; i < columnCount; i++) {
         if (columnHeights[i] < columnHeights[minHeightIndex]) minHeightIndex = i
@@ -436,6 +481,25 @@ watch(() => props.dataList, (newDataList) => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+.yuemu-skeleton-item {
+  border-radius: 6px;
+}
+
+/* 原生广告样式 */
+.yuemu-ad-card {
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.yuemu-inline-ad-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  background: var(--card-background);
 }
 .yuemu-skeleton-item {
   border-radius: 6px;

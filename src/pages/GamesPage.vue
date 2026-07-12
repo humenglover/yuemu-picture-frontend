@@ -26,6 +26,10 @@
       </div>
 
       <div class="games-grid">
+        <!-- 广告作为一个卡片融入网格 -->
+        <div class="modern-card" style="padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 128px;" v-if="$enableAds">
+          <GlobalAdBanner margin="0" :fillHeight="true" style="width: 100%; height: 100%;" />
+        </div>
         <div
           v-for="game in filteredGames"
           :key="game.id"
@@ -67,6 +71,7 @@
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue';
 
 const { t } = useI18n();
 const router = useRouter();

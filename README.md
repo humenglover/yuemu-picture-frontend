@@ -86,11 +86,14 @@ yuemu-picture-frontend/
 ├── public/                  # Static assets (copied to dist/ as-is)
 │   ├── logo.png
 │   ├── robots.txt
-│   └── sitemap*.xml
+│   └── sitemap.xml          # Static sitemap
 ├── scripts/
-│   └── generate-sitemap.mjs # Dynamic sitemap generator
+│   ├── generate-sitemap.mjs # Dynamic sitemap generator
+│   └── generate-api.mjs     # API client code generator (OpenAPI → TypeScript)
+├── openapi.config.js        # Legacy OpenAPI config (referenced by generate-api.mjs)
+├── sitemap-output/          # Generated dynamic sitemaps (git-ignored, backend-only)
 ├── src/
-│   ├── api/                 # Auto-generated API client
+│   ├── api/                 # Auto-generated API client (from backend Swagger)
 │   ├── assets/              # Images, fonts, icons
 │   ├── components/          # Shared components
 │   ├── composables/         # Composable functions
@@ -141,16 +144,45 @@ Edit `.env.production`:
 VITE_APP_API_URL=https://www.yuemutuku.com
 ```
 
+## 📡 API Code Generation
+
+`src/api/` contains auto-generated TypeScript API clients. To regenerate from the backend Swagger docs:
+
+```bash
+# Backend must be running at localhost:8123
+npm run api:generate
+
+# Use staging backend
+npm run api:generate:staging
+```
+
+The script `scripts/generate-api.mjs`:
+1. Fetches Swagger 2.0 JSON from the backend (`/api/v2/api-docs`)
+2. Fixes unresolvable `$ref` references (Java generics like `List<T>`, `Map<K,V>`)
+3. Runs `@umijs/openapi` to generate TypeScript service files into `src/api/`
+
+> **Note:** The legacy `node openapi.config.js` no longer works due to broken `$ref` references in the backend Swagger docs. Use the npm script above instead.
+
 ## 🔍 SEO
 
 | File | Purpose |
 |------|---------|
 | `public/robots.txt` | Crawler rules — blocks admin/private paths |
-| `public/sitemap.xml` | Static sitemap (~60 public pages) |
-| `public/sitemap-combined.xml` | Combined sitemap (static + dynamic routes) |
+| `public/sitemap.xml` | Static sitemap (~60 public pages, copied to `dist/` on build) |
 | `scripts/generate-sitemap.mjs` | Dynamic sitemap generator — fetches latest content from backend API |
 
-Run `npm run sitemap:generate` to refresh dynamic routes. Files in `public/` are copied to `dist/` on build.
+**Sitemap strategy:**
+
+- `public/sitemap.xml` — hand-maintained static routes. Included in the frontend build.
+- Dynamic sitemaps (image/space/user/post detail pages) — generated to `sitemap-output/` via `npm run sitemap:generate`. These are **not** bundled into the frontend build — the backend serves them directly to Google Search Console.
+
+```bash
+# Refresh dynamic sitemaps (fetches latest content from backend)
+npm run sitemap:generate
+
+# Use staging backend
+npm run sitemap:generate:staging
+```
 
 ## 📦 Deployment
 
@@ -226,9 +258,12 @@ yuemu-picture-frontend/
 ├── public/                  # 静态资源（构建时直接复制到 dist/）
 │   ├── logo.png
 │   ├── robots.txt
-│   └── sitemap*.xml
+│   └── sitemap.xml          # 静态 sitemap
 ├── scripts/
-│   └── generate-sitemap.mjs # 动态 sitemap 生成
+│   ├── generate-sitemap.mjs # 动态 sitemap 生成
+│   └── generate-api.mjs     # API 客户端代码生成（OpenAPI → TypeScript）
+├── openapi.config.js        # OpenAPI 配置文件（generate-api.mjs 使用）
+├── sitemap-output/          # 动态 sitemap 生成产物（git-ignore，仅供后端使用）
 ├── src/
 │   ├── api/                 # 后端接口封装（自动生成）
 │   ├── assets/              # 图片、字体、图标
@@ -281,16 +316,45 @@ let apiTarget = 'http://localhost:8123'          // 本地后端
 VITE_APP_API_URL=https://www.yuemutuku.com
 ```
 
+## 📡 API 代码生成
+
+`src/api/` 目录包含自动生成的 TypeScript API 客户端代码。从后端 Swagger 文档重新生成：
+
+```bash
+# 后端需在 localhost:8123 运行
+npm run api:generate
+
+# 使用 staging 环境后端
+npm run api:generate:staging
+```
+
+`scripts/generate-api.mjs` 的工作流程：
+1. 从后端 `/api/v2/api-docs` 拉取 Swagger 2.0 JSON
+2. 修复无法解析的 `$ref` 引用（Java 泛型如 `List<T>`、`Map<K,V>` 等）
+3. 调用 `@umijs/openapi` 生成 TypeScript service 文件到 `src/api/`
+
+> **注意：** 旧的 `node openapi.config.js` 因后端 Swagger 文档存在 `$ref` 引用缺陷已无法正常运行，请使用上面的 npm script。
+
 ## 🔍 SEO
 
 | 文件 | 用途 |
 |------|------|
 | `public/robots.txt` | 爬虫规则，禁止抓取后台 / 私密路径 |
-| `public/sitemap.xml` | 静态路由 sitemap（~60 个公开页面） |
-| `public/sitemap-combined.xml` | 完整版（静态 + 动态路由） |
+| `public/sitemap.xml` | 静态路由 sitemap（~60 个公开页面，构建时输出到 `dist/`） |
 | `scripts/generate-sitemap.mjs` | 动态 sitemap 生成脚本，从后端 API 拉取最新内容 |
 
-运行 `npm run sitemap:generate` 刷新动态路由。`public/` 下文件构建时自动输出到 `dist/`。
+**Sitemap 策略：**
+
+- `public/sitemap.xml` — 手动维护的静态路由，随前端打包发布
+- 动态 sitemap（图片/空间/用户/帖子详情页）— 通过 `npm run sitemap:generate` 生成到 `sitemap-output/` 目录。**不进入前端打包产物**，由后端单独向 Google Search Console 提交
+
+```bash
+# 刷新动态 sitemap（从后端拉取最新内容）
+npm run sitemap:generate
+
+# 使用 staging 环境后端
+npm run sitemap:generate:staging
+```
 
 ## 📦 部署
 

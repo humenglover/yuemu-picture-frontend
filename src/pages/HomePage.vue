@@ -304,7 +304,8 @@ const getCategoryI18n = (category: string) => {
   return CATEGORY_MAP[category] || category
 }
 
-import { onMounted, reactive, ref, onUnmounted, onActivated, onDeactivated, watch, nextTick, computed } from 'vue'
+import { onMounted, reactive, ref, onUnmounted, onActivated, onDeactivated, watch, nextTick, computed, provide } from 'vue'
+provide('enableAds', typeof __ENABLE_ADS__ !== 'undefined' ? __ENABLE_ADS__ : true)
 import {
   getFollowPictureUsingPost,
   getTop100PictureUsingGet,

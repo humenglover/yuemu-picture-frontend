@@ -42,6 +42,7 @@ export default {
   failGetDeepFeatures: '无法获取图像深度特征',
   btnConfirm: '确定',
   btnCancel: '取消',
+  sensitiveWarning: '提示：AI 检测到图片中包含人物，请确保已获得相关权利人的授权，并注意遵守肖像权与版权相关法律法规。',
   
   aiWritingStatusInit: '分析图片中...',
   aiWritingStatusPreparing: 'AI 正在准备...',

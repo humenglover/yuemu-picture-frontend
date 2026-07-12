@@ -6,25 +6,27 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { VantResolver } from '@vant/auto-import-resolver'
 
-// https://vite.dev/config/
 export default defineConfig(({ command, mode }) => {
-  // 加载环境变量
   const env = loadEnv(mode, process.cwd(), '')
 
-  // 生产环境下禁用 console
-  const isProd = mode === 'production'
-  if (isProd) {
-    console.log = () => {}
-    console.error = () => {}
-    console.warn = () => {}
-    console.info = () => {}
-    console.debug = () => {}
+  let apiTarget = 'http://localhost:8123'
+  // let apiTarget = 'https://www.yuemutuku.com'
+  if (mode === 'production') {
+    apiTarget = 'https://www.yuemutuku.com'
+  } else if (mode === 'staging') {
+    apiTarget = 'https://lumenglover.com'
   }
 
+  const isProd = mode === 'production'
   return {
     plugins: [
-      vue(),
-      // 仅在开发和测试环境启用 vue-devtools
+      vue({
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => tag === 'lottie-player'
+          }
+        }
+      }),
       !isProd && vueDevTools(),
       AutoImport({
         resolvers: [VantResolver()],
@@ -41,25 +43,38 @@ export default defineConfig(({ command, mode }) => {
     server: {
       proxy: {
         '/api': {
-          // 根据环境选择目标服务器
-          target: isProd
-            ? 'https://lumenglover.com'
-            // : 'https://localhost:8123',
-            : 'https://lumenglover.com',
+          target: apiTarget,
           changeOrigin: true,
-          secure: false,
-        },
+          ws: true,
+          // 关键：禁用缓冲以支持SSE流式传输
+          buffer: false,
+          timeout: 600000, // 10 minutes
+          proxyTimeout: 600000 // 10 minutes
+        }
       },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+        'Referrer-Policy': 'no-referrer-when-downgrade'
+      }
     },
-    // 生产环境特定配置
     build: {
-      // 移除 console
+      minify: 'terser',
       terserOptions: {
         compress: {
           drop_console: isProd,
           drop_debugger: isProd,
+          pure_funcs: ['console.log', 'console.info', 'console.warn', 'console.error', 'console.debug']
         },
+        format: {
+          comments: false,
+        }
       },
     },
+    define: {
+      // 开启/关闭全局广告
+      __ENABLE_ADS__: JSON.stringify(true),
+    }
   }
 })

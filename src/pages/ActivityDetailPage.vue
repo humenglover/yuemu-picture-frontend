@@ -83,6 +83,11 @@
       </div>
       <div v-else class="yuemu-rich-text-wrapper">
         <Html-content :content="activity.content" />
+        
+        <!-- 文章底部的横幅广告 -->
+        <div style="margin-top: 32px;" v-if="adEnabled">
+          <GlobalAdBanner min-height="160px" />
+        </div>
       </div>
     </main>
 
@@ -135,10 +140,16 @@
       </div>
 
       <div class="yuemu-masonry-layout" v-else-if="submissions.length > 0">
-        <div class="yuemu-masonry-item yuemu-card" v-for="item in submissions" :key="item.id"
-             :class="{ 'is-selected': selectedSubmissions.has(item.id), 'voting-active': isVotingMode }">
-
-          <div class="yuemu-img-wrapper" @click="handleImageClick(item)"
+        <template v-for="(item, index) in submissions" :key="item.id">
+          <!-- 纯图片网格，不使用 absolute 绝对定位以免塌陷高度 -->
+          <div class="yuemu-masonry-item yuemu-card yuemu-ad-card" v-if="(index === 3 || (index > 3 && (index - 3) % 10 === 0)) && adEnabled">
+             <GlobalAdBanner margin="0 0 20px 0" min-height="180px" />
+          </div>
+          
+          <div class="yuemu-masonry-item yuemu-card"
+               :class="{ 'is-selected': selectedSubmissions.has(item.id), 'voting-active': isVotingMode }">
+  
+            <div class="yuemu-img-wrapper" @click="handleImageClick(item)"
                :style="item.picture?.picWidth && item.picture?.picHeight ? { aspectRatio: `${item.picture.picWidth} / ${item.picture.picHeight}` } : {}">
             <div class="yuemu-thumb-placeholder yuemu-skeleton-anim" v-show="!item._imgLoaded"></div>
             <img
@@ -190,6 +201,7 @@
             </div>
           </div>
         </div>
+        </template>
       </div>
 
       <div ref="loadMoreTrigger" class="yuemu-infinite-trigger">
@@ -314,6 +326,14 @@ import { listSubmissionByPageUsingPost, submitToActivityUsingPost } from '@/api/
 import { voteUsingPost, cancelVoteUsingDelete } from '@/api/activityVoteController'
 import { uploadPostImageUsingPost, aiGenerateImageStreamUsingGet } from '@/api/pictureController'
 import { doShareUsingPost } from '@/api/shareRecordController'
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
+
+const adEnabled = ref(true)
+// eslint-disable-next-line no-undef
+if (typeof __ENABLE_ADS__ !== 'undefined') {
+  // eslint-disable-next-line no-undef
+  adEnabled.value = __ENABLE_ADS__
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -1044,6 +1064,13 @@ onUnmounted(() => {
   .yuemu-img-wrapper {
     min-height: 140px;
     border-radius: 8px 8px 0 0;
+  }
+
+  .yuemu-ad-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
   }
 
   .yuemu-item-content { padding: 8px; }

@@ -11,13 +11,12 @@
       tag="div"
       class="yuemu-message-grid"
     >
-      <div
-        v-for="(message, index) in allMessages"
-        :key="getMessageKey(message, index)"
-        class="yuemu-compact-message-card"
-        :class="{ 'yuemu-is-read': isMessageRead(message) }"
-        @click="handleMessageClick(message)"
-      >
+      <template v-for="(message, index) in allMessages" :key="getMessageKey(message, index)">
+        <div
+          class="yuemu-compact-message-card"
+          :class="{ 'yuemu-is-read': isMessageRead(message) }"
+          @click="handleMessageClick(message)"
+        >
         <div class="yuemu-card-status-info">
           <span class="yuemu-time-stamp">{{ formatTime(getMessageTime(message)) }}</span>
           <div
@@ -82,7 +81,12 @@
             </div>
           </div>
         </div>
-      </div>
+        </div>
+        
+        <div v-if="$enableAds && index > 0 && index % 11 === 0" :key="'ad-' + index" class="yuemu-compact-message-card" style="padding: 0; min-height: 120px; overflow: hidden; position: relative; border: none; background: transparent; box-shadow: none;">
+          <GlobalAdBanner margin="0" :fillHeight="true" />
+        </div>
+      </template>
     </transition-group>
 
     <div v-else class="yuemu-empty-state">
@@ -110,6 +114,7 @@ import {
 import { message as antMessage } from 'ant-design-vue'
 import { markSingleAsReadUsingPost } from '@/api/messageCenterController'
 import defaultImage from '@/assets/default.png'
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
 
 const router = useRouter()
 const props = defineProps<{

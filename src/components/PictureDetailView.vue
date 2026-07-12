@@ -26,6 +26,7 @@
                   <i class="fas fa-chevron-down yuemu-bounce"></i>{{ t('components.pictureDetailView.scrollDownForSimilar') }}</div>
               </div>
             </div>
+
             <!-- 新增：猜你喜欢推荐瀑布流（沉浸式手账风） -->
             <div class="yuemu-guess-like-section" v-show="picture.id && showGuessLike">
               <div class="yuemu-guess-like-header">
@@ -33,6 +34,17 @@
                 <button class="yuemu-guess-like-refresh" @click="handleRefreshGuessLike" :disabled="guessLikeLoading">
                   <i class="fas fa-sync-alt" :class="{ 'fa-spin': guessLikeLoading }"></i>{{ t('components.pictureDetailView.change') }}</button>
               </div>
+              
+              <!-- 顶部横幅广告注入 -->
+              <div class="yuemu-sponsor-ad-wrapper" v-if="$enableAds">
+                <div class="yuemu-sponsor-ad-label">
+                  <i class="fas fa-ad"></i> {{ t('components.bigPicture.sponsoredTitle') || '精选赞助内容' }}
+                </div>
+                <div class="yuemu-sponsor-ad-box">
+                  <GlobalAdBanner margin="0" :fillHeight="true" />
+                </div>
+              </div>
+
               <GuessLikePictureList
                 :dataList="guessLikeList"
                 @click-picture="handleGuessLikeClick"
@@ -276,6 +288,8 @@ import ContentPermissionSetting from '@/components/ContentPermissionSetting.vue'
 import ImagePreview from '@/components/ImagePreview.vue'
 import BigPictureList from '@/components/BigPictureList.vue'
 import GuessLikePictureList from '@/components/GuessLikePictureList.vue'
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
+
 interface Props {
   id: string | number
   visible?: boolean
@@ -1115,6 +1129,7 @@ const emojiI18n = {
   -ms-overflow-style: none; /* IE/Edge */
 }
 .yuemu-preview-section::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
 .yuemu-image-container {
   width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
   position: relative; flex-shrink: 0; padding: 40px 0; box-sizing: border-box;
@@ -1146,6 +1161,28 @@ const emojiI18n = {
   background: var(--card-background);
   color: var(--text-primary);
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.yuemu-sponsor-ad-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+.yuemu-sponsor-ad-box {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  margin-bottom: 24px;
+}
+.yuemu-sponsor-ad-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  padding-left: 2px;
+}
+.yuemu-sponsor-ad-label i {
+  margin-right: 6px;
 }
 .yuemu-scroll-down-hint {
   color: var(--text-secondary);

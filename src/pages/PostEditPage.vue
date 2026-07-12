@@ -107,11 +107,11 @@
           <div class="yuemu-settings-list">
             <div class="yuemu-post-actions-row" v-if="isPC">
               <button class="yuemu-btn-draft yuemu-ai-btn" @click="showAiGenerator = true" v-if="!isEdit" :title="$t('pages.postEditPage.header.aiGen')">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> 一键成帖
+                <i class="fa-solid fa-wand-magic-sparkles"></i> {{ $t('pages.postEditPage.header.oneClickGen') }}
               </button>
               <div class="yuemu-draft-actions">
                 <button class="yuemu-draft-inbox-btn yuemu-pc-draft-btn" @click="openDraftModal" :title="$t('pages.postEditPage.header.drafts')">
-                  <i class="fa-solid fa-inbox"></i> 草稿箱
+                  <i class="fa-solid fa-inbox"></i> {{ $t('pages.postEditPage.header.drafts') }}
                 </button>
                 <button class="yuemu-btn-draft" @click="saveDraft" v-if="!isEdit || (isEdit && route.query.draft)" :disabled="submitting">
                   {{ $t('pages.postEditPage.header.saveDraft') }}
@@ -174,20 +174,20 @@
             <div class="yuemu-action-sheet-panel yuemu-menu-sheet" @click.stop>
               <div class="yuemu-menu-list">
                 <button class="yuemu-menu-btn" @click="openCoverPreview()" v-if="postForm.coverUrl">
-                  <i class="fa-solid fa-eye"></i> 查看封面
+                  <i class="fa-solid fa-eye"></i> {{ $t('pages.postEditPage.cover.viewCover') }}
                 </button>
                 <button class="yuemu-menu-btn" @click="triggerCoverUpload(); showCoverMenu = false">
-                  <i class="fa-solid fa-image"></i> 从相册上传
+                  <i class="fa-solid fa-image"></i> {{ $t('pages.postEditPage.cover.uploadFromAlbum') }}
                 </button>
                 <button class="yuemu-menu-btn" @click="selectCoverFromContent(); showCoverMenu = false" v-if="postForm.content">
-                  <i class="fa-solid fa-file-image"></i> 从正文提取
+                  <i class="fa-solid fa-file-image"></i> {{ $t('pages.postEditPage.cover.extractContent') }}
                 </button>
                 <button class="yuemu-menu-btn" @click="showCoverGenerator = true; showCoverMenu = false">
-                  <i class="fa-solid fa-wand-magic-sparkles"></i> AI 智能生成
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> {{ $t('pages.postEditPage.cover.aiGen') }}
                 </button>
                 <div class="yuemu-menu-divider" v-if="postForm.coverUrl"></div>
                 <button class="yuemu-menu-btn yuemu-danger" @click="postForm.coverUrl = ''; showCoverMenu = false" v-if="postForm.coverUrl">
-                  <i class="fa-solid fa-trash-can"></i> 删除封面
+                  <i class="fa-solid fa-trash-can"></i> {{ $t('pages.postEditPage.cover.delCover') }}
                 </button>
               </div>
               <button class="yuemu-menu-cancel" @click="showCoverMenu = false">{{ $t('pages.postEditPage.cover.cancel') }}</button>
@@ -278,7 +278,7 @@
               </div>
               <div class="yuemu-sheet-content custom-scroll" @scroll="handleDraftScroll">
                 <div v-if="draftLoading" class="yuemu-draft-loading">
-                  <i class="fa-solid fa-spinner fa-spin"></i> 加载中...
+                  <i class="fa-solid fa-spinner fa-spin"></i> {{ $t('pages.postEditPage.drafts.loading') }}
                 </div>
                 <div v-else-if="draftList.length === 0" class="yuemu-empty-draft">
                   <i class="fa-solid fa-inbox"></i>

@@ -30,8 +30,8 @@ const CONFIG = {
   maxPerType: 5000,
   // 请求间隔（ms），避免打爆服务器
   requestDelay: 200,
-  // 输出路径
-  outputDir: resolve(PROJECT_ROOT, 'public'),
+  // 输出路径（不放在 public/ 下，避免打包到 dist/。动态 sitemap 由后端单独提交给 Google）
+  outputDir: resolve(PROJECT_ROOT, 'sitemap-output'),
 }
 
 // ==================== HTTP 工具 ====================

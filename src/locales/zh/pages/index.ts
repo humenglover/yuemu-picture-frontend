@@ -58,6 +58,7 @@ import chatListPage from './chatListPage';
 import browseHistoryPage from './browseHistoryPage';
 import barragePage from './barragePage';
 import aiResourcePage from './aiResourcePage';
+import privacyPage from './privacyPage';
 
 export default {
   app,
@@ -119,5 +120,6 @@ export default {
   chatListPage,
   browseHistoryPage,
   barragePage,
-  aiResourcePage
+  aiResourcePage,
+  privacyPage
 };

@@ -48,6 +48,7 @@ import * as sessionController from './sessionController'
 import * as reminderController from './reminderController'
 import * as reportController from './reportController'
 import * as searchController from './searchController'
+import * as seoController from './seoController'
 import * as shareRecordController from './shareRecordController'
 import * as snakeGameController from './snakeGameController'
 import * as spaceController from './spaceController'
@@ -108,6 +109,7 @@ export default {
   reminderController,
   reportController,
   searchController,
+  seoController,
   shareRecordController,
   snakeGameController,
   spaceController,

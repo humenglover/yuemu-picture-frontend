@@ -60,8 +60,9 @@
             <h3 class="yuemu-title">{{ $t('pages.chatListPage.tribe.allTitle') }}</h3>
           </div>
 
-          <div v-if="publicSpaces.length > 0" class="yuemu-public-spaces-list">
-            <TeamSpaceCard v-for="space in publicSpaces" :key="`public-${space.id}`" :space="space" />
+          <div v-if="publicSpacesWithAds.length > 0" class="yuemu-public-spaces-list">
+            
+            <TeamSpaceCard v-for="space in publicSpacesWithAds" :key="space.isAd ? space.id : `public-${space.id}`" :space="space" />
 
             <div v-if="publicHasMore" class="yuemu-load-more-container">
               <button class="yuemu-load-btn" @click="loadMorePublicSpaces" :disabled="loadingPublic">
@@ -106,6 +107,9 @@
             <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${gamesImg})` }" @click="$router.push('/games')">
               <div class="yuemu-action-label">{{ $t('pages.chatListPage.discover.games') }}</div>
               <div class="yuemu-action-desc">{{ $t('pages.chatListPage.discover.gamesDesc') }}</div>
+            </div>
+            <div class="yuemu-action-card" style="position: relative; padding: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--card-background);" v-if="$enableAds">
+              <GlobalAdBanner margin="0" :fillHeight="true" style="width: 100%; height: 100%;" />
             </div>
           </div>
         </div>
@@ -262,11 +266,12 @@ import gamesImg from '@/assets/images/games.png';
 
 const { t } = useI18n();
 
-import { ref, onMounted, computed, watch, reactive, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, computed, watch, reactive, onBeforeUnmount, nextTick, onActivated, onDeactivated, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { message, notification, Badge } from 'ant-design-vue'
 import { clearUnreadCountUsingPost, deletePrivateChatUsingPost, updateChatNameUsingPost } from '@/api/privateChatController'
 import TeamSpaceCard from '@/components/TeamSpaceCard.vue'
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
 import { listSpaceVoByPageUsingPost, listRecommendedSpacesUsingGet } from '@/api/spaceController'
 import { formatMessageTime } from "@/utils/dateUtils"
 import { getDefaultAvatar } from '@/utils/userUtils'
@@ -464,6 +469,23 @@ onMounted(async () => {
   }
 })
 
+onActivated(async () => {
+  await nextTick()
+  if (device.value === DEVICE_TYPE_ENUM.PC && pcListRef.value) {
+    pcListRef.value.scrollTop = chatListStore.scrollPosition
+  } else if (mobileListRef.value) {
+    mobileListRef.value.scrollTop = chatListStore.scrollPosition
+  }
+})
+
+onDeactivated(() => {
+  if (device.value === DEVICE_TYPE_ENUM.PC && pcListRef.value) {
+    chatListStore.updateScrollPosition(pcListRef.value.scrollTop)
+  } else if (mobileListRef.value) {
+    chatListStore.updateScrollPosition(mobileListRef.value.scrollTop)
+  }
+})
+
 onBeforeUnmount(() => {
   chatListStore.updateUserId(loginUserStore.loginUser?.id)
   if (device.value === DEVICE_TYPE_ENUM.PC && pcListRef.value) chatListStore.updateScrollPosition(pcListRef.value.scrollTop)
@@ -492,6 +514,19 @@ const publicCurrentPage = ref(1)
 const publicHasMore = ref(true)
 const publicTotal = ref(0)
 const isPublicSpacesLoaded = ref(false)
+const enableAds = inject('enableAds', true)
+
+const publicSpacesWithAds = computed(() => {
+  const result: any[] = []
+  for (let i = 0; i < publicSpaces.value.length; i++) {
+    result.push(publicSpaces.value[i])
+    // 在第 4 个空间后插入一个广告，之后每隔 10 个插入一个广告
+    if (enableAds && (i === 3 || (i > 3 && (i - 3) % 10 === 0))) {
+      result.push({ id: `ad-space-${i}`, isAd: true })
+    }
+  }
+  return result
+})
 
 const moreListRef = ref<HTMLElement | null>(null)
 

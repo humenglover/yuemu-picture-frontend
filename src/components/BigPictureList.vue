@@ -26,22 +26,28 @@
     </div>
 
     <div v-else class="yuemu-justified-feed">
-      <div
-        v-for="(row, rowIndex) in justifiedRows"
-        :key="rowIndex"
-        class="yuemu-justified-row"
+      <template v-for="(row, rowIndex) in justifiedRows" :key="rowIndex">
+        <div
+          class="yuemu-justified-row"
         :style="{ height: (row.height + 64) + 'px' }"
       >
         <div
           v-for="picture in row.pictures"
           :key="picture.id"
           class="yuemu-justified-item"
+          :class="{ 'is-ad-item': (picture as any).isAd }"
           :data-pic-id="picture.id"
           :style="{ width: picture.rowWidth + 'px' }"
-          @click.stop.prevent="doClickPicture(picture)"
+          @click.stop.prevent="!(picture as any).isAd && doClickPicture(picture)"
         >
           <div class="yuemu-j-image-box" :style="{ height: row.height + 'px' }">
-            <div class="yuemu-j-placeholder" v-if="!imageLoadedMap[picture.id]"></div>
+            <template v-if="(picture as any).isAd">
+              <div class="yuemu-inline-ad-wrapper" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+                <GlobalAdBanner class="yuemu-inline-ad" format="rectangle" margin="0" :fillHeight="true" />
+              </div>
+            </template>
+            <template v-else>
+              <div class="yuemu-j-placeholder" v-if="!imageLoadedMap[picture.id]"></div>
 
             <img
               :src="picture.thumbnailUrl || picture.url || '/default-image.png'"
@@ -69,25 +75,43 @@
               </div>
             </div>
 
+            </template>
           </div>
           
           <div class="yuemu-bottom-info">
-            <div class="yuemu-bottom-title">{{ picture.name || t('components.bigPicture.unnamed') }}</div>
-            <div class="yuemu-bottom-meta" v-if="picture.isDraft !== 1 && picture.user">
-              <div class="yuemu-user-meta">
-                <img
-                  :src="picture.user.userAvatar || getDefaultAvatar(picture.user.userName)"
-                  class="yuemu-u-avatar"
-                  :class="{ 'yuemu-loaded': avatarLoadedMap[picture.id] }"
-                  @load="handleAvatarLoad(picture.id)"
-                />
-                <span class="yuemu-u-name">{{ picture.user.userName }}</span>
+            <template v-if="!(picture as any).isAd">
+              <div class="yuemu-bottom-title">{{ picture.name || t('components.bigPicture.unnamed') }}</div>
+              <div class="yuemu-bottom-meta" v-if="picture.isDraft !== 1 && picture.user">
+                <div class="yuemu-user-meta">
+                  <img
+                    :src="picture.user.userAvatar || getDefaultAvatar(picture.user.userName)"
+                    class="yuemu-u-avatar"
+                    :class="{ 'yuemu-loaded': avatarLoadedMap[picture.id] }"
+                    @load="handleAvatarLoad(picture.id)"
+                  />
+                  <span class="yuemu-u-name">{{ picture.user.userName }}</span>
+                </div>
+                <span class="yuemu-view-count"><i class="fas fa-eye"></i> {{ formatNumber(picture.viewCount) }}</span>
               </div>
-              <span class="yuemu-view-count"><i class="fas fa-eye"></i> {{ formatNumber(picture.viewCount) }}</span>
-            </div>
+            </template>
+            <template v-else>
+              <div class="yuemu-bottom-title" style="color: var(--text-secondary);">
+                {{ t('components.bigPicture.sponsoredTitle') || '精选赞助内容' }}
+              </div>
+              <div class="yuemu-bottom-meta">
+                <div class="yuemu-user-meta">
+                  <div class="yuemu-u-avatar yuemu-loaded" style="background: #52c41a; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px;">
+                    <i class="fas fa-ad"></i>
+                  </div>
+                  <span class="yuemu-u-name" style="color: var(--text-secondary); font-size: 12px;">{{ t('components.bigPicture.sponsored') || '赞助商广告' }}</span>
+                </div>
+                <span class="yuemu-view-count" style="font-size: 12px; color: var(--text-secondary);">{{ t('components.globalAd.adsense') || 'AdSense' }}</span>
+              </div>
+            </template>
+          </div>
           </div>
         </div>
-      </div>
+      </template>
     </div>
 
     <PictureDetailView
@@ -110,7 +134,7 @@
           <i class="fas fa-check-circle" v-else-if="currentPicture?.reviewStatus === 1"></i>
           <i class="fas fa-times-circle" v-else-if="currentPicture?.reviewStatus === 2"></i>
         </div>
-        <p class="yuemu-status-msg">
+        <p class="yuemu-status-msg"> 
           <template v-if="currentPicture?.reviewStatus === 0">{{ t('components.bigPicture.reviewProcessing') }}</template>
           <template v-else-if="currentPicture?.reviewStatus === 1">{{ t('components.bigPicture.reviewPassed') }}</template>
           <template v-else-if="currentPicture?.reviewStatus === 2">{{ currentPicture?.reviewMessage || t('components.bigPicture.reviewRejected') }}</template>
@@ -121,13 +145,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, reactive, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, reactive, nextTick, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Modal as AModal } from 'ant-design-vue'
 import { getDefaultAvatar } from '@/utils/userUtils'
 import emptyImage from '@/assets/illustrations/empty.png'
 import { throttle } from 'lodash-es'
 import PictureDetailView from './PictureDetailView.vue'
+import GlobalAdBanner from './GlobalAdBanner.vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -191,10 +216,28 @@ const avatarLoadedMap = reactive<Record<string | number, boolean>>({})
 
 const reviewModalVisible = ref(false)
 const currentPicture = ref<PictureVO | null>(null)
+const enableAds = inject('enableAds', false)
 
 const justifiedRows = computed(() => {
-  const list = props.dataList
-  if (!list || list.length === 0) return []
+  const originalList = props.dataList
+  if (!originalList || originalList.length === 0) return []
+
+  // 核心：像拼积木一样将广告对象作为真实数据插入瀑布流数组
+  const list = []
+  let adCounter = 0
+  for (let i = 0; i < originalList.length; i++) {
+    list.push(originalList[i])
+    // 在第 4 张图片后插入一张广告，之后每隔 10 张插入
+    if (enableAds && (i === 3 || (i > 3 && (i - 3) % 10 === 0))) {
+      adCounter++
+      list.push({
+        id: 'ad-slot-' + adCounter,
+        isAd: true,
+        picScale: 1.0, // 宽/高比 = 1，完美矩形广告
+        url: '',
+      } as any)
+    }
+  }
 
   const availableWidth = Math.floor(containerWidth.value > 0 ? containerWidth.value : window.innerWidth)
 
@@ -269,7 +312,10 @@ const justifiedRows = computed(() => {
 
 const updateWidth = () => {
   if (containerRef.value) {
-    containerWidth.value = Math.floor(containerRef.value.clientWidth)
+    const newWidth = Math.floor(containerRef.value.clientWidth)
+    if (containerWidth.value === 0 || Math.abs(containerWidth.value - newWidth) > 25) {
+      containerWidth.value = newWidth
+    }
   }
   windowWidth.value = window.innerWidth
 }
@@ -610,7 +656,37 @@ onUnmounted(() => {
   100% { background-position: 0 50%; }
 }
 
+/* 内嵌式广告组件的满铺适配 */
+.is-ad-item {
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.yuemu-inline-ad {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+:deep(.yuemu-inline-ad .yuemu-global-ad-container),
+:deep(.yuemu-inline-ad .yuemu-ad-inner) {
+  height: 100% !important;
+  max-width: 100% !important;
+  border-radius: 8px !important;
+  margin: 0 !important;
+}
+
 .yuemu-review-detail-box { padding: 30px 20px; text-align: center; }
+
+
+.yuemu-inline-ad-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--card-background);
+}
 .yuemu-status-icon-box {
   font-size: 40px;
   margin-bottom: 16px;

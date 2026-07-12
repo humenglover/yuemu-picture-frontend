@@ -14,6 +14,8 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint ../yuemu-version/012 --fix",
     "format": "prettier --write ../yuemu-version/012/src",
+    "api:generate": "node scripts/generate-api.mjs",
+    "api:generate:staging": "cross-env API_BASE=https://lumenglover.com node scripts/generate-api.mjs",
     "sitemap:generate": "node scripts/generate-sitemap.mjs",
     "sitemap:generate:staging": "cross-env API_BASE=https://lumenglover.com node scripts/generate-sitemap.mjs"
   },

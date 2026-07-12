@@ -165,6 +165,13 @@
         </div>
 
         <div v-show="activeTab === 'recommend'" class="yuemu-recommend-section">
+          <!-- 在 AI 相似瀑布流顶部注入全局广告组件，对用户影响极小 -->
+          <div class="yuemu-sponsor-ad-wrapper" v-if="$enableAds">
+            <div class="yuemu-sponsor-ad-label">
+              <i class="fas fa-ad"></i> {{ $t('components.bigPicture.sponsoredTitle') || '精选赞助内容' }}
+            </div>
+            <GlobalAdBanner margin="0 0 16px 0" />
+          </div>
           <GuessLikePictureList
             :dataList="guessLikeList"
             @click-picture="handleGuessLikeClick"
@@ -336,6 +343,7 @@ import { formatTime } from '@/utils/dateUtils.ts'
 import { ViewDurationTracker } from '@/utils/viewDurationTracker'
 import ContentPermissionSetting from '@/components/ContentPermissionSetting.vue'
 import GuessLikePictureList from '@/components/GuessLikePictureList.vue'
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
 import { getCopyrightByPictureIdUsingGet } from '@/api/pictureCopyrightController'
 import { searchPictureByPictureUsingPost } from '@/api/pictureController'
 import emptyImage from '@/assets/illustrations/empty.png'
@@ -1155,5 +1163,18 @@ const handleScroll = throttle(() => {
 }
 .yuemu-recommend-section {
   padding: 0 14px;
+}
+.yuemu-sponsor-ad-wrapper {
+  margin-top: 16px;
+  position: relative;
+}
+.yuemu-sponsor-ad-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  padding-left: 2px;
 }
 </style>

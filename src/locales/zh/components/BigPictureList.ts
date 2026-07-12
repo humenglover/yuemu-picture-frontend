@@ -13,5 +13,7 @@ export default {
     modalTitleReviewing: '内容正在审核',
     modalTitlePassed: '审核已通过',
     modalTitleRejected: '审核未通过',
-    modalTitleStatus: '发布状态'
+    modalTitleStatus: '发布状态',
+    sponsored: '赞助商广告',
+    sponsoredTitle: '精选赞助内容'
 };

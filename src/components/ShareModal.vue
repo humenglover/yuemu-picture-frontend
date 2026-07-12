@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="yuemu-apple-share-overlay" @click="closeModal">
+  <div v-if="visible" class="yuemu-apple-share-overlay" @click="closeModal" @wheel.stop>
     <div class="yuemu-share-modal-content" @click.stop>
 
       <div class="yuemu-poster-card" :class="`theme-${currentTheme}`">
@@ -114,7 +114,7 @@
           <h3>{{ t('components.shareModal.selectFriend', '选择一位好友') }}</h3>
           <button class="yuemu-chat-close-btn" @click="showChatShareModal = false"><i class="fas fa-times"></i></button>
         </div>
-        <div class="yuemu-chat-share-list">
+        <div class="yuemu-chat-share-list" @wheel.stop @scroll="handleChatListScroll">
           <div v-if="loadingChatList" class="yuemu-chat-share-loading">
             <a-spin />
           </div>
@@ -136,16 +136,27 @@
             <i class="fas fa-inbox"></i>
             <p>{{ t('components.shareModal.noFriends', '暂无联系人，快去私信打个招呼吧') }}</p>
           </div>
+          <!-- 触底加载更多的状态 -->
+          <div v-if="loadingMoreChat" class="yuemu-chat-load-more">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>{{ t('components.shareModal.loadingMore', '正在加载更多...') }}</span>
+          </div>
         </div>
       </div>
     </div>
+    <!-- 独立的 Toast 提示（解决层级覆盖问题） -->
+    <Transition name="yuemu-share-fade">
+      <div v-if="toastMsg" class="yuemu-share-toast">
+        <i :class="toastIcon"></i>
+        <span>{{ toastMsg }}</span>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { message } from 'ant-design-vue'
 import html2canvas from 'html2canvas'
 import { formatTime } from '@/utils/dateUtils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
@@ -182,11 +193,41 @@ const { t } = useI18n()
 const visible = ref(false)
 const showChatShareModal = ref(false)
 const loadingChatList = ref(false)
+const chatPage = ref(1)
+const hasMoreChat = ref(true)
+const loadingMoreChat = ref(false)
 const emit = defineEmits(['close'])
 const screenshotRef = ref<HTMLElement | null>(null)
 const captureTargetRef = ref<HTMLElement | null>(null)
 const fallbackImageUrl = 'https://pic.imgdb.cn/item/65ced2939f345e8d03633db1.jpg?x-oss-process=style/small'
 const generatedCoverUrl = ref<string | null>(null)
+
+// ================= 全局原生提示框状态 (替代 ant-design-vue message) =================
+const toastMsg = ref('')
+const toastIcon = ref('fas fa-info-circle')
+let toastTimer: any = null
+
+const showMessage = (msg: string | { content: string, key?: string }, type: 'info' | 'success' | 'warning' | 'error' | 'loading' = 'info', duration = 2500) => {
+  if (toastTimer) clearTimeout(toastTimer)
+  const content = typeof msg === 'string' ? msg : msg.content
+  toastMsg.value = content
+  if (type === 'success') toastIcon.value = 'fas fa-check-circle'
+  else if (type === 'error') toastIcon.value = 'fas fa-times-circle'
+  else if (type === 'warning') toastIcon.value = 'fas fa-exclamation-triangle'
+  else if (type === 'loading') toastIcon.value = 'fas fa-spinner fa-spin'
+  else toastIcon.value = 'fas fa-info-circle'
+
+  if (type !== 'loading') {
+    toastTimer = setTimeout(() => { toastMsg.value = '' }, duration)
+  }
+}
+
+const message = {
+  success: (msg: string | any) => showMessage(msg, 'success'),
+  error: (msg: string | any) => showMessage(msg, 'error'),
+  warning: (msg: string | any) => showMessage(msg, 'warning'),
+  loading: (msg: string | any) => showMessage(msg, 'loading'),
+}
 
 const openModal = async (dynamicImageUrl = '') => {
   visible.value = true
@@ -278,16 +319,56 @@ const openChatShare = async () => {
   // 边缘情况处理：如果 store 里没有联系人缓存，主动发起一次拉取
   if (chatListStore.chatListData.length === 0) {
     loadingChatList.value = true;
+    chatPage.value = 1;
+    hasMoreChat.value = true;
     try {
-      const res = await listPrivateChatByPageUsingPost({ current: 1, pageSize: 20 });
+      const res = await listPrivateChatByPageUsingPost({ current: 1, pageSize: 10 });
       if (res.data?.code === 0 && res.data.data?.records) {
         // 更新到 store，保证模板直接渲染
         chatListStore.updateChatListData(res.data.data.records);
+        if (res.data.data.records.length < 10) {
+          hasMoreChat.value = false;
+        }
       }
     } catch (error) {
       console.error('获取联系人失败', error);
     } finally {
       loadingChatList.value = false;
+    }
+  } else {
+    chatPage.value = Math.max(1, Math.ceil(chatListStore.chatListData.length / 10));
+    hasMoreChat.value = true; 
+  }
+}
+
+const handleChatListScroll = async (e: Event) => {
+  const target = e.target as HTMLElement;
+  // 提前50px触发加载，使用 Math.ceil 防止小数精度问题
+  if (Math.ceil(target.scrollTop) + target.clientHeight >= target.scrollHeight - 50) {
+    if (!hasMoreChat.value || loadingMoreChat.value || loadingChatList.value) return;
+    
+    loadingMoreChat.value = true;
+    chatPage.value += 1;
+    
+    try {
+      const res = await listPrivateChatByPageUsingPost({ current: chatPage.value, pageSize: 10 });
+      if (res.data?.code === 0 && res.data.data?.records) {
+        const newRecords = res.data.data.records;
+        if (newRecords.length < 10) {
+          hasMoreChat.value = false;
+        }
+        
+        if (newRecords.length > 0) {
+          const existingIds = new Set(chatListStore.chatListData.map(c => c.id));
+          const uniqueNewRecords = newRecords.filter((c: any) => !existingIds.has(c.id));
+          chatListStore.updateChatListData([...chatListStore.chatListData, ...uniqueNewRecords]);
+        }
+      }
+    } catch (error) {
+      chatPage.value -= 1;
+      console.error('加载更多联系人失败', error);
+    } finally {
+      loadingMoreChat.value = false;
     }
   }
 }
@@ -921,14 +1002,61 @@ defineExpose({
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
   padding: 40px 20px;
-  color: var(--text-tertiary, #9ca3af);
-  gap: 12px;
+  color: #999;
+}
+.yuemu-chat-share-empty i {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: #e0e0e0;
 }
 
-.yuemu-chat-share-empty i {
+.yuemu-chat-load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  color: #999;
+  font-size: 13px;
+  gap: 8px;
+}
+
+/* 独立的 Toast 提示 */
+.yuemu-share-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  padding: 16px 24px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 100001; /* 高于 ShareModal 的 2000 */
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  pointer-events: none;
+}
+.yuemu-share-toast i {
   font-size: 32px;
-  opacity: 0.5;
+}
+.yuemu-share-toast span {
+  font-size: 15px;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 80vw;
+}
+.yuemu-share-fade-enter-active,
+.yuemu-share-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.yuemu-share-fade-enter-from,
+.yuemu-share-fade-leave-to {
+  opacity: 0;
 }
 
 .yuemu-chat-share-loading {

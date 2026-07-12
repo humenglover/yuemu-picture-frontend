@@ -20,8 +20,6 @@ export default {
   "veryWeak": "Extremely Weak",
   "normalDefense": "Normal Defense",
   "highlySecure": "Highly Secure",
-  "unbreakable": "Unbreakable",
-  "notReady": "Not Ready",
   "sysWarnNoCharset": "System Warn: No charsets detected",
   "copied": "Copied!",
   "copyFailed": "Copy Failed",

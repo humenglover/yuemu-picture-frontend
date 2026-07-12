@@ -2,6 +2,10 @@
   <div class="games-page">
     <div class="container">
       <div class="games-grid">
+        <!-- 广告作为一个卡片融入网格 -->
+        <div class="modern-card" style="padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 128px;" v-if="$enableAds">
+          <GlobalAdBanner margin="0" :fillHeight="true" style="width: 100%; height: 100%;" />
+        </div>
         <div 
           v-for="tool in tools" 
           :key="tool.key" 
@@ -30,6 +34,7 @@ const { t } = useI18n();
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import ToolIconCanvas from '../components/ToolIconCanvas.vue'
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
 
 const router = useRouter()
 

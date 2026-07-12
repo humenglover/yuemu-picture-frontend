@@ -8,13 +8,13 @@
         <div class="yuemu-tabs-container">
           <div class="yuemu-tabs-nav">
             <div class="yuemu-tab-item" :class="{ active: activeStatus === '1' }" @click="handleStatusChange('1')">
-              已通过 <span class="yuemu-badge-count">{{ statusCounts[1] }}</span>
+              {{ t('pages.admin.spaceUserManagePage.passed') }} <span class="yuemu-badge-count">{{ statusCounts[1] }}</span>
             </div>
             <div class="yuemu-tab-item" :class="{ active: activeStatus === '0' }" @click="handleStatusChange('0')">
-              待审核 <span class="yuemu-badge-count">{{ statusCounts[0] }}</span>
+              {{ t('pages.admin.spaceUserManagePage.pending') }} <span class="yuemu-badge-count">{{ statusCounts[0] }}</span>
             </div>
             <div class="yuemu-tab-item" :class="{ active: activeStatus === '2' }" @click="handleStatusChange('2')">
-              已拒绝 <span class="yuemu-badge-count">{{ statusCounts[2] }}</span>
+              {{ t('pages.admin.spaceUserManagePage.rejected') }} <span class="yuemu-badge-count">{{ statusCounts[2] }}</span>
             </div>
           </div>
         </div>
@@ -34,7 +34,7 @@
             </button>
           </div>
           <button type="submit" class="yuemu-btn-pill primary">
-            <i class="fas fa-user-plus"></i> 添加成员
+            <i class="fas fa-user-plus"></i> {{ t('pages.admin.spaceUserManagePage.addMember') }}
           </button>
         </form>
       </div>
@@ -94,7 +94,7 @@
                 :class="{ 'is-recommended': record.isRecommended === 1 }"
                 :disabled="activeStatus !== '1'"
               >
-                <i class="fas fa-star"></i> {{ record.isRecommended === 1 ? '取消推荐' : '设为推荐' }}
+                <i class="fas fa-star"></i> {{ record.isRecommended === 1 ? t('pages.admin.spaceUserManagePage.cancelRecommend') : t('pages.admin.spaceUserManagePage.setRecommend') }}
               </button>
 
               <button
@@ -102,7 +102,7 @@
                 :disabled="record.user?.id === loginUserStore.loginUser?.id"
                 class="yuemu-btn-action delete"
               >
-                移除
+                {{ t('pages.admin.spaceUserManagePage.remove') }}
               </button>
             </div>
           </div>
@@ -114,13 +114,13 @@
       <div class="yuemu-mobile-header">
         <div class="yuemu-tabs-nav mobile-tabs">
           <div class="yuemu-tab-item" :class="{ active: activeStatus === '1' }" @click="handleStatusChange('1')">
-            已通过 <span class="yuemu-badge-count">{{ statusCounts[1] }}</span>
+            {{ t('pages.admin.spaceUserManagePage.passed') }} <span class="yuemu-badge-count">{{ statusCounts[1] }}</span>
           </div>
           <div class="yuemu-tab-item" :class="{ active: activeStatus === '0' }" @click="handleStatusChange('0')">
-            待审核 <span class="yuemu-badge-count">{{ statusCounts[0] }}</span>
+            {{ t('pages.admin.spaceUserManagePage.pending') }} <span class="yuemu-badge-count">{{ statusCounts[0] }}</span>
           </div>
           <div class="yuemu-tab-item" :class="{ active: activeStatus === '2' }" @click="handleStatusChange('2')">
-            已拒绝 <span class="yuemu-badge-count">{{ statusCounts[2] }}</span>
+            {{ t('pages.admin.spaceUserManagePage.rejected') }} <span class="yuemu-badge-count">{{ statusCounts[2] }}</span>
           </div>
         </div>
 
@@ -151,7 +151,7 @@
               <img :src="member.user?.userAvatar || getDefaultAvatar(member.user?.userName)" class="yuemu-avatar" />
               <div class="yuemu-user-meta">
                 <span class="yuemu-name">{{ member.user?.userName || t('pages.admin.spaceUserManagePage.unknownUser') }}</span>
-                <span class="yuemu-time">加入: {{ dayjs(member.createTime).format('YYYY-MM-DD') }}</span>
+                <span class="yuemu-time">{{ t('pages.admin.spaceUserManagePage.joinText') }}: {{ dayjs(member.createTime).format('YYYY-MM-DD') }}</span>
               </div>
             </div>
             <button
@@ -177,7 +177,7 @@
               :class="{ 'is-active': member.isRecommended === 1 }"
               :disabled="activeStatus !== '1'"
             >
-              <i class="fas fa-star"></i> {{ member.isRecommended === 1 ? '取消推荐' : '设为推荐' }}
+              <i class="fas fa-star"></i> {{ member.isRecommended === 1 ? t('pages.admin.spaceUserManagePage.cancelRecommend') : t('pages.admin.spaceUserManagePage.setRecommend') }}
             </button>
 
             <button
@@ -185,7 +185,7 @@
               :disabled="member.user?.id === loginUserStore.loginUser?.id"
               class="yuemu-btn-pill outline danger-text fill"
             >
-              移除
+              {{ t('pages.admin.spaceUserManagePage.remove') }}
             </button>
           </div>
         </div>
@@ -197,11 +197,10 @@
         <div class="yuemu-modal-box">
           <div class="yuemu-modal-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
           <h3 class="yuemu-modal-title"> {{ t('pages.admin.spaceUserManagePage.confirmRemoveMember') }} </h3>
-          <p class="yuemu-modal-desc">
-            将 <b>{{ selectedMember?.user?.userName || t('pages.admin.spaceUserManagePage.notSet') }}</b> ({{ selectedMember?.user?.userAccount }}) 从空间中移除。
+          <p class="yuemu-modal-desc" v-html="t('pages.admin.spaceUserManagePage.removeMemberDesc', { name: selectedMember?.user?.userName || t('pages.admin.spaceUserManagePage.notSet'), account: selectedMember?.user?.userAccount })">
           </p>
           <div class="yuemu-modal-actions">
-            <button class="yuemu-btn-pill outline" @click="deleteConfirmVisible = false">取消</button>
+            <button class="yuemu-btn-pill outline" @click="deleteConfirmVisible = false">{{ t('pages.admin.spaceUserManagePage.cancel') }}</button>
             <button class="yuemu-btn-pill danger" @click="confirmDelete"> {{ t('pages.admin.spaceUserManagePage.confirmRemove') }} </button>
           </div>
         </div>
@@ -229,7 +228,7 @@
           </div>
           <div class="yuemu-sheet-footer">
             <button class="yuemu-btn-pill primary full-width" @click="confirmRoleChange" :disabled="selectedRole === currentMember?.spaceRole">
-              确认修改
+              {{ t('pages.admin.spaceUserManagePage.confirmModify') }}
             </button>
           </div>
         </div>
@@ -333,7 +332,7 @@ const handleAudit = async (record: API.SpaceUserVO, status: number) => {
     if (res.data?.code === 0) {
       message.success(status === 1 ? t('pages.admin.spaceUserManagePage.passSuccess') : t('pages.admin.spaceUserManagePage.rejectSuccess')); fetchData(); fetchStatusCounts();
     }
-  } catch (error) { message.error('操作失败') }
+  } catch (error) { message.error(t('pages.admin.spaceUserManagePage.opFailGeneral')) }
 }
 
 const toggleRecommended = async (record: API.SpaceUserVO) => {
@@ -341,11 +340,11 @@ const toggleRecommended = async (record: API.SpaceUserVO) => {
     const newRecommended = record.isRecommended === 1 ? 0 : 1;
     const res = await setRecommendedMemberUsingPost({ spaceId: props.id, userId: record.userId, isRecommended: Number(newRecommended) })
     if (res.data?.code === 0) {
-      message.success(record.isRecommended === 1 ? '已取消推荐' : '已设为推荐'); record.isRecommended = Number(newRecommended);
+      message.success(record.isRecommended === 1 ? t('pages.admin.spaceUserManagePage.cancelRecommendSuccess') : t('pages.admin.spaceUserManagePage.setRecommendSuccess')); record.isRecommended = Number(newRecommended);
     } else message.error(t('pages.admin.spaceUserManagePage.opFail') + res.data.message)
   } catch (error: any) {
     if (error.message && error.message.includes('上限')) message.error(t('pages.admin.spaceUserManagePage.limitReached'));
-    else message.error('操作失败');
+    else message.error(t('pages.admin.spaceUserManagePage.opFailGeneral'));
   }
 }
 

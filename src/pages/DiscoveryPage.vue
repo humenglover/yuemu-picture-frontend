@@ -7,11 +7,11 @@
             <h2 class="module-title">{{ $t('pages.discoveryPage.communityInteraction') }}</h2>
             <span class="module-subtitle">{{ $t('pages.discoveryPage.communitySubtitle') }}</span>
           </div>
-
+          
           <div class="bento-grid">
-            <div class="bento-card bento-large bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.45)), url(${loveImg})` }" @click="goToPage('/loveboard/list')">
-              <div class="bento-content">
-                <div class="text-group bottom-text">
+            <div class="bento-card bento-medium bg-image-card" :style="{ backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.1)), url(${loveImg})` }" @click="goToPage('/loveboard/list')">
+              <div class="bento-content row-content">
+                <div class="text-group">
                   <h3 class="bento-title">{{ $t('pages.discoveryPage.loveBoard') }}</h3>
                   <p class="bento-desc">{{ $t('pages.discoveryPage.loveBoardDesc') }}</p>
                 </div>
@@ -35,6 +35,11 @@
                 </div>
               </div>
             </div>
+            
+            <!-- 广告作为一个 bento 块 (放到最后) -->
+            <div class="bento-card bento-medium" style="padding: 0; display: flex; align-items: center; justify-content: center; background: var(--card-background); overflow: hidden;" v-if="$enableAds">
+              <GlobalAdBanner margin="0" :fillHeight="true" style="width: 100%; height: 100%;" />
+            </div>
           </div>
         </div>
 
@@ -45,6 +50,9 @@
           </div>
           
           <div class="games-grid">
+            <div class="modern-card" style="padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 128px;" v-if="$enableAds">
+              <GlobalAdBanner margin="0" :fillHeight="true" style="width: 100%; height: 100%;" />
+            </div>
             <div class="modern-card" v-for="(game, index) in games" :key="game.path" @click="goToPage(game.path)">
               <div class="card-left">
                 <span class="card-serial" :style="{ color: getAccentColor(game.path) }">{{ String(index + 1).padStart(2, '0') }}</span>
@@ -63,7 +71,11 @@
             <h2 class="module-title">{{ $t('pages.discoveryPage.usefulTools') }}</h2>
             <span class="module-subtitle">{{ $t('pages.discoveryPage.toolsSubtitle') }}</span>
           </div>
+          
           <div class="games-grid">
+            <div class="modern-card" style="padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 128px;" v-if="$enableAds">
+              <GlobalAdBanner margin="0" :fillHeight="true" style="width: 100%; height: 100%;" />
+            </div>
             <div class="modern-card" v-for="(tool, index) in tools" :key="tool.path" @click="goToPage(tool.path)">
               <div class="card-left">
                 <span class="card-serial" :style="{ color: getAccentColor(tool.key) }">{{ String(index + 1).padStart(2, '0') }}</span>
@@ -92,6 +104,7 @@ const { t } = useI18n();
 import { markRaw } from 'vue';
 import { useRouter } from 'vue-router';
 import { LinkOutlined, HeartOutlined, MessageOutlined } from '@ant-design/icons-vue';
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue';
 
 const router = useRouter();
 const goToPage = (path: string) => {

@@ -8,34 +8,55 @@
           <div v-for="picture in column" :key="picture.id" class="yuemu-card-spacing">
             <div
               class="yuemu-masonry-item"
+              :class="{ 'is-ad-item': (picture as any).isAd }"
               :data-pic-id="picture.id"
-              @click="handleClick(picture)"
+              @click="!(picture as any).isAd && handleClick(picture)"
             >
-              <div class="yuemu-image-container">
-                <div class="yuemu-j-placeholder" v-if="!imageLoadedMap[picture.id]"></div>
-                <img
-                  :src="getValidImageUrl(picture)"
-                  :alt="picture.name || t('components.guessLike.picture')"
-                  class="yuemu-masonry-image"
-                  :class="{ 'yuemu-is-loaded': imageLoadedMap[picture.id] }"
-                  referrerpolicy="no-referrer"
-                  @load="handleImageLoad(picture.id)"
-                  @error="handleImageLoad(picture.id)"
-                />
+              <div class="yuemu-image-container" :style="{ aspectRatio: getPictureRatio(picture) }">
+                <template v-if="(picture as any).isAd">
+                  <div class="yuemu-inline-ad-wrapper" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+                    <GlobalAdBanner class="yuemu-inline-ad" format="vertical" margin="0" :fillHeight="true" />
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="yuemu-j-placeholder" v-if="!imageLoadedMap[picture.id]"></div>
+                  <img
+                    :src="getValidImageUrl(picture)"
+                    :alt="picture.name || t('components.guessLike.picture')"
+                    class="yuemu-masonry-image"
+                    :class="{ 'yuemu-is-loaded': imageLoadedMap[picture.id] }"
+                    referrerpolicy="no-referrer"
+                    @load="handleImageLoad(picture.id)"
+                    @error="handleImageLoad(picture.id)"
+                  />
+                </template>
                 
-                <div class="yuemu-guess-like-overlay">
-                  <div class="yuemu-guess-user">
-                    <img
-                      :src="picture.user?.userAvatar || getDefaultAvatar(picture.user?.userName)"
-                      class="yuemu-guess-avatar"
-                      alt=""
-                    />
-                    <span class="yuemu-guess-username">{{ picture.user?.userName || t('components.guessLike.anonymous') }}</span>
-                  </div>
-                  <div class="yuemu-guess-likes">
-                    <i class="fas fa-eye"></i>
-                    <span>{{ formatNumber(picture.viewCount || 0) }}</span>
-                  </div>
+                <div class="yuemu-guess-like-overlay" :class="{ 'is-always-visible': (picture as any).isAd }">
+                  <template v-if="!(picture as any).isAd">
+                    <div class="yuemu-guess-user">
+                      <img
+                        :src="picture.user?.userAvatar || getDefaultAvatar(picture.user?.userName)"
+                        class="yuemu-guess-avatar"
+                        alt=""
+                      />
+                      <span class="yuemu-guess-username">{{ picture.user?.userName || t('components.guessLike.anonymous') }}</span>
+                    </div>
+                    <div class="yuemu-guess-likes">
+                      <i class="fas fa-eye"></i>
+                      <span>{{ formatNumber(picture.viewCount || 0) }}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="yuemu-guess-user">
+                      <div class="yuemu-guess-avatar" style="background: #52c41a; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px;">
+                        <i class="fas fa-ad"></i>
+                      </div>
+                      <span class="yuemu-guess-username">{{ t('components.bigPicture.sponsoredTitle') || '赞助商广告' }}</span>
+                    </div>
+                    <div class="yuemu-guess-likes">
+                      <span style="display: none;"></span>
+                    </div>
+                  </template>
                 </div>
               </div>
             </div>
@@ -47,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, onMounted, computed, nextTick, watch, onUnmounted } from 'vue'
+import { defineProps, defineEmits, ref, onMounted, computed, nextTick, watch, onUnmounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { getDeviceType } from '@/utils/device'
 import { DEVICE_TYPE_ENUM } from '@/constants/device'
@@ -80,6 +101,7 @@ const masonryRef = ref<HTMLElement | null>(null)
 const gridRef = ref<HTMLElement | null>(null)
 const containerWidth = ref(0)
 const columnHeights = ref<number[]>([])
+const enableAds = inject('enableAds', true)
 
 onMounted(async () => {
   const device = await getDeviceType()
@@ -110,6 +132,24 @@ const getColumnCount = () => {
   return 5
 }
 
+// 生成基于 ID 的伪随机数 [0, 1)
+const pseudoRandom = (id: string | number) => {
+  const str = String(id)
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i)
+    hash |= 0
+  }
+  const x = Math.sin(hash) * 10000
+  return x - Math.floor(x)
+}
+
+const getPictureRatio = (picture: Picture) => {
+  if ((picture as any).isAd) return 0.8;
+  const picRatio = picture.picScale || pseudoRandom(picture.id) * (1.5 - 0.7) + 0.7
+  return Math.max(0.55, Math.min(picRatio, 1.60))
+}
+
 // 核心：JS 计算瀑布流
 const columns = computed(() => {
   const count = getColumnCount()
@@ -121,15 +161,31 @@ const columns = computed(() => {
 
   const localHeights = new Array(count).fill(0)
 
-  props.dataList.forEach(picture => {
+  // 核心：像拼积木一样将广告对象作为真实数据插入瀑布流数组
+  const list = []
+  let adCounter = 0
+  for (let i = 0; i < props.dataList.length; i++) {
+    list.push(props.dataList[i])
+    // 在第 4 张图后插入一张广告，之后每隔 10 张插入
+    if (enableAds && (i === 3 || (i > 3 && (i - 3) % 10 === 0))) {
+      adCounter++
+      list.push({
+        id: 'ad-slot-' + adCounter,
+        isAd: true,
+        picScale: 0.8, // 偏竖屏长方形
+        url: '',
+      } as any)
+    }
+  }
+
+  list.forEach(picture => {
     // 寻找当前最短的列
     const minHeight = Math.min(...localHeights)
     const targetIndex = localHeights.indexOf(minHeight)
     cols[targetIndex].push(picture)
     
-    // 如果有比例使用比例，没有默认 1
-    const picRatio = picture.picScale || Math.random() * (1.5 - 0.7) + 0.7 // 若无比例，随机估算一个避免全堆在一列
-    const limitedRatio = Math.max(0.55, Math.min(picRatio, 1.60))
+    // 使用确定的比例
+    const limitedRatio = getPictureRatio(picture)
     
     // 高度估算
     localHeights[targetIndex] += (1 / limitedRatio) * 100 + 8
@@ -230,13 +286,14 @@ const formatNumber = (num: number) => {
 .yuemu-image-container {
   position: relative;
   width: 100%;
-  /* 不再强制 1:1，由图片自身的高度撑开 */
+  /* 不再强制 1:1，由行内样式的 aspectRatio 撑开以防加载抖动 */
   display: flex;
 }
 
 .yuemu-masonry-image {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
   opacity: 0;
   transition: opacity 0.5s ease;
@@ -277,7 +334,8 @@ const formatNumber = (num: number) => {
   transition: opacity 0.3s ease;
 }
 
-.yuemu-masonry-item:hover .yuemu-guess-like-overlay {
+.yuemu-masonry-item:hover .yuemu-guess-like-overlay,
+.yuemu-guess-like-overlay.is-always-visible {
   opacity: 1;
 }
 
@@ -325,5 +383,21 @@ const formatNumber = (num: number) => {
   .yuemu-masonry-item:active *, .yuemu-masonry-item:hover * {
     transform: none !important;
   }
+}
+
+/* 原生广告样式 */
+.is-ad-item {
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.yuemu-inline-ad-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--card-background);
 }
 </style>

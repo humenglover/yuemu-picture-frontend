@@ -162,15 +162,15 @@ const handleBack = () => {
   max-width: 1400px;
   margin: auto;
   box-sizing: border-box;
-  padding: 0 16px;
+  padding: 0 8px;
   transition: var(--theme-transition);
 }
 
 .search-header {
   padding: 10px 0;
-  max-width: 800px;
+  max-width: 1000px;
   margin: auto;
-  margin-top: 24px;
+  margin-top: 16px;
   border-bottom: 1px solid var(--header-border);
 }
 
@@ -191,6 +191,7 @@ const handleBack = () => {
   padding: 8px 16px;
   height: 36px;
   transition: var(--theme-transition);
+  min-width: 0;
 }
 
 .searchbar:focus-within {
@@ -213,6 +214,8 @@ const handleBack = () => {
   color: var(--text-primary);
   height: 100%;
   line-height: 1;
+  width: 100%;
+  min-width: 0;
 }
 
 .search-input::placeholder {
@@ -250,6 +253,7 @@ const handleBack = () => {
   flex-shrink: 0;
   transition: var(--theme-transition);
   border: 1px solid var(--search-btn-border);
+  white-space: nowrap;
 }
 
 .search-btn:hover {
@@ -261,8 +265,8 @@ const handleBack = () => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  padding: 24px 0;
-  max-width: 400px;
+  padding: 20px 0;
+  max-width: 1000px;
   margin: 0 auto;
 }
 

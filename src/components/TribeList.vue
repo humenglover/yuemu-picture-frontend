@@ -89,7 +89,7 @@
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
-import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, computed, watch, inject } from 'vue';
 import TeamSpaceCard from '@/components/TeamSpaceCard.vue';
 import { listSpaceVoByPageUsingPost, listRecommendedSpacesUsingGet } from '@/api/spaceController';
 import { throttle } from 'lodash-es';
@@ -120,6 +120,7 @@ const isPublicSpacesLoaded = ref(false);
 const isFirstLoad = ref(true);
 const containerRef = ref<HTMLDivElement | null>(null);
 const loadMoreThreshold = ref(200);
+const enableAds = inject('enableAds', true);
 
 const handleScrollThrottled = throttle(handleScroll, 200);
 
@@ -244,10 +245,22 @@ watch(viewMode, () => {
   updateNumCols();
 });
 
+const publicSpacesWithAds = computed(() => {
+  const result: any[] = []
+  for (let i = 0; i < publicSpaces.value.length; i++) {
+    result.push(publicSpaces.value[i])
+    // 在第 4 个空间后插入一个广告，之后每隔 10 个插入一个广告
+    if (enableAds && (i === 3 || (i > 3 && (i - 3) % 10 === 0))) {
+      result.push({ id: `ad-space-${i}`, isAd: true })
+    }
+  }
+  return result
+})
+
 // 将数据分发到各个列中，实现从左到右、从上到下的顺序
 const masonryColumns = computed(() => {
   const cols: API.SpaceVO[][] = Array.from({ length: numCols.value }, () => []);
-  publicSpaces.value.forEach((space, index) => {
+  publicSpacesWithAds.value.forEach((space, index) => {
     cols[index % numCols.value].push(space);
   });
   return cols;

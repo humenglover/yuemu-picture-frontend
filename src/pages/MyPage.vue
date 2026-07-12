@@ -310,7 +310,11 @@ import { SPACE_TYPE_ENUM } from '@/constants/space'
 import MemberDetailModal from '@/components/MemberDetailModal.vue'
 import ScanAndSearchModal from '@/components/ScanAndSearchModal.vue'
 import { message } from 'ant-design-vue'
-import { h, ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
+import { h, ref, onMounted, onUnmounted, computed, watch, nextTick, provide } from 'vue'
+
+// 在“我的空间”中强制关闭所有广告
+provide('enableAds', false)
+
 import { Modal } from 'ant-design-vue'
 import { getFollowAndFansCountUsingPost } from '@/api/userFollowsController'
 import { useMessageStore } from '@/stores/useMessageStore'

@@ -134,6 +134,14 @@
       <div class="setting-group">
         <div class="group-title">{{ $t('pages.settingView.groups.privacy') }}</div>
         <div class="group-card">
+          <div class="setting-cell" @click="$router.push('/privacy-center')">
+            <div class="cell-icon bg-purple"><i class="fas fa-file-shield"></i></div>
+            <div class="cell-content">
+              <div class="cell-title">{{ $t('pages.privacyPage.privacyCenter') }}</div>
+            </div>
+            <div class="cell-right"><i class="fas fa-chevron-right"></i></div>
+          </div>
+
           <div class="setting-cell" @click="handlePrivacySettingClick">
             <div class="cell-icon bg-teal"><i class="fas fa-shield-alt"></i></div>
             <div class="cell-content">
@@ -465,7 +473,7 @@
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { useThemeStore } from '@/stores/useThemeStore'
 import { ref,
-onMounted, computed, reactive, onBeforeUnmount, watch, provide } from 'vue'
+  onMounted, computed, reactive, onBeforeUnmount, watch, provide } from 'vue'
 import { addUserSignInUsingPost, userLogoutUsingPost } from '@/api/userController'
 import { message, Switch } from 'ant-design-vue'
 import {
@@ -490,7 +498,6 @@ import router from '@/router'
 import type { UserModifyPassWord } from '@/api/API.ts'
 import VChart from 'vue-echarts'
 import * as echarts from 'echarts'
-import { getFollowAndFansCountUsingPost } from '@/api/userFollowsController'
 import { getUserPermissionsUsingGet } from '@/api/userController'
 import AvatarCropper from '@/components/AvatarCropper.vue'
 import UserPermissionSetting from '@/components/UserPermissionSetting.vue'
@@ -922,7 +929,6 @@ const filterLayoutOptions = async () => {
 const currentYear = computed(() => getCurrentYear())
 watch(() => loginUserStore.loginUser, (newVal) => updateUserInfo(newVal), { deep: true })
 onMounted(async () => {
-  await getFollowAndFansCount()
   if (loginUserStore.loginUser.id) {
     await autoSignIn(); await loadUserPermissions(); await loadUserMultiDeviceLoginSetting()
   }

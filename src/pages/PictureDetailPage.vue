@@ -113,6 +113,15 @@
 
               <div class="divider"></div>
 
+              <div class="yuemu-sponsor-ad-wrapper" style="margin: 32px 0;" v-if="$enableAds">
+                <div class="yuemu-sponsor-ad-label" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; padding-left: 2px;">
+                  <i class="fas fa-ad" style="margin-right: 6px; color: #52c41a;"></i> {{ $t('components.bigPicture.sponsoredTitle') || '精选赞助内容' }}
+                </div>
+                <div style="position: relative; width: 100%; min-height: 100px;">
+                  <GlobalAdBanner margin="0" :fillHeight="true" />
+                </div>
+              </div>
+
               <div class="comments-area">
                 <div class="comments-count-title-wrapper">
                   <div class="comments-count-title">{{ $t('pages.pictureDetailPage.commentsCount', { count: picture.commentCount || 0 }) }}</div>
@@ -278,6 +287,7 @@ import ReportModal from '@/components/ReportModal.vue'
 import { getCopyrightByPictureIdUsingGet } from '@/api/pictureCopyrightController'
 import PictureChatRoom from '@/components/PictureChatRoom.vue'
 import ContentPermissionSetting from '@/components/ContentPermissionSetting.vue'
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
 
 const { t } = useI18n();
 

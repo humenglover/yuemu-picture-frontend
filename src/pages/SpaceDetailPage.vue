@@ -263,7 +263,6 @@
     <van-popup v-model:show="showSearchPopup" :position="isMobile ? 'bottom' : 'center'" :class="['full-search-popup', { 'is-desktop': !isMobile }]">
       <div class="drawer-drag-bar" v-if="isMobile"></div>
       <div class="search-popup-header">
-        <button class="back-btn" @click="showSearchPopup = false"><i class="fas fa-arrow-left"></i></button>
         <div class="search-input-wrap">
           <i class="fas fa-search"></i>
           <input type="text" v-model="searchParams.searchText" :placeholder="$t('pages.spaceDetailPage.search.inputPlaceholder')" @keyup.enter="doPopupSearch" />
@@ -315,7 +314,11 @@ import { PieChart } from 'echarts/charts';
 import { TitleComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 
 use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent]);
-import { h, onMounted, onUnmounted, reactive, computed, watch, ref, createVNode, onActivated, onDeactivated, nextTick } from 'vue'
+import { h, onMounted, onUnmounted, reactive, computed, watch, ref, createVNode, onActivated, onDeactivated, nextTick, provide } from 'vue'
+
+// 在私有空间和团队空间中禁用所有子组件的广告
+provide('enableAds', false)
+
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 import { message, Modal, Badge } from 'ant-design-vue'
 import { listPictureVoByPageUsingPost, searchPictureByColorUsingPost, searchPictureBySemanticUsingPost, searchPictureByPictureUsingPost } from '@/api/pictureController.ts'
@@ -476,27 +479,23 @@ const toggleMoreModal = () => {
 
 onMounted(async () => {
   device.value = await getDeviceType()
-  if (device.value !== DEVICE_TYPE_ENUM.PC) {
-    window.addEventListener('scroll', checkScrollBottom)
-  }
+  window.addEventListener('scroll', checkScrollBottom)
 })
 
 const scrollPosition = ref(0)
 
 onActivated(() => {
-  if (device.value !== DEVICE_TYPE_ENUM.PC) {
-    nextTick(() => { window.scrollTo({ top: scrollPosition.value, behavior: 'instant' }) })
-  }
+  window.addEventListener('scroll', checkScrollBottom)
+  nextTick(() => { window.scrollTo({ top: scrollPosition.value, behavior: 'instant' }) })
 })
 
 onDeactivated(() => {
   scrollPosition.value = window.pageYOffset || document.documentElement.scrollTop
+  window.removeEventListener('scroll', checkScrollBottom)
 })
 
 onUnmounted(() => {
-  if (device.value !== DEVICE_TYPE_ENUM.PC) {
-    window.removeEventListener('scroll', checkScrollBottom)
-  }
+  window.removeEventListener('scroll', checkScrollBottom)
   document.body.style.overflow = ''
 })
 
@@ -816,7 +815,6 @@ const maxPullDistance = 100
 const refreshThreshold = 80
 
 const checkScrollBottom = () => {
-  if (device.value === DEVICE_TYPE_ENUM.PC) return
   const scrollHeight = document.documentElement.scrollHeight
   const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
   const clientHeight = document.documentElement.clientHeight
@@ -1676,20 +1674,25 @@ const gaugeOption = computed(() => {
 .fake-search-bar span {
   font-weight: 500;
   color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
-.full-search-popup { display: flex; flex-direction: column; width: 100%; background: var(--background); }
+.full-search-popup { display: flex; flex-direction: column; width: 100%; max-width: 100vw; background: var(--background); box-sizing: border-box; overflow-x: hidden; }
 .full-search-popup:not(.is-desktop) { height: 85vh; border-radius: 24px 24px 0 0; }
-.drawer-drag-bar { width: 40px; height: 5px; background: var(--border-color, #e5e7eb); border-radius: 3px; margin: 12px auto 0; }
-.full-search-popup.is-desktop { width: 640px; height: auto; max-height: 80vh; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-.search-popup-header { display: flex; align-items: center; padding: 12px 16px; gap: 12px; background: var(--header-background); border-bottom: 1px solid var(--border-color); }
-.back-btn { background: none; border: none; font-size: 20px; color: var(--text-primary); cursor: pointer; padding: 4px; }
+.drawer-drag-bar { width: 40px; height: 5px; background: var(--border-color, #e5e7eb); border-radius: 3px; margin: 12px auto 0; flex-shrink: 0; }
+.full-search-popup.is-desktop { width: 640px; height: auto; max-height: 80vh; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+.search-popup-header { display: flex; align-items: center; padding: 12px 16px; gap: 12px; background: var(--header-background); border-bottom: 1px solid var(--border-color); width: 100%; box-sizing: border-box; }
+.back-btn { background: none; border: none; font-size: 20px; color: var(--text-primary); cursor: pointer; padding: 4px; flex-shrink: 0; }
 .search-input-wrap {
   flex: 1; display: flex; align-items: center;
   background: rgba(37, 99, 235, 0.05); /* 非常浅的品牌蓝色底 */
   border: 1px solid rgba(37, 99, 235, 0.2);
   border-radius: 12px; padding: 8px 12px; gap: 8px;
   transition: all 0.2s ease;
+  min-width: 0;
 }
 .search-input-wrap:focus-within {
   background: var(--card-background);
@@ -1697,11 +1700,11 @@ const gaugeOption = computed(() => {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 .search-input-wrap i { color: var(--link-color, #2563eb); font-size: 16px; }
-.search-input-wrap input { flex: 1; border: none; background: transparent; outline: none; font-size: 15px; color: var(--text-primary); }
-.search-btn { background: var(--link-color); color: #fff; border: none; border-radius: 16px; padding: 8px 16px; font-size: 14px; font-weight: 500; cursor: pointer; }
+.search-input-wrap input { flex: 1; border: none; background: transparent; outline: none; font-size: 15px; color: var(--text-primary); width: 100%; min-width: 0; }
+.search-btn { background: var(--link-color); color: #fff; border: none; border-radius: 16px; padding: 8px 16px; font-size: 14px; font-weight: 500; cursor: pointer; flex-shrink: 0; white-space: nowrap; }
 
 .search-popup-body { padding: 24px 16px; flex: 1; overflow-y: auto; background: var(--background); }
-.advanced-tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 10px; width: 100%; }
+.advanced-tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 10px; width: 100%; box-sizing: border-box; overflow-x: hidden; }
 .tool-card { display: flex; align-items: center; background: var(--card-background); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; gap: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 16px rgba(0,0,0,0.02); }
 .tool-card:active { transform: scale(0.98); }
 .tool-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; }

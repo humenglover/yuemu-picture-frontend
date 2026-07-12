@@ -51,6 +51,21 @@
       </div>
     </template>
 
+    <!-- 广告卡片伪装：作为文字卡片的样式 -->
+    <template v-else-if="space && (space as any).isAd">
+      <div class="yuemu-card-cover" style="aspect-ratio: 16 / 10; position: relative;">
+        <GlobalAdBanner margin="0" :fillHeight="true" />
+        <div class="yuemu-space-type-badge yuemu-private" style="background: var(--primary-color, #52c41a); color: white;">
+          <i class="fas fa-ad" style="margin-right: 4px;"></i>Ad
+        </div>
+      </div>
+
+      <div class="yuemu-card-info" style="padding-bottom: 16px;">
+        <h3 class="yuemu-space-title">{{ t('components.bigPicture.sponsoredTitle') || '精选赞助内容' }}</h3>
+        <p class="yuemu-space-desc" style="display: none;"></p>
+      </div>
+    </template>
+
     <!-- 文本部落：上边生成图，下边白色内容区 -->
     <template v-else-if="space">
       <div class="yuemu-card-cover" style="aspect-ratio: 16 / 10;">
@@ -85,6 +100,7 @@
         </div>
       </div>
     </template>
+
   </div>
 </template>
 
@@ -97,6 +113,7 @@ import { useRouter } from 'vue-router'
 import { getTextCover } from '@/utils/textCoverGenerator'
 import defaultCover from '@/assets/images/default_space_cover.png'
 import defaultAvatar from '@/assets/default.png'
+import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
 
 const props = withDefaults(defineProps<{
   space?: API.SpaceVO
@@ -164,7 +181,7 @@ const handleActivityClick = (activity: API.Activity) => {
 }
 
 const handleTeamClick = (space: API.SpaceVO) => {
-  if (space.id) {
+  if (space && !(space as any).isAd && space.id) {
     router.push(`/space/${space.id}`)
   }
 }

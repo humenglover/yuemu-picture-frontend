@@ -7,9 +7,9 @@
           <p class="hero-subtitle">{{ $t('pages.myTeamsPage.subtitle') }}</p>
         </div>
         <div class="header-actions">
-          <button class="apple-circle-btn" @click="handleAddTeam">
-            <i class="fas fa-plus"></i>
-          </button>
+          <div class="apple-circle-btn" @click.stop.prevent="handleAddTeam" style="position: relative; z-index: 999; cursor: pointer;">
+            <i class="fas fa-plus" style="pointer-events: none;"></i>
+          </div>
         </div>
       </div>
     </header>
@@ -50,9 +50,9 @@
               </div>
               <h3 class="empty-title">{{ $t('pages.myTeamsPage.emptyTitle') }}</h3>
               <p class="empty-desc">{{ $t('pages.myTeamsPage.emptyDesc') }}</p>
-              <button class="apple-primary-btn large-btn" @click="handleAddTeam">
+              <div class="apple-primary-btn large-btn" @click.stop.prevent="handleAddTeam" style="display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; z-index: 999;">
           {{ $t('pages.myTeamsPage.createNowBtn') }}
-              </button>
+              </div>
             </div>
           </div>
 
@@ -201,10 +201,10 @@ const handleTouchMove = (e: TouchEvent) => {
   currentY.value = e.touches[0].clientY
   const distance = currentY.value - startY.value
 
-  if (distance > 0) {
-    // 阻止浏览器原生下拉刷新行为
+  if (distance > 15) {
+    // 阻止浏览器原生下拉刷新行为，增加 15px 手势死区以防误杀原生 click
     if(e.cancelable) e.preventDefault()
-    refreshDistance.value = Math.min(distance * 0.5, maxPullDistance)
+    refreshDistance.value = Math.min((distance - 15) * 0.5, maxPullDistance)
   }
 }
 
@@ -266,6 +266,7 @@ const handleAddTeam = () => {
   cursor: pointer; box-shadow: 0 8px 16px rgba(22,119,255,0.2); transition: 0.2s;
 }
 .apple-circle-btn:active { transform: scale(0.92); }
+.apple-circle-btn *, .large-btn * { pointer-events: none; }
 .large-btn { height: 52px; border-radius: 14px; font-size: 16px; padding: 0 32px; width: 100%; max-width: 280px; margin: 0 auto; background: var(--link-color, #1677ff); color:#fff; border:none; }
 /* ================= 页面主体 ================= */
 .page-main-content {

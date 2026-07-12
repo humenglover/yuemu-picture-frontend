@@ -20,8 +20,6 @@ export default {
   "veryWeak": "极度脆弱",
   "normalDefense": "常规防御",
   "highlySecure": "高度安全",
-  "unbreakable": "坚不可摧",
-  "notReady": "未就绪",
   "sysWarnNoCharset": "系统警告：未检测到任何可用字符集",
   "copied": "已复制！",
   "copyFailed": "复制失败",

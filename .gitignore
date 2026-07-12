@@ -28,3 +28,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Sitemap 动态生成产物（后端单独提交给 Google，不需要进前端打包）
+sitemap-output/

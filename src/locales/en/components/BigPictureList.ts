@@ -13,5 +13,7 @@ export default {
     modalTitleReviewing: 'Content is under review',
     modalTitlePassed: 'Review Passed',
     modalTitleRejected: 'Review Rejected',
-    modalTitleStatus: 'Publishing Status'
+    modalTitleStatus: 'Publishing Status',
+    sponsored: 'Sponsored Ad',
+    sponsoredTitle: 'Featured Sponsored Content'
 };

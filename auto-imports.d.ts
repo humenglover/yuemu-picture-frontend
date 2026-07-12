@@ -6,5 +6,8 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-
+  const VanDialog: typeof import('vant/es')['Dialog']
+  const showFailToast: typeof import('vant/es')['showFailToast']
+  const showSuccessToast: typeof import('vant/es')['showSuccessToast']
+  const showToast: typeof import('vant/es')['showToast']
 }

@@ -16,6 +16,8 @@
             {{ t('components.globalFooter.disclaimer') }}
             <a class="yuemu-mail-link" href="mailto:109484028@qq.com">109484028@qq.com</a>
           </span>
+          <span class="yuemu-footer-divider">|</span>
+          <router-link to="/privacy" class="yuemu-privacy-link">{{ t('pages.privacyPage.privacyPolicy') }}</router-link>
         </div>
 
         <!-- 右侧：备案信息 -->
@@ -320,26 +322,38 @@ const getBeianNumber = () => {
   opacity: 0.85;
 }
 
-.yuemu-mail-link, .yuemu-beian-link {
+.yuemu-mail-link, .yuemu-beian-link, .yuemu-privacy-link {
   color: #64748b;
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
 @media (prefers-color-scheme: dark) { .yuemu-mail-link,
-@media (prefers-color-scheme: dark) { .yuemu-beian-link {
+@media (prefers-color-scheme: dark) { .yuemu-beian-link,
+@media (prefers-color-scheme: dark) { .yuemu-privacy-link {
  color: #94a3b8; 
-} } }
+} } } }
 
-.yuemu-mail-link:hover, .yuemu-beian-link:hover {
+.yuemu-mail-link:hover, .yuemu-beian-link:hover, .yuemu-privacy-link:hover {
   color: #2563eb;
   opacity: 1;
 }
 
 @media (prefers-color-scheme: dark) { .yuemu-mail-link:hover,
-@media (prefers-color-scheme: dark) { .yuemu-beian-link:hover {
+@media (prefers-color-scheme: dark) { .yuemu-beian-link:hover,
+@media (prefers-color-scheme: dark) { .yuemu-privacy-link:hover {
  color: #60a5fa; 
-} } }
+} } } }
+
+.yuemu-footer-divider {
+  margin: 0 8px;
+  color: #cbd5e1;
+}
+@media (prefers-color-scheme: dark) {
+  .yuemu-footer-divider {
+    color: #475569;
+  }
+}
 
 .yuemu-footer-right {
   display: flex;

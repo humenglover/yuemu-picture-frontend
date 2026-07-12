@@ -119,6 +119,22 @@
           <div class="dot-core"></div>
           <div class="dot-ripple"></div>
         </div>
+
+        <!-- 自定义确认弹窗，解决 z-index 遮挡问题 -->
+        <Transition name="yuemu-preview-fade">
+          <div v-if="confirmDialog.visible" class="yuemu-preview-confirm-overlay" @click.stop>
+            <div class="yuemu-preview-confirm-box">
+              <div class="confirm-icon"><i class="fas fa-exclamation-triangle"></i></div>
+              <h3>{{ confirmDialog.title }}</h3>
+              <p>{{ confirmDialog.content }}</p>
+              <p class="confirm-url">{{ confirmDialog.url }}</p>
+              <div class="confirm-actions">
+                <button class="confirm-btn cancel" @click="confirmDialog.visible = false">{{ t('components.imagePreview.btnCancel', '取消') }}</button>
+                <button class="confirm-btn ok" @click="handleConfirmOk">{{ t('components.imagePreview.btnConfirm', '继续跳转') }}</button>
+              </div>
+            </div>
+          </div>
+        </Transition>
       </div>
     </Transition>
   </Teleport>
@@ -129,7 +145,6 @@ import { ref, computed, watch, onUnmounted, nextTick } from 'vue'
 import { downloadImage as utilDownloadImage } from '@/utils'
 import { useI18n } from 'vue-i18n'
 import jsQR from 'jsqr'
-import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import scanSoundUrl from '@/assets/sounds/scan_QR.mp3'
 
@@ -188,6 +203,21 @@ const showToast = (msg: string, type: 'info' | 'success' | 'warning' | 'error' |
   }
 }
 const hideToast = () => { toastMsg.value = ''; if (toastTimer) clearTimeout(toastTimer); }
+
+// 自定义确认弹窗状态
+const confirmDialog = ref({
+  visible: false,
+  title: '',
+  content: '',
+  url: ''
+})
+
+const handleConfirmOk = () => {
+  if (confirmDialog.value.url) {
+    window.open(confirmDialog.value.url, '_blank')
+  }
+  confirmDialog.value.visible = false
+}
 
 // 下拉关闭专属状态
 const pullDownOffset = ref(0)
@@ -806,7 +836,12 @@ const detectQRCode = async () => {
          router.push(path)
          close()
       } else if (text.startsWith('http')) {
-         window.open(text, '_blank')
+         confirmDialog.value = {
+           visible: true,
+           title: t('components.imagePreview.qrCodeExternalLinkTitle', '跳转提示'),
+           content: t('components.imagePreview.qrCodeExternalLinkContent', '即将前往非本站链接，请注意账号及财产安全。是否继续跳转？'),
+           url: text
+         }
       } else if (text.startsWith('{shareBase64:')) {
          const encoded = text.replace('{shareBase64:', '').replace('}', '')
          try {
@@ -1252,5 +1287,92 @@ onUnmounted(() => {
   text-align: center;
   line-height: 1.5;
   max-width: 80vw;
+}
+
+/* 自定义确认弹窗 */
+.yuemu-preview-confirm-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100005;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.yuemu-preview-confirm-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  color: #333;
+}
+.confirm-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff3e0;
+  color: #ff9800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+.yuemu-preview-confirm-box h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+.yuemu-preview-confirm-box p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.confirm-url {
+  font-size: 13px !important;
+  color: #999 !important;
+  word-break: break-all;
+  margin-bottom: 24px !important;
+  background: #f5f5f5;
+  padding: 8px;
+  border-radius: 6px;
+  width: 100%;
+}
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+.confirm-btn {
+  flex: 1;
+  height: 40px;
+  border-radius: 20px;
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.confirm-btn.cancel {
+  background: #f0f0f0;
+  color: #666;
+}
+.confirm-btn.cancel:active {
+  background: #e0e0e0;
+}
+.confirm-btn.ok {
+  background: #1890ff;
+  color: #fff;
+}
+.confirm-btn.ok:active {
+  background: #096dd9;
 }
 </style>

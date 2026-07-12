@@ -1,109 +1,220 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" href="/favicon.ico">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- 添加网站描述，用于说明网站有海量素材以及生活分享的功能特点 -->
-  <meta name="description" content="悦木 - 一个汇聚海量素材的平台，在这里你可以分享生活点滴，也能浏览各种精彩素材，发现生活中的美好与创意。">
-  <title>悦木</title>
+  <link rel="icon" href="/src/assets/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="/src/assets/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="/src/assets/logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Font Awesome 备用CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+
+  <!-- 基础 SEO 标签 -->
+  <title>悦木图库 - 发现、分享、创造美好瞬间</title>
+  <meta name="description" content="悦木图库是一个汇聚海量素材的创意社区平台，在这里你可以发现美好瞬间，分享生活点滴，与志同道合的创作者交流互动。加入悦木图库，让我们一起分享、创造美好瞬间。">
+  <meta name="keywords" content="悦木图库,创意社区,素材分享,生活记录,艺术灵感,创作者社区,图片分享,设计素材">
+  <meta name="author" content="悦木团队">
+
+  <!-- Open Graph / 社交媒体分享标签 -->
+  <meta property="og:title" content="悦木图库 - 发现、分享、创造美好瞬间">
+  <meta property="og:description" content="在悦木图库，发现美好瞬间，分享生活点滴，与创作者一起创造美好。">
+  <meta property="og:image" content="/src/assets/logo.png">
+  <meta property="og:url" content="https://www.yuemutuku.com">
+  <meta property="og:type" content="website">
+
+  <!-- 微信分享配置 -->
+  <meta property="wx:title" content="悦木图库 - 发现、分享、创造美好瞬间">
+  <meta property="wx:description" content="在悦木图库，发现美好瞬间，分享生活点滴，与创作者一起创造美好。">
+  <meta property="wx:image" content="/src/assets/logo.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#2563eb">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- 搜索引擎优化 -->
+  <meta name="robots" content="index,follow">
+  <meta name="googlebot" content="index,follow">
+  <meta name="revisit-after" content="7 days">
+  <meta name="theme-color" content="#2563eb">
+  <!-- 声明原生支持暗黑模式，阻止微信/安卓浏览器强制注入灰色遮罩(Force Dark Mode) -->
+  <meta name="color-scheme" content="light dark">
+  <meta name="darkreader-lock">
+
+  <!-- Google AdSense 全局引入 -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8411665379717170" crossorigin="anonymous"></script>
+
+  <!-- 百度统计代码 -->
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f35c09ac50eaea43d9d9fac3984d2525";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+  <!-- 预加载主题，防止闪烁 -->
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (theme === 'dark' || (theme !== 'light' && prefersDark)) {
+          document.documentElement.classList.add('dark-theme');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <style>
-    #app-loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-      z-index: 9999;
-    }
-
-    .loading-content {
-      text-align: center;
-      padding: 24px;
-    }
-
-    .loading-logo {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 16px;
-      animation: bounce 2s infinite;
-    }
-
-    .loading-title {
-      font-size: 24px;
-      color: #ff8e53;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .loading-subtitle {
-      font-size: 14px;
-      color: #64748b;
-    }
-
-    .loading-spinner {
-      width: 40px;
-      height: 40px;
-      margin: 20px auto;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #ff8e53;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      100% {
-        transform: translateY(0);
+      /* 全局首屏加载层 */
+      #app-loading {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
       }
 
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
+      .loader-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 24px;
       }
 
-      100% {
-        transform: rotate(360deg);
+      .loader-orb {
+          width: 80px;
+          height: 80px;
+          background: radial-gradient(circle at 30% 30%, #f0f9ff, #7dd3fc, #38bdf8);
+          border-radius: 50%;
+          filter: blur(10px);
+          box-shadow: 0 0 50px rgba(56, 189, 248, 0.25);
+          animation: orb-breathe 2.8s ease-in-out infinite;
+          opacity: 0.8;
       }
-    }
+
+      @keyframes orb-breathe {
+          0%, 100% {
+              transform: scale(0.9);
+              opacity: 0.6;
+              filter: blur(8px);
+          }
+          50% {
+              transform: scale(1.1);
+              opacity: 0.9;
+              filter: blur(12px);
+          }
+      }
+
+      .loader-text {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+          font-size: 15px;
+          font-weight: 500;
+          color: #64748b;
+          letter-spacing: 2px;
+      }
+
+      /* 适配系统暗色主题或用户手动设置的暗黑模式 */
+      @media (prefers-color-scheme: dark) {
+          #app-loading:not(.light-theme-forced) {
+              background-color: #121212;
+          }
+          #app-loading:not(.light-theme-forced) .loader-orb {
+              background: radial-gradient(circle at 30% 30%, #0f172a, #0369a1, #0ea5e9);
+              box-shadow: 0 0 50px rgba(14, 165, 233, 0.2);
+          }
+          #app-loading:not(.light-theme-forced) .loader-text {
+              color: #94a3b8;
+          }
+      }
+
+      html.dark-theme #app-loading {
+          background-color: #121212;
+      }
+      html.dark-theme .loader-orb {
+          background: radial-gradient(circle at 30% 30%, #0f172a, #0369a1, #0ea5e9);
+          box-shadow: 0 0 50px rgba(14, 165, 233, 0.2);
+      }
+      html.dark-theme .loader-text {
+          color: #94a3b8;
+      }
+      html.light-theme #app-loading {
+          background-color: #ffffff;
+      }
+      html.light-theme .loader-orb {
+          background: radial-gradient(circle at 30% 30%, #f0f9ff, #7dd3fc, #38bdf8);
+          box-shadow: 0 0 50px rgba(56, 189, 248, 0.25);
+      }
+      html.light-theme .loader-text {
+          color: #64748b;
+      }
   </style>
 </head>
 
 <body>
-  <div id="app-loading">
-    <div class="loading-content">
-      <h1 class="loading-title">悦木</h1>
-      <p class="loading-subtitle">正在加载精彩内容...</p>
-      <div class="loading-spinner"></div>
-    </div>
+<div id="app-loading">
+  <div class="loader-content">
+    <div class="loader-orb"></div>
+    <div class="loader-text" id="initial-loader-text">正在开启悦木图库...</div>
   </div>
-  <div id="app"></div>
-  <script type="module" src="/src/main.ts"></script>
-  <script>
-    // 当Vue应用加载完成后，移除loading
-    window.addEventListener('load', function () {
-      const loading = document.getElementById('app-loading');
-      if (loading) {
-        loading.style.opacity = '0';
-        loading.style.transition = 'opacity 0.3s ease';
-        setTimeout(() => {
-          loading.style.display = 'none';
-        }, 300);
+</div>
+
+<div id="app"></div>
+
+<script type="module" src="/src/main.ts"></script>
+
+<!-- 666ms 后直接关闭，干净利落 -->
+<script>
+  setTimeout(() => {
+    const loading = document.getElementById('app-loading');
+    if (loading) loading.remove();
+  }, 999);
+</script>
+
+<script>
+  (function() {
+    try {
+      var lang = localStorage.getItem('locale') || 'zh-CN';
+      var el = document.getElementById('initial-loader-text');
+      if (lang === 'en-US') {
+        if (el) el.innerText = 'Opening Yuemu Gallery...';
+        document.title = 'Yuemu Gallery - Discover, Share, Create';
+        document.documentElement.lang = 'en';
+
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.content = 'Yuemu Gallery is a creative community platform gathering massive assets, where you can discover beautiful moments, share life, and interact with creators.';
+
+        var metaKeywords = document.querySelector('meta[name="keywords"]');
+        if (metaKeywords) metaKeywords.content = 'Yuemu Gallery, creative community, asset sharing, life recording, art inspiration, creator community, image sharing, design assets';
+
+        var metaAuthor = document.querySelector('meta[name="author"]');
+        if (metaAuthor) metaAuthor.content = 'Yuemu Team';
+
+        var ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.content = 'Yuemu Gallery - Discover, Share, Create';
+
+        var ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.content = 'Discover beautiful moments and share life with creators at Yuemu Gallery.';
+      } else {
+        if (el) el.innerText = '正在开启悦木图库...';
+        document.documentElement.lang = 'zh-CN';
       }
-    });
-  </script>
+    } catch (e) {}
+  })();
+</script>
+
 </body>
 
 </html>

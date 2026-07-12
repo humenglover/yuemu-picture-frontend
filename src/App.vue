@@ -36,13 +36,16 @@ import enUS from 'ant-design-vue/es/locale/en_US';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import 'dayjs/locale/en';
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, provide } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { respondExitConfirm } from '@/utils/back';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { theme } from 'ant-design-vue';
 import { getDeviceType } from '@/utils/device';
 // import FontLoader from '@/components/FontLoader.vue'
+
+// ── 全局广告开关提供给所有子组件 ────────────────────
+provide('enableAds', typeof __ENABLE_ADS__ !== 'undefined' ? __ENABLE_ADS__ : true);
 
 const { locale } = useI18n();
 

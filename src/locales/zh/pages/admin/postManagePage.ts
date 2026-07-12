@@ -44,7 +44,6 @@ export default {
   "delete": "确认删除",
   "deleteWarning1": "即将彻底删除该帖子及相关附件。",
   "deleteWarning2": "此操作不可恢复。",
-  "cancelBtn": "取消",
   "etcAttachmentsText": "等 {count} 个附件",
   "anonymousText": "匿名",
   "title": "帖子管理",
