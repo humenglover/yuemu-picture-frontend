@@ -53,7 +53,7 @@
               </div>
 
               <div class="yuemu-card-footer">
-                <span class="yuemu-time-tag"><CalendarOutlined /> {{ item.timing || '未设置' }}</span>
+                <span class="yuemu-time-tag"><CalendarOutlined /> {{ item.timing || t('pages.admin.loveBoardManagePage.notSet') }}</span>
                 <div class="yuemu-footer-btns">
                   <button class="yuemu-mini-btn yuemu-danger" @click="handleDelete(item.id)">
                     <DeleteOutlined />
@@ -118,7 +118,7 @@
                   </div>
                   <div class="yuemu-m-names-col">
                     <span class="yuemu-m-couple-name">{{ item.manName }} & {{ item.womanName }}</span>
-                    <span class="yuemu-m-timing"><CalendarOutlined /> {{ item.timing || '未设置纪念日' }}</span>
+                    <span class="yuemu-m-timing"><CalendarOutlined /> {{ item.timing || t('pages.admin.loveBoardManagePage.notSetTiming') }}</span>
                   </div>
                 </div>
               </div>
@@ -173,7 +173,7 @@
         </div>
 
         <div class="yuemu-form-group">
-          <label>纪念日 (Timing)</label>
+          <label>{{ t('pages.admin.loveBoardManagePage.timing') }}</label>
           <input class="yuemu-full-input" v-model="editForm.timing" placeholder="YYYY-MM-DD" />
         </div>
 
@@ -240,14 +240,14 @@ const handleEditSubmit = async () => {
   try {
     const res = await updateLoveBoardAdminUsingPost({ ...editForm, status: editForm.status ? 1 : 0 })
     if (res.data?.code === 0) {
-      message.success('配置已更新'); editModalVisible.value = false; loadData()
+      message.success(t('common.message.operationSuccess')); editModalVisible.value = false; loadData()
     }
   } finally { editSubmitLoading.value = false }
 }
 
 const handleDelete = (id: any) => {
   batchOperationLoveBoardsUsingPost({ ids: [id], operation: 'delete' }).then(res => {
-    if (res.data.code === 0) { message.success('已移除'); loadData() }
+    if (res.data.code === 0) { message.success(t('common.message.deleteSuccess')); loadData() }
   })
 }
 

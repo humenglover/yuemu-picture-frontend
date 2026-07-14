@@ -31,5 +31,6 @@ export default {
   "batchDeleteErrText": "Batch delete error",
   "totalRecordsText3": "Total {total} items",
   "prevPage": "Prev",
-  "nextPage": "Next"
+  "nextPage": "Next",
+  "selectedCount": "{count} selected",
 };

@@ -1,8 +1,9 @@
 /**
- * SBTI 人格测试常数与题目数据
+ * SBTI Personality Test Constants & Question Data
+ * TODO: English translations needed for questions array (requires psychometric domain expertise)
  */
 
-export const dimensionMeta: Record<string, { name: string; model: string }> = {
+const dimensionMetaZH: Record<string, { name: string; model: string }> = {
   S1: { name: 'S1 自尊自信', model: '自我模型' },
   S2: { name: 'S2 自我清晰度', model: '自我模型' },
   S3: { name: 'S3 核心价值', model: '自我模型' },
@@ -20,6 +21,29 @@ export const dimensionMeta: Record<string, { name: string; model: string }> = {
   So3: { name: 'So3 表达与真实度', model: '社交模型' },
 }
 
+const dimensionMetaEN: Record<string, { name: string; model: string }> = {
+  S1: { name: 'S1 Self-Esteem & Confidence', model: 'Self Model' },
+  S2: { name: 'S2 Self-Clarity', model: 'Self Model' },
+  S3: { name: 'S3 Core Values', model: 'Self Model' },
+  E1: { name: 'E1 Attachment Security', model: 'Emotion Model' },
+  E2: { name: 'E2 Emotional Engagement', model: 'Emotion Model' },
+  E3: { name: 'E3 Boundaries & Dependency', model: 'Emotion Model' },
+  A1: { name: 'A1 Worldview Orientation', model: 'Attitude Model' },
+  A2: { name: 'A2 Rules & Flexibility', model: 'Attitude Model' },
+  A3: { name: 'A3 Sense of Meaning', model: 'Attitude Model' },
+  Ac1: { name: 'Ac1 Motivational Orientation', model: 'Action Drive Model' },
+  Ac2: { name: 'Ac2 Decision-Making Style', model: 'Action Drive Model' },
+  Ac3: { name: 'Ac3 Execution Pattern', model: 'Action Drive Model' },
+  So1: { name: 'So1 Social Initiative', model: 'Social Model' },
+  So2: { name: 'So2 Interpersonal Boundaries', model: 'Social Model' },
+  So3: { name: 'So3 Expression & Authenticity', model: 'Social Model' },
+}
+
+export const getDimensionMeta = (isZh: boolean) => isZh ? dimensionMetaZH : dimensionMetaEN
+
+/** @deprecated Use getDimensionMeta(i18n.global.locale.value !== 'en-US') instead */
+export const dimensionMeta = dimensionMetaZH
+
 export interface Option {
   label: string
   value: number
@@ -34,7 +58,7 @@ export interface Question {
   kind?: string
 }
 
-export const questions: Question[] = [
+const questionsZH: Question[] = [
   {
     id: 'q1',
     dim: 'S1',
@@ -336,6 +360,15 @@ export const questions: Question[] = [
     ],
   },
 ]
+
+// TODO: Add questionsEN array with English translations (requires psychometric domain expertise)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const questionsEN: Question[] = questionsZH // fallback to Chinese until English translations are provided
+
+export const getQuestions = (isZh: boolean) => isZh ? questionsZH : questionsEN
+
+/** @deprecated Use getQuestions(i18n.global.locale.value !== 'en-US') instead */
+export const questions: Question[] = questionsZH
 
 export const specialQuestions: Question[] = [
   {

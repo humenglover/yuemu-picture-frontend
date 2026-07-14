@@ -1,5 +1,5 @@
 export default {
-  shareTitle: 'Yuemu Gallery - User Details',
+  shareTitle: 'yuemutuku - User Details',
   bgTitle: 'Background Image',
   avatarTitle: 'Avatar',
   report: 'Report',

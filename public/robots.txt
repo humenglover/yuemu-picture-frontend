@@ -1,17 +1,50 @@
 User-agent: *
+Crawl-delay: 1
+
+# Allow public content indexing
 Allow: /
-Disallow: /api/
-Disallow: /admin/
+Allow: /home
+Allow: /discovery
+Allow: /search
+Allow: /search_picture
+Allow: /forum
+Allow: /ranking
+Allow: /barrage
+Allow: /friend-links
+Allow: /contact
+Allow: /privacy
+Allow: /privacy-center
+Allow: /ai_resource
+Allow: /loveboard
+Allow: /loveboard/list
+Allow: /games
+Allow: /games/*
+Allow: /tools
+Allow: /tools/*
+Allow: /sitemap.xml
+
+# Disallow API endpoints (internal)
+Disallow: /api
+Disallow: /api/*
+
+# Disallow admin area
+Disallow: /admin
+Disallow: /admin/*
+
+# Disallow authenticated user-only pages
 Disallow: /user/login
 Disallow: /user/register
 Disallow: /user/setting
 Disallow: /user/reset-password
-Disallow: /chat/
+Disallow: /user/report-center
+Disallow: /chat
+Disallow: /chat/*
 Disallow: /pc-chat
 Disallow: /chat-list
 Disallow: /chat-redirect
 Disallow: /message-center
-Disallow: /message/
+Disallow: /message
+Disallow: /message/*
 Disallow: /my
 Disallow: /my_space
 Disallow: /my_teams
@@ -22,9 +55,14 @@ Disallow: /reminder
 Disallow: /invite
 Disallow: /follow-list
 Disallow: /redirect
-Disallow: /item/analytics/
+Disallow: /item/analytics
+Disallow: /item/analytics/*
 Disallow: /creator/analytics
 Disallow: /space_analyze
-Disallow: /user/report-center
+Disallow: /add_picture
+Disallow: /add_picture/*
+Disallow: /add_space
+Disallow: /post/edit
+Disallow: /post/edit/*
 
 Sitemap: https://www.yuemutuku.com/sitemap.xml

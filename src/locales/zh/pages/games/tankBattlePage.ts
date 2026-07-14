@@ -36,5 +36,6 @@ export default {
   "enemiesDestroyedVal": "击毁敌军: {enemies}",
   "playerRankingBracket": "玩家排行榜 [RANKING]",
   "personalHistoryBracket": "个人成绩档 [HISTORY]",
-  "levelValueText": "第{level}关"
+  "levelValueText": "第{level}关",
+  "finalScoreIs": "最终得分: {score}"
 };

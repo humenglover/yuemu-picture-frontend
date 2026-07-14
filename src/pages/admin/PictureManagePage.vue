@@ -228,7 +228,7 @@
         </div>
       </div>
 
-      <van-action-sheet v-model:show="showActionSheet" :actions="mobileOperationOptions" cancel-text="取消" @select="handleBatchOperation" class="yuemu-dark-action-sheet" teleport="body" />
+      <van-action-sheet v-model:show="showActionSheet" :actions="mobileOperationOptions" :cancel-text="t('common.cancel')" @select="handleBatchOperation" class="yuemu-dark-action-sheet" teleport="body" />
       <ImagePreview v-model:visible="showPreview" :images="[previewImage]" :initialIndex="0" />
     </template>
 
@@ -245,7 +245,7 @@
           <a-textarea v-model:value="rejectMessage" :rows="4" class="yuemu-input-base" :placeholder="t('pages.admin.pictureManagePage.rejectPlaceholder')" />
         </div>
         <div class="yuemu-modal-footer">
-          <a-button class="yuemu-btn-ghost" @click="rejectModalVisible = false">取消</a-button>
+          <a-button class="yuemu-btn-ghost" @click="rejectModalVisible = false">{{ t('common.cancel') }}</a-button>
           <a-button type="primary" danger class="yuemu-btn-danger" @click="handleRejectConfirm" :loading="rejectLoading"> {{ t('pages.admin.pictureManagePage.confirmReject') }} </a-button>
         </div>
       </div>
@@ -257,7 +257,7 @@
         <h3 class="yuemu-confirm-title"> {{ t('pages.admin.pictureManagePage.permanentDelete') }} </h3>
         <p class="yuemu-confirm-desc">「{{ selectedPicture?.name || t('pages.admin.pictureManagePage.unnamedPic') }}」<br> {{ t('pages.admin.pictureManagePage.deleteWarning') }} </p>
         <div class="yuemu-confirm-actions">
-          <button class="yuemu-action-cancel" @click="deleteConfirmVisible = false">取消</button>
+          <button class="yuemu-action-cancel" @click="deleteConfirmVisible = false">{{ t('common.cancel') }}</button>
           <button class="yuemu-action-danger" @click="confirmDelete"> {{ t('pages.admin.pictureManagePage.delete') }} </button>
         </div>
       </div>

@@ -6,8 +6,15 @@ export default {
     qrCodeFound: 'QR Code found!',
     noQRCode: 'No QR Code detected',
     qrCodeDetectFailed: 'Detection failed. Image might not be supported.',
+    qrCodeContentPrefix: 'Content: ',
     qrCodeExternalLinkTitle: 'Redirection Notice',
     qrCodeExternalLinkContent: 'You are about to visit an external link. Please ensure your account and property safety. Do you want to continue?',
     btnConfirm: 'Continue',
-    btnCancel: 'Cancel'
+    btnCancel: 'Cancel',
+    fit: 'Fit',
+    actualSize: 'Actual Size 100%',
+    zoomIn: 'Zoom In 200%',
+    zoomInMore: 'Zoom In 400%',
+    flipHorizontal: 'Flip Horizontal',
+    flipVertical: 'Flip Vertical',
 };

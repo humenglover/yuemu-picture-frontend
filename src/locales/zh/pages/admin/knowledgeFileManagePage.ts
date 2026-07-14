@@ -36,4 +36,10 @@ export default {
 
 
   "totalRecordsText3": "共 {total} 条",
+  "totalFiles": "共 {total} 个文件",
+  "selectedCount": "已选 {count} 项",
+  "vectorCount": "{count} 向量",
+  "uploadSuccess": "{name} 上传成功",
+  "uploadFail": "{name} 上传失败",
+  "deleteVectorWarning": "删除后知识库向量将同步移除，不可恢复。",
 };

@@ -3,51 +3,89 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" href="/src/assets/favicon.ico" type="image/x-icon">
-  <link rel="shortcut icon" href="/src/assets/favicon.ico" type="image/x-icon">
-  <link rel="apple-touch-icon" href="/src/assets/logo.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" type="image/png" sizes="64x64" href="/logo.png">
+  <link rel="apple-touch-icon" href="/logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <meta name="referrer" content="no-referrer-when-downgrade">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://www.yuemutuku.com/">
+
+  <!-- Alternate language versions (hreflang) -->
+  <link rel="alternate" hreflang="zh-CN" href="https://www.yuemutuku.com/">
+  <link rel="alternate" hreflang="en-US" href="https://www.yuemutuku.com/?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://www.yuemutuku.com/">
 
   <!-- Font Awesome CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Font Awesome 备用CDN -->
+  <!-- Font Awesome fallback -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 
-  <!-- 基础 SEO 标签 -->
-  <title>悦木图库 - 发现、分享、创造美好瞬间</title>
-  <meta name="description" content="悦木图库是一个汇聚海量素材的创意社区平台，在这里你可以发现美好瞬间，分享生活点滴，与志同道合的创作者交流互动。加入悦木图库，让我们一起分享、创造美好瞬间。">
-  <meta name="keywords" content="悦木图库,创意社区,素材分享,生活记录,艺术灵感,创作者社区,图片分享,设计素材">
-  <meta name="author" content="悦木团队">
+  <!-- Basic SEO Tags — bilingual for all search engines -->
+  <title>悦木图库 · yuemutuku — 发现、分享、创造 | Discover, Share, Create</title>
+  <meta name="description" content="悦木图库是创意社区平台，发现美好瞬间、分享生活。yuemutuku is a creative community — discover beautiful moments, share life, and create with fellow creators.">
+  <meta name="keywords" content="悦木图库,yuemutuku,创意社区,图片分享,设计素材,creative community,image sharing,design assets,art inspiration">
+  <meta name="author" content="yuemutuku">
 
-  <!-- Open Graph / 社交媒体分享标签 -->
-  <meta property="og:title" content="悦木图库 - 发现、分享、创造美好瞬间">
-  <meta property="og:description" content="在悦木图库，发现美好瞬间，分享生活点滴，与创作者一起创造美好。">
-  <meta property="og:image" content="/src/assets/logo.png">
-  <meta property="og:url" content="https://www.yuemutuku.com">
+  <!-- Open Graph / Facebook — bilingual -->
+  <meta property="og:title" content="悦木图库 · yuemutuku — 发现、分享、创造 | Discover, Share, Create">
+  <meta property="og:description" content="悦木图库是创意社区平台，发现美好瞬间、分享生活。yuemutuku is a creative community — discover, share, create.">
+  <meta property="og:image" content="https://www.yuemutuku.com/logo.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:url" content="https://www.yuemutuku.com/">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="悦木图库 · yuemutuku">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale:alternate" content="en_US">
 
-  <!-- 微信分享配置 -->
-  <meta property="wx:title" content="悦木图库 - 发现、分享、创造美好瞬间">
-  <meta property="wx:description" content="在悦木图库，发现美好瞬间，分享生活点滴，与创作者一起创造美好。">
-  <meta property="wx:image" content="/src/assets/logo.png">
+  <!-- Twitter Card — bilingual -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="悦木图库 · yuemutuku — 发现、分享、创造 | Discover, Share, Create">
+  <meta name="twitter:description" content="悦木图库是创意社区平台，发现美好瞬间、分享生活。yuemutuku is a creative community — discover, share, create.">
+  <meta name="twitter:image" content="https://www.yuemutuku.com/logo.png">
+
+  <!-- WeChat sharing -->
+  <meta property="wx:title" content="悦木图库 · yuemutuku — 发现、分享、创造 | Discover, Share, Create">
+  <meta property="wx:description" content="悦木图库是创意社区平台，发现美好瞬间、分享生活。yuemutuku is a creative community — discover, share, create.">
+  <meta property="wx:image" content="https://www.yuemutuku.com/logo.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="#2563eb">
   <meta name="format-detection" content="telephone=no">
 
-  <!-- 搜索引擎优化 -->
-  <meta name="robots" content="index,follow">
+  <!-- Search engines -->
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="googlebot" content="index,follow">
+  <meta name="baiduspider" content="index,follow">
   <meta name="revisit-after" content="7 days">
   <meta name="theme-color" content="#2563eb">
-  <!-- 声明原生支持暗黑模式，阻止微信/安卓浏览器强制注入灰色遮罩(Force Dark Mode) -->
   <meta name="color-scheme" content="light dark">
   <meta name="darkreader-lock">
 
-  <!-- Google AdSense 全局引入 -->
+  <!-- JSON-LD Structured Data (Schema.org WebSite) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "悦木图库 · yuemutuku",
+    "url": "https://www.yuemutuku.com",
+    "description": "悦木图库是创意社区平台，发现美好瞬间、分享生活。yuemutuku is a creative community — discover, share, create.",
+    "inLanguage": ["zh-CN", "en-US"],
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://www.yuemutuku.com/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8411665379717170" crossorigin="anonymous"></script>
 
-  <!-- 百度统计代码 -->
+  <!-- Baidu Analytics -->
   <script>
     var _hmt = _hmt || [];
     (function() {
@@ -58,7 +96,7 @@
     })();
   </script>
 
-  <!-- 预加载主题，防止闪烁 -->
+  <!-- Prevent theme flash -->
   <script>
     (function () {
       try {
@@ -72,149 +110,151 @@
   </script>
 
   <style>
-      /* 全局首屏加载层 */
-      #app-loading {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: #ffffff;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          z-index: 10000;
+    #app-loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .loader-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .loader-orb {
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle at 30% 30%, #f0f9ff, #7dd3fc, #38bdf8);
+      border-radius: 50%;
+      filter: blur(10px);
+      box-shadow: 0 0 50px rgba(56, 189, 248, 0.25);
+      animation: orb-breathe 2.8s ease-in-out infinite;
+      opacity: 0.8;
+    }
+    @keyframes orb-breathe {
+      0%, 100% { transform: scale(0.9); opacity: 0.6; filter: blur(8px); }
+      50% { transform: scale(1.1); opacity: 0.9; filter: blur(12px); }
+    }
+    .loader-text {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      font-size: 15px;
+      font-weight: 500;
+      color: #64748b;
+      letter-spacing: 2px;
+    }
+    @media (prefers-color-scheme: dark) {
+      #app-loading:not(.light-theme-forced) { background-color: #121212; }
+      #app-loading:not(.light-theme-forced) .loader-orb {
+        background: radial-gradient(circle at 30% 30%, #0f172a, #0369a1, #0ea5e9);
+        box-shadow: 0 0 50px rgba(14, 165, 233, 0.2);
       }
-
-      .loader-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 24px;
-      }
-
-      .loader-orb {
-          width: 80px;
-          height: 80px;
-          background: radial-gradient(circle at 30% 30%, #f0f9ff, #7dd3fc, #38bdf8);
-          border-radius: 50%;
-          filter: blur(10px);
-          box-shadow: 0 0 50px rgba(56, 189, 248, 0.25);
-          animation: orb-breathe 2.8s ease-in-out infinite;
-          opacity: 0.8;
-      }
-
-      @keyframes orb-breathe {
-          0%, 100% {
-              transform: scale(0.9);
-              opacity: 0.6;
-              filter: blur(8px);
-          }
-          50% {
-              transform: scale(1.1);
-              opacity: 0.9;
-              filter: blur(12px);
-          }
-      }
-
-      .loader-text {
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-          font-size: 15px;
-          font-weight: 500;
-          color: #64748b;
-          letter-spacing: 2px;
-      }
-
-      /* 适配系统暗色主题或用户手动设置的暗黑模式 */
-      @media (prefers-color-scheme: dark) {
-          #app-loading:not(.light-theme-forced) {
-              background-color: #121212;
-          }
-          #app-loading:not(.light-theme-forced) .loader-orb {
-              background: radial-gradient(circle at 30% 30%, #0f172a, #0369a1, #0ea5e9);
-              box-shadow: 0 0 50px rgba(14, 165, 233, 0.2);
-          }
-          #app-loading:not(.light-theme-forced) .loader-text {
-              color: #94a3b8;
-          }
-      }
-
-      html.dark-theme #app-loading {
-          background-color: #121212;
-      }
-      html.dark-theme .loader-orb {
-          background: radial-gradient(circle at 30% 30%, #0f172a, #0369a1, #0ea5e9);
-          box-shadow: 0 0 50px rgba(14, 165, 233, 0.2);
-      }
-      html.dark-theme .loader-text {
-          color: #94a3b8;
-      }
-      html.light-theme #app-loading {
-          background-color: #ffffff;
-      }
-      html.light-theme .loader-orb {
-          background: radial-gradient(circle at 30% 30%, #f0f9ff, #7dd3fc, #38bdf8);
-          box-shadow: 0 0 50px rgba(56, 189, 248, 0.25);
-      }
-      html.light-theme .loader-text {
-          color: #64748b;
-      }
+      #app-loading:not(.light-theme-forced) .loader-text { color: #94a3b8; }
+    }
+    html.dark-theme #app-loading { background-color: #121212; }
+    html.dark-theme .loader-orb {
+      background: radial-gradient(circle at 30% 30%, #0f172a, #0369a1, #0ea5e9);
+      box-shadow: 0 0 50px rgba(14, 165, 233, 0.2);
+    }
+    html.dark-theme .loader-text { color: #94a3b8; }
+    html.light-theme #app-loading { background-color: #ffffff; }
+    html.light-theme .loader-orb {
+      background: radial-gradient(circle at 30% 30%, #f0f9ff, #7dd3fc, #38bdf8);
+      box-shadow: 0 0 50px rgba(56, 189, 248, 0.25);
+    }
+    html.light-theme .loader-text { color: #64748b; }
   </style>
 </head>
 
 <body>
-<div id="app-loading">
-  <div class="loader-content">
-    <div class="loader-orb"></div>
-    <div class="loader-text" id="initial-loader-text">正在开启悦木图库...</div>
+  <div id="app-loading">
+    <div class="loader-content">
+      <div class="loader-orb"></div>
+      <div class="loader-text" id="initial-loader-text">正在开启悦木图库...</div>
+    </div>
   </div>
-</div>
 
-<div id="app"></div>
+  <!-- SEO fallback for crawlers that don't execute JS -->
+  <noscript>
+    <div style="padding:40px;text-align:center;font-family:sans-serif;">
+      <h1>悦木图库 - yuemutuku</h1>
+      <p>发现、分享、创造美好瞬间 | Discover, Share, Create Beautiful Moments</p>
+      <p>请启用 JavaScript 以访问完整功能。 | Please enable JavaScript to access full features.</p>
+      <p><a href="/">首页 Home</a> | <a href="/discovery">发现 Discovery</a> | <a href="/forum">社区 Forum</a></p>
+    </div>
+  </noscript>
 
-<script type="module" src="/src/main.ts"></script>
+  <div id="app"></div>
 
-<!-- 666ms 后直接关闭，干净利落 -->
-<script>
-  setTimeout(() => {
-    const loading = document.getElementById('app-loading');
-    if (loading) loading.remove();
-  }, 999);
-</script>
+  <script type="module" src="/src/main.ts"></script>
 
-<script>
-  (function() {
-    try {
-      var lang = localStorage.getItem('locale') || 'zh-CN';
-      var el = document.getElementById('initial-loader-text');
-      if (lang === 'en-US') {
-        if (el) el.innerText = 'Opening Yuemu Gallery...';
-        document.title = 'Yuemu Gallery - Discover, Share, Create';
-        document.documentElement.lang = 'en';
+  <!-- Auto-remove loading screen -->
+  <script>
+    setTimeout(function() {
+      var loading = document.getElementById('app-loading');
+      if (loading) loading.remove();
+    }, 999);
+  </script>
 
-        var metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc) metaDesc.content = 'Yuemu Gallery is a creative community platform gathering massive assets, where you can discover beautiful moments, share life, and interact with creators.';
+  <!-- Locale-aware initial meta update BEFORE Vue mounts -->
+  <script>
+    (function() {
+      try {
+        var lang = localStorage.getItem('locale') || 'zh-CN';
+        var el = document.getElementById('initial-loader-text');
+        if (lang === 'en-US') {
+          if (el) el.innerText = 'Opening yuemutuku...';
+          document.documentElement.lang = 'en';
+          document.title = 'yuemutuku - Discover, Share, Create Beautiful Moments';
 
-        var metaKeywords = document.querySelector('meta[name="keywords"]');
-        if (metaKeywords) metaKeywords.content = 'Yuemu Gallery, creative community, asset sharing, life recording, art inspiration, creator community, image sharing, design assets';
+          var _d = document.querySelector('meta[name="description"]');
+          if (_d) _d.content = 'yuemutuku is a creative community platform gathering massive assets, where you can discover beautiful moments, share life, and interact with like-minded creators. Join us to share and create together.';
 
-        var metaAuthor = document.querySelector('meta[name="author"]');
-        if (metaAuthor) metaAuthor.content = 'Yuemu Team';
+          var _k = document.querySelector('meta[name="keywords"]');
+          if (_k) _k.content = 'yuemutuku, creative community, asset sharing, life recording, art inspiration, creator community, image sharing, design assets';
 
-        var ogTitle = document.querySelector('meta[property="og:title"]');
-        if (ogTitle) ogTitle.content = 'Yuemu Gallery - Discover, Share, Create';
+          var _a = document.querySelector('meta[name="author"]');
+          if (_a) _a.content = 'yuemutuku Team';
 
-        var ogDesc = document.querySelector('meta[property="og:description"]');
-        if (ogDesc) ogDesc.content = 'Discover beautiful moments and share life with creators at Yuemu Gallery.';
-      } else {
-        if (el) el.innerText = '正在开启悦木图库...';
-        document.documentElement.lang = 'zh-CN';
-      }
-    } catch (e) {}
-  })();
-</script>
+          var _ot = document.querySelector('meta[property="og:title"]');
+          if (_ot) _ot.content = 'yuemutuku - Discover, Share, Create Beautiful Moments';
 
+          var _od = document.querySelector('meta[property="og:description"]');
+          if (_od) _od.content = 'Discover beautiful moments, share life, and create together at yuemutuku.';
+
+          var _tt = document.querySelector('meta[name="twitter:title"]');
+          if (_tt) _tt.content = 'yuemutuku - Discover, Share, Create Beautiful Moments';
+
+          var _td = document.querySelector('meta[name="twitter:description"]');
+          if (_td) _td.content = 'Discover beautiful moments, share life, and create together at yuemutuku.';
+
+          var _wl = document.querySelector('meta[property="wx:title"]');
+          if (_wl) _wl.content = 'yuemutuku - Discover, Share, Create Beautiful Moments';
+
+          var _wd = document.querySelector('meta[property="wx:description"]');
+          if (_wd) _wd.content = 'Discover beautiful moments, share life, and create together at yuemutuku.';
+
+          var _c = document.querySelector('link[rel="canonical"]');
+          if (_c) _c.href = 'https://www.yuemutuku.com/?lang=en';
+
+          var _alts = document.querySelectorAll('link[rel="alternate"]');
+          _alts.forEach(function(link) {
+            if (link.getAttribute('hreflang') === 'zh-CN') link.href = 'https://www.yuemutuku.com/';
+            if (link.getAttribute('hreflang') === 'en-US') link.href = 'https://www.yuemutuku.com/?lang=en';
+          });
+        } else {
+          if (el) el.innerText = '正在开启悦木图库...';
+          document.documentElement.lang = 'zh-CN';
+        }
+      } catch (e) {}
+    })();
+  </script>
 </body>
-
 </html>

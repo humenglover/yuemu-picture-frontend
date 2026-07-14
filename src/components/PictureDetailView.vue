@@ -72,14 +72,14 @@
                   />
                   <div class="yuemu-author-meta">
                     <div class="yuemu-name-row">
-                      <span class="yuemu-author-name">{{ picture.user?.userName || '匿名用户' }}</span>
+                      <span class="yuemu-author-name">{{ picture.user?.userName || $t('components.pictureDetailView.anonymousUser') }}</span>
                       <button
                         v-if="picture.user?.id !== loginUserStore.loginUser?.id"
                         class="yuemu-follow-btn-inline"
                         :class="{ 'yuemu-followed': isFollowed }"
                         @click.stop="handleFollow"
                       >
-                        {{ isFollowed ? '已关注' : '关注' }}
+                        {{ isFollowed ? $t('components.pictureDetailView.followed') : $t('components.pictureDetailView.follow') }}
                       </button>
                     </div>
                     <span class="yuemu-publish-time">{{ formatTime(picture.createTime) }}</span>
@@ -87,19 +87,19 @@
                 </div>
               </div>
               <div class="yuemu-description-card">
-                <h1 class="yuemu-pic-title">{{ picture.name || '未命名图片' }}</h1>
+                <h1 class="yuemu-pic-title">{{ picture.name || $t('components.pictureDetailView.unnamedPicture') }}</h1>
                 <div class="yuemu-pic-intro" v-html="formattedIntroduction"></div>
                 <div class="yuemu-pic-tags" v-if="picture.tags?.length">
                   <span v-for="tag in picture.tags" :key="tag" class="yuemu-tag-item">#{{ tag }}</span>
                 </div>
               </div>
               <div class="yuemu-stats-bar">
-                <span class="yuemu-stat-item"><i class="fas fa-eye"></i> {{ picture.viewCount || 0 }} 浏览</span>
-                <span class="yuemu-stat-item"><i class="fas fa-clock"></i> 发布于 {{ formatTime(picture.createTime) }}</span>
+                <span class="yuemu-stat-item"><i class="fas fa-eye"></i> {{ $t('components.pictureDetailView.viewCount', { count: picture.viewCount || 0 }) }}</span>
+                <span class="yuemu-stat-item"><i class="fas fa-clock"></i> {{ $t('components.pictureDetailView.publishedAt') }} {{ formatTime(picture.createTime) }}</span>
               </div>
               <div class="yuemu-divider"></div>
               <div class="yuemu-comments-header">
-                <h3>共 {{ picture.commentCount || 0 }} 条评论</h3>
+                <h3>{{ $t('components.pictureDetailView.commentsCount', { count: picture.commentCount || 0 }) }}</h3>
               </div>
             </div>
             <div class="yuemu-details-inner">
@@ -112,7 +112,7 @@
               <div v-if="comments.length === 0 && commentloading" class="yuemu-loading-more" style="padding-top: 40px; color: #999;">
                 <i class="fas fa-spinner fa-spin"></i>{{ t('components.pictureDetailView.loadingComments') }}</div>
               <div v-if="comments.length === 0 && !commentloading" class="yuemu-empty-comment-state">
-                <img src="@/assets/illustrations/empty.png" alt="暂无评论" />
+                <img src="@/assets/illustrations/empty.png" :alt="$t('components.pictureDetailView.noCommentsAlt')" />
                 <p>{{ t('components.pictureDetailView.noCommentsYet') }}</p>
               </div>
               <div v-if="isEndOfData && comments.length > 0" class="yuemu-end-of-data">
@@ -131,7 +131,7 @@
                       v-model="commentContent"
                       type="text"
                       autocomplete="off"
-                      :placeholder="replyCommentId ? `回复 @${replyTargetUserName}` : (picture.allowComment ? '添加评论...' : '评论已关闭')"
+                      :placeholder="replyCommentId ? `${t('components.pictureDetailView.replyTo')}${replyTargetUserName}` : (picture.allowComment ? t('components.pictureDetailView.addCommentPlaceholder') : t('components.pictureDetailView.commentsClosed'))"
                       :disabled="!picture.allowComment"
                       @focus="isInputFocused = true"
                       @blur="handleInputBlur"
@@ -289,6 +289,7 @@ import ImagePreview from '@/components/ImagePreview.vue'
 import BigPictureList from '@/components/BigPictureList.vue'
 import GuessLikePictureList from '@/components/GuessLikePictureList.vue'
 import GlobalAdBanner from '@/components/GlobalAdBanner.vue'
+import { useStructuredData, buildImageObject, buildBreadcrumbList } from '@/composables/useStructuredData'
 
 interface Props {
   id: string | number
@@ -1093,7 +1094,48 @@ const emojiI18n = {
   categories: {
     recent: t('components.pictureDetailView.emojiRecent'), smileys: t('components.pictureDetailView.emojiSmileys'), people: t('components.pictureDetailView.emojiPeople'), nature: t('components.pictureDetailView.emojiNature'), foods: t('components.pictureDetailView.emojiFoods'), activity: t('components.pictureDetailView.emojiActivity'), places: t('components.pictureDetailView.emojiPlaces'), objects: t('components.pictureDetailView.emojiObjects'), symbols: t('components.pictureDetailView.emojiSymbols'), flags: t('components.pictureDetailView.emojiFlags')
   }
-}</script>
+}
+
+// ── SEO: JSON-LD structured data ──
+let structuredDataScript: HTMLScriptElement | null = null
+
+watch([picture, () => picture.value?.id], () => {
+  // remove previous script
+  if (structuredDataScript?.parentNode) {
+    structuredDataScript.parentNode.removeChild(structuredDataScript)
+    structuredDataScript = null
+  }
+  if (!picture.value?.id) return
+
+  const picUrl = picture.value.url || picture.value.thumbnailUrl || ''
+  if (!picUrl) return
+
+  const imageData = buildImageObject({
+    url: picUrl.startsWith('http') ? picUrl : `https://www.yuemutuku.com${picUrl}`,
+    name: picture.value.name || picture.value.introduction || 'Untitled',
+    description: picture.value.introduction || '',
+    author: picture.value.user?.userName || '',
+    datePublished: picture.value.createTime || '',
+    license: 'https://www.yuemutuku.com/privacy',
+  })
+  const breadcrumb = buildBreadcrumbList([
+    { name: '首页', url: 'https://www.yuemutuku.com/' },
+    { name: picture.value.name || '作品详情', url: window.location.href },
+  ])
+
+  structuredDataScript = injectStructuredData({
+    '@context': 'https://schema.org',
+    '@graph': [imageData, breadcrumb],
+  })
+})
+
+onUnmounted(() => {
+  if (structuredDataScript?.parentNode) {
+    structuredDataScript.parentNode.removeChild(structuredDataScript)
+  }
+})
+
+</script>
 <style scoped>.yuemu-fade-enter-active, .yuemu-fade-leave-active {
   transition: background-color 0.35s ease;
 }

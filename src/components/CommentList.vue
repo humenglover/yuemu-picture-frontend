@@ -343,7 +343,7 @@ const handleReply = (comment: Comment) => {
     message.warning(t('components.comment.waitReply'))
     return
   }
-  const userName = comment.commentUser?.userName || '用户'
+  const userName = comment.commentUser?.userName || t('common.message.unknown')
   emit('reply-clicked', comment.commentId!, userName)
 }
 

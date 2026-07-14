@@ -593,10 +593,10 @@ const handleBanOrUnban = async (user: API.UserVO) => {
       message.success(user.userRole === 'ban' ? t('pages.admin.userManagePage.unbanSuccess') : t('pages.admin.userManagePage.banSuccess'))
       fetchData()
     } else {
-      message.error(res.data?.message || '操作失败')
+      message.error(res.data?.message || t('common.message.operationFailed'))
     }
   } catch (error: any) {
-    message.error(error.response?.data?.message || '操作失败')
+    message.error(error.response?.data?.message || t('common.message.operationFailed'))
   }
 }
 

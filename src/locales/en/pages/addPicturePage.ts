@@ -74,5 +74,10 @@ export default {
   confirmTitleDiscardEdit: 'Discard Edit',
   confirmContentDiscardEdit: 'Current content is not published and will not be saved. Are you sure you want to leave?',
   btnLeave: 'Leave',
-  btnContinueEdit: 'Continue Editing'
+  btnContinueEdit: 'Continue Editing',
+  allowSavePicture: 'Allow saving picture',
+  altSpaceAvatar: 'Space avatar',
+  altPreview: 'Preview',
+  altDraftPreview: 'Draft preview',
+  altAnnotation: 'Annotation',
 }

@@ -62,7 +62,7 @@
             <div v-if="showGameOverModal" class="screen-overlay game-over-overlay">
               <h1 class="pixel-title text-red">{{ t('pages.games.tankBattlePage.gameOver') }}</h1>
               <div class="results">
-                <p>最终{{ t('pages.games.tankBattlePage.scoreIs', { score: score }) }}</p>
+                <p>{{ t('pages.games.tankBattlePage.finalScoreIs', { score: score }) }}</p>
                 <p>{{ t('pages.games.tankBattlePage.enemiesDestroyedVal', { enemies: enemiesDestroyed }) }}</p>
               </div>
               <div class="action-hints">

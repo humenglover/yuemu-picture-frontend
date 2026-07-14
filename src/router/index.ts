@@ -2,11 +2,31 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteLocationNormalized, RouteLocationNormalizedLoaded } from 'vue-router'
 import { shouldSaveScrollPosition } from '@/constants/route'
 import { getDeviceType } from '@/utils/device'
+import i18n from '@/locales'
 
 import HomePage from '@/pages/HomePage.vue'
 
-const DEFAULT_PAGE_TITLE = '悦木图库 - 发现、分享、创造美好瞬间'
+const DEFAULT_ZH_TITLE = '悦木图库 - 发现、分享、创造美好瞬间'
+const DEFAULT_EN_TITLE = 'yuemutuku - Discover, Share, Create Beautiful Moments'
 let prevRoute: RouteLocationNormalizedLoaded | null = null
+
+/** 根据当前语言和路由名获取页面标题 */
+const resolvePageTitle = (to: RouteLocationNormalized): string => {
+  if (to.name) {
+    const routeName = to.name as string
+    const key = `pageTitles.${routeName}`
+    const translated = i18n.global.t(key)
+    // t() 返回 key 本身说明翻译未命中，回退到 meta.title
+    if (translated && translated !== key) {
+      return translated
+    }
+  }
+  // meta.title 作为兜底（中文硬编码标题）
+  const metaTitle = to.meta?.title ? String(to.meta.title) : ''
+  if (metaTitle) return metaTitle
+  // 最终兜底：按语言显示默认站点名
+  return i18n.global.locale.value === 'en-US' ? DEFAULT_EN_TITLE : DEFAULT_ZH_TITLE
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -1051,6 +1071,15 @@ const router = createRouter({
         keepAlive: true,
         title: '风云榜单 - 看看谁最火'
       }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('@/views/NotFoundView.vue'),
+      meta: {
+        keepAlive: false,
+        title: '404 - 页面未找到'
+      }
     }
   ],
   scrollBehavior(to, from, savedPosition) {
@@ -1092,10 +1121,10 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-let lastTitle = DEFAULT_PAGE_TITLE
+let lastTitle = DEFAULT_ZH_TITLE
 
 router.afterEach((to) => {
-  const newTitle = to.meta?.title ? `${String(to.meta.title)}` : DEFAULT_PAGE_TITLE
+  const newTitle = resolvePageTitle(to)
 
   // 只有当标题真正改变时才更新DOM，减少不必要的DOM操作
   if (newTitle !== lastTitle) {

@@ -1,4 +1,4 @@
-// tui-image-editor语言配置，汉化文字
+// tui-image-editor language configuration (Chinese)
 export const localeCN = {
   Resize: "调整宽高",
   Crop: "裁剪",
@@ -77,30 +77,109 @@ export const localeCN = {
   Blend: "混合色",
 };
 
-// tui-image-editor自定义主题样式
+// tui-image-editor language configuration (English)
+export const localeEN = {
+  Resize: "Resize",
+  Crop: "Crop",
+  Flip: "Flip",
+  Rotate: "Rotate",
+  Draw: "Draw",
+  Shape: "Shape",
+  Icon: "Icon",
+  Text: "Text",
+  Mask: "Mask",
+  Filter: "Filter",
+
+  Download: "Download",
+  Load: "Load",
+
+  Free: "Free",
+  Straight: "Straight",
+  Color: "Color",
+  Range: "Range",
+
+  ZoomIn: "Zoom In",
+  ZoomOut: "Zoom Out",
+  Hand: "Hand",
+  History: "History",
+  Undo: "Undo",
+  Redo: "Redo",
+  Reset: "Reset",
+  Delete: "Delete",
+  DeleteAll: "Delete All",
+
+  Bold: "Bold",
+  Italic: "Italic",
+  Underline: "Underline",
+  Left: "Left",
+  Center: "Center",
+  Right: "Right",
+  "Text size": "Text Size",
+  Custom: "Custom",
+  Square: "Square",
+  Apply: "Apply",
+  Cancel: "Cancel",
+  "Flip X": "Flip X",
+  "Flip Y": "Flip Y",
+  Stroke: "Stroke",
+  Fill: "Fill",
+  Circle: "Circle",
+  Triangle: "Triangle",
+  Rectangle: "Rectangle",
+  Arrow: "Arrow",
+  "Arrow-2": "Arrow 2",
+  "Arrow-3": "Arrow 3",
+  "Star-1": "Star 1",
+  "Star-2": "Star 2",
+  Polygon: "Polygon",
+  Location: "Location",
+  Heart: "Heart",
+  Bubble: "Bubble",
+  "Custom icon": "Custom Icon",
+  "Load Mask Image": "Load Mask Image",
+  Grayscale: "Grayscale",
+  Blur: "Blur",
+  Sharpen: "Sharpen",
+  Emboss: "Emboss",
+  "Remove White": "Remove White",
+  Distance: "Distance",
+  Brightness: "Brightness",
+  Noise: "Noise",
+  "Color Filter": "Color Filter",
+  Sepia: "Sepia",
+  Sepia2: "Sepia 2",
+  Invert: "Invert",
+  Pixelate: "Pixelate",
+  Threshold: "Threshold",
+  Tint: "Tint",
+  Multiply: "Multiply",
+  Blend: "Blend",
+};
+
+// Export a helper to get the locale based on i18n language
+export const getImageEditorLocale = (isZh: boolean) => isZh ? localeCN : localeEN;
+
+// tui-image-editor custom theme
 export const customTheme = {
-  // image 坐上角度图片
-  "common.bi.image": "", // 替换logo图片 我直接不显示
+  // brand image top-left corner
+  "common.bi.image": "",
   "common.bisize.width": "0px",
   "common.bisize.height": "0px",
   "common.border": "1px solid #d5cfcf",
-  "common.backgroundColor": "#fff", // 整体背景颜色
+  "common.backgroundColor": "#fff",
 
-  // header（头部）
-  "header.backgroundColor": "#000", // 头部的背景颜色
+  // header
+  "header.backgroundColor": "#000",
 
-  // load button（上传按钮）
-  "loadButton.display": "none", // 可以直接隐藏掉"上传"按钮
+  // load button
+  "loadButton.display": "none",
 
-  // download button（下载按钮）
-  "downloadButton.display": "none", // 可以直接隐藏掉"下载"按钮
+  // download button
+  "downloadButton.display": "none",
 
-  // 菜单-普通状态 - 绿色
+  // menu states
   "menu.normalIcon.color": "#2d8cf0",
-  // 菜单-选中状态 - 蓝色
   "menu.activeIcon.color": "blue",
-  // 菜单-禁用状态 - 灰色
   "menu.disabledIcon.color": "grey",
-  // 菜单-鼠标悬浮状态 - 黄色
   "menu.hoverIcon.color": "yellow",
 };

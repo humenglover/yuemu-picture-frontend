@@ -32,5 +32,10 @@ export default {
   "descCannotBeEmpty": "Description cannot be empty",
   "descMax500": "Description max 500 chars",
   "submitFailedRetry": "Submit failed, please try again",
-  "networkOrSystemError": "Network or system error"
+  "networkOrSystemError": "Network or system error",
+  "max6Pics": "Maximum 6 pictures",
+  "onlyImageFormat": "Only image formats supported",
+  "imageSizeLimit": "Image size must not exceed 5MB",
+  "uploadingWait": "Uploading, please wait...",
+  "submitSuccess": "Report submitted successfully! We will process it as soon as possible.",
 };

@@ -1,6 +1,6 @@
 export default {
     title: 'AI Assistant Capabilities',
-    subtitle: 'Yuemu Gallery · Multimodal Agent',
+    subtitle: 'yuemutuku · Multimodal Agent',
     visDeepAnalysis: 'Visual Deep Analysis',
     visDeepAnalysisDesc: 'Supports YOLO object detection, K-Means palette extraction, and deep EXIF parameter extraction.',
     imgProcessing: 'Omnipotent Image Processing',

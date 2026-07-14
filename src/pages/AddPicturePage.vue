@@ -34,7 +34,7 @@
 
         <div v-if="spaceId && spaceInfo" class="yuemu-space-info-banner">
           <div class="yuemu-space-banner-left">
-            <img :src="spaceInfo.spaceCover|| 'src/assets/default-av.png'" alt="空间头像" class="yuemu-space-avatar" />
+            <img :src="spaceInfo.spaceCover|| 'src/assets/default-av.png'" :alt="$t('pages.addPicturePage.altSpaceAvatar')" class="yuemu-space-avatar" />
             <div class="yuemu-space-meta">
               <span class="yuemu-space-name">{{ spaceInfo.spaceName }}</span>
               <span class="yuemu-space-desc">{{ spaceInfo.spaceDescription || t('pages.addPicturePage.noDescription') }}</span>
@@ -89,7 +89,7 @@
                   <div class="yuemu-rolling-circle yuemu-circle-2"></div>
                 </div>
 
-                <img :src="picture?.url || tempPreviewUrl" alt="预览图" class="yuemu-preview-img" :class="{ 'is-uploading': uploading }" />
+                <img :src="picture?.url || tempPreviewUrl" :alt="$t('pages.addPicturePage.altPreview')" class="yuemu-preview-img" :class="{ 'is-uploading': uploading }" />
 
                 <div class="yuemu-glass-toolbar" @click.stop v-if="!uploading">
                   <button class="yuemu-tool-btn" @click="doEditPicture" :title="t('pages.addPicturePage.btnEditPicture')">
@@ -206,7 +206,7 @@
                   <div class="yuemu-setting-icon-wrap yuemu-bg-green">
                     <i class="fa-solid fa-download"></i>
                   </div>
-                  <span class="yuemu-setting-label">允许保存图片</span>
+                  <span class="yuemu-setting-label">{{ $t('pages.addPicturePage.allowSavePicture') }}</span>
                 </div>
                 <div class="yuemu-setting-action" @click="pictureForm.isDownload = pictureForm.isDownload === 1 ? 0 : 1">
                   <div class="yuemu-ios-switch" :class="{ active: pictureForm.isDownload === 1 }">
@@ -329,7 +329,7 @@
                   @click="loadDraft(draft)"
                 >
                   <div class="yuemu-draft-cover-wrap">
-                    <img :src="draft.url" alt="草稿预览" class="yuemu-draft-cover" />
+                    <img :src="draft.url" :alt="$t('pages.addPicturePage.altDraftPreview')" class="yuemu-draft-cover" />
                     <div class="yuemu-draft-overlay">
                       <span class="yuemu-draft-time-badge">{{ formatDraftTime(draft.editTime || draft.createTime) }}</span>
                     </div>
@@ -377,7 +377,7 @@
             </div>
             <div v-else-if="yoloResult" class="yuemu-yolo-result-view">
               <div class="yuemu-yolo-image-box">
-                <img :src="'data:image/jpeg;base64,' + yoloResult.annotatedImageBase64" alt="标注图" />
+                <img :src="'data:image/jpeg;base64,' + yoloResult.annotatedImageBase64" :alt="$t('pages.addPicturePage.altAnnotation')" />
               </div>
               <div class="yuemu-yolo-data">
                 <h4>{{ t('pages.addPicturePage.extractedTotal', { count: yoloResult.detections?.length || 0 }) }}</h4>

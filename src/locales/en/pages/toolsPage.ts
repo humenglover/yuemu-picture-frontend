@@ -3,7 +3,7 @@ export default {
   title: 'Toolbox',
   subtitle: 'Data Processing · Efficiency Boosting · Convenient Ops',
   serialPrefix: 'No.: ',
-  footerText: 'Created in 2026 // Yuemu Gallery // Utility Tools System',
+  footerText: 'Created in 2026 // yuemutuku // Utility Tools System',
   tools: {
     reminder: {
       name: 'Notepad',

@@ -59,7 +59,7 @@
         </div>
         <div class="yuemu-action-item" @click="openChatShare">
           <div class="yuemu-action-icon yuemu-icon-green"><i class="fas fa-paper-plane"></i></div>
-          <span>{{ t('components.shareModal.shareToChat', '发给好友') }}</span>
+          <span>{{ t('components.shareModal.shareToChat') }}</span>
         </div>
         <div class="yuemu-action-item" @click="closeModal">
           <div class="yuemu-action-icon yuemu-icon-gray"><i class="fas fa-times"></i></div>
@@ -111,7 +111,7 @@
     <div v-if="showChatShareModal" class="yuemu-chat-share-overlay" @click="showChatShareModal = false">
       <div class="yuemu-chat-share-card" @click.stop>
         <div class="yuemu-chat-share-header">
-          <h3>{{ t('components.shareModal.selectFriend', '选择一位好友') }}</h3>
+          <h3>{{ t('components.shareModal.selectFriend') }}</h3>
           <button class="yuemu-chat-close-btn" @click="showChatShareModal = false"><i class="fas fa-times"></i></button>
         </div>
         <div class="yuemu-chat-share-list" @wheel.stop @scroll="handleChatListScroll">
@@ -128,18 +128,18 @@
               <img :src="chat.targetUser?.userAvatar || getDefaultAvatar(chat.targetUser?.userName)" class="chat-share-avatar" />
               <div class="chat-share-info">
                 <span class="chat-share-name">{{ chat.targetUser?.userName }}</span>
-                <span v-if="chat.chatType === 3" class="chat-share-badge group">{{ t('components.shareModal.group', '群组') }}</span>
+                <span v-if="chat.chatType === 3" class="chat-share-badge group">{{ t('components.shareModal.group') }}</span>
               </div>
             </div>
           </template>
           <div v-else class="yuemu-chat-share-empty">
             <i class="fas fa-inbox"></i>
-            <p>{{ t('components.shareModal.noFriends', '暂无联系人，快去私信打个招呼吧') }}</p>
+            <p>{{ t('components.shareModal.noFriends') }}</p>
           </div>
           <!-- 触底加载更多的状态 -->
           <div v-if="loadingMoreChat" class="yuemu-chat-load-more">
             <i class="fas fa-spinner fa-spin"></i>
-            <span>{{ t('components.shareModal.loadingMore', '正在加载更多...') }}</span>
+            <span>{{ t('components.shareModal.loadingMore') }}</span>
           </div>
         </div>
       </div>
@@ -286,10 +286,14 @@ const qrBgColor = computed(() => {
 // 富文案复制
 const copyRichText = async () => {
   const authorName = props.user ? props.user.userName : t('components.shareModal.yuemuUser');
-  const text = `✨ 我在悦木图库发现了一幅绝美创作《${props.title || t('components.shareModal.untitled')}》\n🎨 创作者：${authorName}\n\n👉 快来扫码看看吧！\n🔗 链接：${props.link}`;
+  const text = t('components.shareModal.shareTemplate', {
+    title: props.title || t('components.shareModal.untitled'),
+    author: authorName,
+    link: props.link,
+  });
   try {
     await navigator.clipboard.writeText(text);
-    message.success(t('components.shareModal.elegantTextCopied', '文案已复制，快去分享吧'));
+    message.success(t('components.shareModal.elegantTextCopied'));
   } catch {
     message.error(t('components.shareModal.copyFailedManualCopy'));
   }
@@ -311,7 +315,7 @@ const dataURLtoFile = (dataurl: string, filename: string) => {
 // 站内好友分享
 const openChatShare = async () => {
   if (!loginUserStore.loginUser?.id) {
-    message.warning(t('components.shareModal.loginFirst', '请先登录以使用分享功能'));
+    message.warning(t('components.shareModal.loginFirst'));
     return;
   }
   showChatShareModal.value = true;
@@ -374,7 +378,7 @@ const handleChatListScroll = async (e: Event) => {
 }
 
 const handleShareToFriend = async (chat: any) => {
-  message.loading({ content: t('components.shareModal.generatingPoster', '正在封装分享卡片...'), key: 'shareMsg' });
+  message.loading({ content: t('components.shareModal.generatingPoster'), key: 'shareMsg' });
   
   try {
     await nextTick();
@@ -413,7 +417,7 @@ const handleShareToFriend = async (chat: any) => {
     const file = dataURLtoFile(base64Data, `share_${Date.now()}.jpg`)
     
     // 发起上传
-    message.loading({ content: t('components.shareModal.sendingMsg', '正在发送...'), key: 'shareMsg' });
+    message.loading({ content: t('components.shareModal.sendingMsg'), key: 'shareMsg' });
     const uploadRes = await uploadPostImageUsingPost({}, {}, file);
     
     if (uploadRes.data.code !== 0 || !uploadRes.data.data?.url) {
@@ -438,7 +442,7 @@ const handleShareToFriend = async (chat: any) => {
       setTimeout(() => {
         ws.destroy();
         showChatShareModal.value = false;
-        message.success({ content: t('components.shareModal.sentSuccess', '卡片已发送给好友'), key: 'shareMsg' });
+        message.success({ content: t('components.shareModal.sentSuccess'), key: 'shareMsg' });
       }, 600);
     };
     
@@ -450,7 +454,7 @@ const handleShareToFriend = async (chat: any) => {
     
   } catch (err) {
     console.error(err);
-    message.error({ content: '生成或发送卡片失败，请重试', key: 'shareMsg' });
+    message.error({ content: t('components.shareModal.generateOrSendFailed'), key: 'shareMsg' });
     if (screenshotRef.value) {
        screenshotRef.value.style.display = 'none'
     }

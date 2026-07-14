@@ -10,7 +10,7 @@
             <i class="fas fa-expand-arrows-alt yuemu-ai-icon"></i>
             {{ t('components.imageOutPainting.title') }}
           </div>
-          <button class="yuemu-close-button" @click="closeModal" aria-label="关闭">
+          <button class="yuemu-close-button" @click="closeModal" :aria-label="$t('common.close')">
             <i class="fas fa-times"></i>
           </button>
         </div>

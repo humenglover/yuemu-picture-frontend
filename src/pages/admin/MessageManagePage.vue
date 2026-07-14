@@ -62,7 +62,7 @@
             >
               <template #bodyCell="{ column, record }">
                 <template v-if="column.dataIndex === 'ip'">
-                  <span class="yuemu-tag yuemu-blue">{{ record.ip || '未知' }}</span>
+                  <span class="yuemu-tag yuemu-blue">{{ record.ip || t('common.message.unknown') }}</span>
                 </template>
                 <template v-else-if="column.dataIndex === 'content'">
                   <a-tooltip :title="record.content">
@@ -122,7 +122,7 @@
               {{ sortOrder === 'ascend' ? '时间Ascending' : '时间Descending' }}
             </div>
             <div class="yuemu-batch-action-bar" :class="{ 'yuemu-is-active': hasSelected }">
-              <span class="yuemu-text-secondary">已选 {{ state.selectedRowKeys.length }} 项</span>
+              <span class="yuemu-text-secondary">{{ t('pages.admin.messageManagePage.selectedCount', { count: state.selectedRowKeys.length }) }}</span>
               <van-button size="mini" round type="danger" @click="batchDeleteSelectedMessages"> {{ t('pages.admin.messageManagePage.delete') }} </van-button>
             </div>
           </div>

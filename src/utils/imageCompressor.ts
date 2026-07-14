@@ -1,4 +1,7 @@
 import { message } from 'ant-design-vue'
+import i18n from '@/locales'
+
+const t = (key: string) => i18n.global.t(key)
 
 interface CompressOptions {
   maxWidth?: number
@@ -137,7 +140,7 @@ export class ImageCompressor {
       })
     } catch (error) {
       console.error('图片压缩失败:', error)
-      message.error('图片压缩失败')
+      message.error(t('common.message.imageCompressFailed'))
       throw error
     }
   }
@@ -160,7 +163,7 @@ export class ImageCompressor {
       return await Promise.all(compressPromises)
     } catch (error) {
       console.error('批量压缩失败:', error)
-      message.error('批量压缩失败')
+      message.error(t('common.message.batchCompressFailed'))
       throw error
     }
   }

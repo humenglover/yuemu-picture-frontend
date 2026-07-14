@@ -9,13 +9,8 @@ import { VantResolver } from '@vant/auto-import-resolver'
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
-  let apiTarget = 'http://localhost:8123'
-  // let apiTarget = 'https://www.yuemutuku.com'
-  if (mode === 'production') {
-    apiTarget = 'https://www.yuemutuku.com'
-  } else if (mode === 'staging') {
-    apiTarget = 'https://lumenglover.com'
-  }
+  // let apiTarget = 'http://localhost:8123'
+  let apiTarget = 'https://www.yuemutuku.com'
 
   const isProd = mode === 'production'
   return {

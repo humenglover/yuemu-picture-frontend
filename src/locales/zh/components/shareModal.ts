@@ -15,5 +15,15 @@ export default {
   "yuemuShare": "悦木分享",
   "generatePosterSuccess": "生成海报成功",
   "savePictureFailedColon": "保存图片失败:",
-  "savePictureFailedRetry": "保存图片失败，请重试"
+  "savePictureFailedRetry": "保存图片失败，请重试",
+  "shareToChat": "发给好友",
+  "selectFriend": "选择一位好友",
+  "group": "群组",
+  "noFriends": "暂无联系人，快去私信打个招呼吧",
+  "loadingMore": "正在加载更多...",
+  "loginFirst": "请先登录以使用分享功能",
+  "generateOrSendFailed": "生成或发送卡片失败，请重试",
+  "generatingPoster": "正在封装分享卡片...",
+  "sendingMsg": "正在发送...",
+  "sentSuccess": "卡片已发送给好友",
 };

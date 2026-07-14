@@ -28,6 +28,8 @@ export default {
   "fetchDataError": "Failed to fetch data",
   "batchDeleteSuccess": "Batch delete successful",
   "batchDeleteFail": "Batch delete failed",
+  "selectedCount": "{count} selected",
+  "updatedAt": "Updated",
   "batchDeleteException": "Batch delete exception",
   "ascendText": "Ascending",
   "descendText": "Descending",

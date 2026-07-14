@@ -30,8 +30,10 @@ const CONFIG = {
   maxPerType: 5000,
   // 请求间隔（ms），避免打爆服务器
   requestDelay: 200,
-  // 输出路径（不放在 public/ 下，避免打包到 dist/。动态 sitemap 由后端单独提交给 Google）
-  outputDir: resolve(PROJECT_ROOT, 'sitemap-output'),
+  // 输出路径
+  outputDir: resolve(PROJECT_ROOT, 'public'),
+  // 静态 sitemap 路径
+  staticSitemap: resolve(PROJECT_ROOT, 'public', 'sitemap.xml'),
 }
 
 // ==================== HTTP 工具 ====================
@@ -237,6 +239,32 @@ function makeEntries(items, pathPrefix, { changefreq = 'weekly', priority = '0.6
   })
 }
 
+/** 生成带 image 子标签的图片 sitemap entries（Google 图片搜索专用） */
+function makeImageEntries(pictures) {
+  return pictures.map(pic => {
+    const loc = `${CONFIG.siteUrl}/picture/${pic.id}`
+    const lastmod = (pic.updateTime || pic.createTime)
+      ? new Date(pic.updateTime || pic.createTime).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0]
+
+    let imageXml = `  <url>\n    <loc>${escapeXml(loc)}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>`
+
+    // 添加图片信息（如果有 URL）
+    if (pic.url) {
+      const imageLoc = pic.url.startsWith('http') ? pic.url : `${CONFIG.siteUrl}${pic.url}`
+      const title = pic.name || pic.title || ''
+      const caption = pic.introduction || pic.description || ''
+      imageXml += `\n    <image:image>\n      <image:loc>${escapeXml(imageLoc)}</image:loc>`
+      if (title) imageXml += `\n      <image:title>${escapeXml(title)}</image:title>`
+      if (caption) imageXml += `\n      <image:caption>${escapeXml(caption.substring(0, 200))}</image:caption>`
+      imageXml += `\n    </image:image>`
+    }
+
+    imageXml += `\n  </url>`
+    return imageXml
+  })
+}
+
 // ==================== 主流程 ====================
 
 async function main() {
@@ -264,9 +292,9 @@ async function main() {
     fetchTimeAlbums(),
   ])
 
-  // 生成动态 sitemap entries
+  // 生成动态 sitemap entries（图片使用 image sitemap 格式）
   const dynamicEntries = [
-    ...makeEntries(pictures, '/picture/', { changefreq: 'daily', priority: '0.8' }),
+    ...makeImageEntries(pictures),  // 图片带 <image:image> 子标签，提升 Google 图片搜索收录
     ...makeEntries(spaces, '/space/', { changefreq: 'daily', priority: '0.7' }),
     ...makeEntries(users, '/user/', { changefreq: 'weekly', priority: '0.5' }),
     ...makeEntries(posts, '/post/', { changefreq: 'daily', priority: '0.7' }),
@@ -277,36 +305,13 @@ async function main() {
 
   console.log(`\n📊 共生成 ${dynamicEntries.length} 条动态路由`)
 
-  // 生成动态 sitemap 文件
+  // 生成动态 sitemap → 由 GitHub Action 推送到服务器，与静态 sitemap 互补
   const dynamicSitemap = generateSitemapXml(dynamicEntries)
   const dynamicPath = resolve(CONFIG.outputDir, 'sitemap-dynamic.xml')
   writeFileSync(dynamicPath, dynamicSitemap, 'utf-8')
   console.log(`✅ 动态 Sitemap 已保存: ${dynamicPath}`)
-
-  // 尝试合并静态 + 动态为完整 sitemap
-  const staticPath = resolve(CONFIG.outputDir, 'sitemap.xml')
-  const combinedPath = resolve(CONFIG.outputDir, 'sitemap-combined.xml')
-
-  if (existsSync(staticPath)) {
-    console.log('\n📋 合并静态 & 动态 Sitemap...')
-
-    const staticContent = readFileSync(staticPath, 'utf-8')
-    // 提取静态 sitemap 中的 <url> 条目
-    const staticUrlMatch = staticContent.match(/<url>[\s\S]*?<\/url>/g) || []
-
-    // 合并（静态在前，动态在后）
-    const allEntries = [...staticUrlMatch, ...dynamicEntries]
-    const combinedSitemap = generateSitemapXml(allEntries)
-    writeFileSync(combinedPath, combinedSitemap, 'utf-8')
-
-    console.log(`✅ 完整 Sitemap 已保存: ${combinedPath}`)
-    console.log(`   总计 ${allEntries.length} 条 URL`)
-
-    if (allEntries.length > 50000) {
-      console.warn(`\n⚠️ 警告: 总 URL 数 (${allEntries.length}) 超过 Google 单文件上限 (50,000)!`)
-      console.warn('   建议拆分为多个 sitemap 文件并使用 sitemap index。')
-    }
-  }
+  console.log('   ⚠ 静态 sitemap.xml 不受影响，由 Git 版本管理')
+  console.log('   💡 部署时两个文件共同提交到 Google Search Console')
 
   // 打印统计
   console.log('\n📊 统计数据:')

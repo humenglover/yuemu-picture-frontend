@@ -50,5 +50,15 @@ export default {
   "emojiPlaces": "地点",
   "emojiObjects": "物品",
   "emojiSymbols": "符号",
-  "emojiFlags": "旗帜"
+  "emojiFlags": "旗帜",
+  "publishedAt": "发布于",
+  "commentsCount": "共 {count} 条评论",
+  "addCommentPlaceholder": "添加评论...",
+  "commentsClosed": "评论已关闭",
+  "replyTo": "回复 @",
+  "noCommentsAlt": "暂无评论",
+  "anonymousUser": "匿名用户",
+  "follow": "关注",
+  "unnamedPicture": "未命名图片",
+  "viewCount": "{count} 浏览",
 };

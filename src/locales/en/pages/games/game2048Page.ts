@@ -23,5 +23,6 @@ export default {
   "finalScoreLabel": "Final Score:",
   "maxTileLabel": "Max Tile:",
   "timeUsedLabel": "Time Used:",
-  "maxTileIs": "Max: {max}"
+  "maxTileIs": "Max: {max}",
+  "scoreUnit": "{score} pts"
 };

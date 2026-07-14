@@ -4,6 +4,12 @@ interface Quote {
   english: string;
 }
 
+/** Get locale-appropriate text from a bilingual quote */
+export const getQuoteText = (quote: Quote, isZh: boolean) => ({
+  text: isZh ? quote.content : quote.english,
+  author: quote.author,
+})
+
 export const FAMOUS_QUOTES: Quote[] = [
   {
     content: "生活就像一盒巧克力，你永远不知道下一块是什么味道。",

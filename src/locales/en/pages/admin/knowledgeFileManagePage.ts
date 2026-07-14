@@ -36,4 +36,10 @@ export default {
 
 
   "totalRecordsText3": "Total {total} items",
+  "totalFiles": "Total {total} files",
+  "selectedCount": "{count} selected",
+  "vectorCount": "{count} vectors",
+  "uploadSuccess": "{name} uploaded successfully",
+  "uploadFail": "{name} upload failed",
+  "deleteVectorWarning": "Deleting will also remove knowledge base vectors and cannot be undone.",
 };

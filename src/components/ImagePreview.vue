@@ -84,14 +84,14 @@
           <div class="yuemu-preview-toolbar" @click.stop>
             <!-- 缩放控制 -->
             <div class="yuemu-zoom-controls" v-if="!isMobile">
-              <button class="yuemu-preview-btn yuemu-text-btn" :class="{ 'yuemu-active': currentZoomMode === 'fit' }" @click="setZoomMode('fit')" title="适应">FIT</button>
-              <button class="yuemu-preview-btn yuemu-text-btn" :class="{ 'yuemu-active': currentZoomMode === '100%' }" @click="setZoomMode('100%')" title="实际大小 100%">100%</button>
-              <button class="yuemu-preview-btn yuemu-text-btn" :class="{ 'yuemu-active': currentZoomMode === '200%' }" @click="setZoomMode('200%')" title="放大 200%">200%</button>
-              <button class="yuemu-preview-btn yuemu-text-btn" :class="{ 'yuemu-active': currentZoomMode === '400%' }" @click="setZoomMode('400%')" title="放大 400%">400%</button>
+              <button class="yuemu-preview-btn yuemu-text-btn" :class="{ 'yuemu-active': currentZoomMode === 'fit' }" @click="setZoomMode('fit')" :title="$t('components.imagePreview.fit')">FIT</button>
+              <button class="yuemu-preview-btn yuemu-text-btn" :class="{ 'yuemu-active': currentZoomMode === '100%' }" @click="setZoomMode('100%')" :title="$t('components.imagePreview.actualSize')">100%</button>
+              <button class="yuemu-preview-btn yuemu-text-btn" :class="{ 'yuemu-active': currentZoomMode === '200%' }" @click="setZoomMode('200%')" :title="$t('components.imagePreview.zoomIn')">200%</button>
+              <button class="yuemu-preview-btn yuemu-text-btn" :class="{ 'yuemu-active': currentZoomMode === '400%' }" @click="setZoomMode('400%')" :title="$t('components.imagePreview.zoomInMore')">400%</button>
             </div>
 
             <!-- 镜像 -->
-            <button class="yuemu-preview-btn" @click="toggleMirror" title="水平镜像">
+            <button class="yuemu-preview-btn" @click="toggleMirror" :title="$t('components.imagePreview.flipHorizontal')">
               <i class="fas fa-arrows-alt-h"></i>
             </button>
             <button class="yuemu-preview-btn" @click="rotateImage" :title="t('components.imagePreview.rotateImage')">
@@ -129,8 +129,8 @@
               <p>{{ confirmDialog.content }}</p>
               <p class="confirm-url">{{ confirmDialog.url }}</p>
               <div class="confirm-actions">
-                <button class="confirm-btn cancel" @click="confirmDialog.visible = false">{{ t('components.imagePreview.btnCancel', '取消') }}</button>
-                <button class="confirm-btn ok" @click="handleConfirmOk">{{ t('components.imagePreview.btnConfirm', '继续跳转') }}</button>
+                <button class="confirm-btn cancel" @click="confirmDialog.visible = false">{{ t('components.imagePreview.btnCancel') }}</button>
+                <button class="confirm-btn ok" @click="handleConfirmOk">{{ t('components.imagePreview.btnConfirm') }}</button>
               </div>
             </div>
           </div>
@@ -757,7 +757,7 @@ const detectQRCode = async () => {
   const url = props.images[currentIndex.value]
   if (!url) return
   
-  showToast(t('components.imagePreview.detectingQRCode', '正在识别图中二维码...'), 'loading', 0)
+  showToast(t('components.imagePreview.detectingQRCode'), 'loading', 0)
   
   try {
     const img = new Image()
@@ -828,7 +828,7 @@ const detectQRCode = async () => {
         setTimeout(() => { qrDot.value.show = false }, 2000)
       }
 
-      showToast(t('components.imagePreview.qrCodeFound', '识别成功！跳转中...'), 'success', 2000)
+      showToast(t('components.imagePreview.qrCodeFound'), 'success', 2000)
       const text = code.data
       
       if (text.startsWith(window.location.origin)) {
@@ -849,16 +849,16 @@ const detectQRCode = async () => {
            router.push(path)
            close()
          } catch(e) {
-           showToast(`内容：${text}`, 'info', 5000)
+           showToast(t('components.imagePreview.qrCodeContentPrefix') + text, 'info', 5000)
          }
       } else {
-         showToast(`内容：${text}`, 'info', 5000)
+         showToast(t('components.imagePreview.qrCodeContentPrefix') + text, 'info', 5000)
       }
     } else {
-      showToast(t('components.imagePreview.noQRCode', '未发现可识别的二维码，海报中的二维码可能过小或太模糊。'), 'warning', 4000)
+      showToast(t('components.imagePreview.noQRCode'), 'warning', 4000)
     }
   } catch (err) {
-    showToast(t('components.imagePreview.qrCodeDetectFailed', '识别失败，该图片可能不支持分析或出现跨域限制。'), 'error', 4000)
+    showToast(t('components.imagePreview.qrCodeDetectFailed'), 'error', 4000)
     console.error('QR Detect Error:', err)
   }
 }

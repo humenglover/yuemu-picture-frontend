@@ -267,15 +267,15 @@ const handleFileChange = (e: Event) => {
 
   Array.from(files).forEach(file => {
     if (fileList.value.length >= 6) {
-      showToast('最多上传6张图片');
+      showToast(t('components.reportModal.max6Pics'));
       return;
     }
     if (!file.type.startsWith('image/')) {
-      showToast('仅支持图片格式');
+      showToast(t('components.reportModal.onlyImageFormat'));
       return;
     }
     if (file.size / 1024 / 1024 >= 5) {
-      showToast('图片大小不超过5MB');
+      showToast(t('components.reportModal.imageSizeLimit'));
       return;
     }
 
@@ -353,7 +353,7 @@ const handleSubmit = async () => {
   if (!validateForm()) return;
   const uploadingFiles = fileList.value.filter(file => file.status === 'uploading');
   if (uploadingFiles.length > 0) {
-    showToast('照片正在上传中，请稍候');
+    showToast(t('components.reportModal.uploadingWait'));
     return;
   }
   submitting.value = true;
@@ -367,7 +367,7 @@ const handleSubmit = async () => {
     };
     const response = await addReportUsingPost(reportData);
     if (response.data.code === 0) {
-      showToast('举报提交成功，我们会尽快处理！');
+      showToast(t('components.reportModal.submitSuccess'));
       resetForm();
       closeModal();
       emit('success');

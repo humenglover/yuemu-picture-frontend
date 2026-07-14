@@ -79,7 +79,7 @@
                     />
                   </div>
                   <div class="yuemu-code-captcha" @click="getVerifyCode">
-                    <img :src="verifyCodeImg" alt="验证码" v-if="verifyCodeImg" />
+                    <img :src="verifyCodeImg" :alt="$t('pages.user.userLoginPage.altCaptcha')" v-if="verifyCodeImg" />
                     <div class="yuemu-captcha-placeholder" v-else><a-spin size="small" /></div>
                   </div>
                 </div>

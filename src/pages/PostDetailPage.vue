@@ -402,6 +402,7 @@ import { doLikeUsingPost } from '@/api/likeRecordController'
 import { doShareUsingPost } from '@/api/shareRecordController'
 import { addFavoriteRecordUsingPost, cancelFavoriteUsingPost } from '@/api/favoriteRecordController'
 import { getDefaultAvatar } from '@/utils/userUtils'
+import { useStructuredData, buildBreadcrumbList, buildArticle } from '@/composables/useStructuredData'
 import { formatTime, formatShortDate } from '@/utils/dateUtils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { throttle } from 'lodash-es'
@@ -1353,6 +1354,30 @@ const doFavorite = async () => {
       message.error(t('pages.postDetailPage.msgs.favFailDefault'))
     }
   }
+}
+
+// ── SEO: JSON-LD Article schema ──
+watch(post, (p) => {
+  if (!p?.id) return
+  const articleData = buildArticle({
+    headline: p.title || 'Untitled',
+    description: stripHtml(p.content || '').substring(0, 200),
+    image: p.cover || '',
+    author: p.author?.userName || p.user?.userName || '',
+    datePublished: p.createTime,
+    dateModified: p.updateTime,
+    url: window.location.href,
+  })
+  const breadcrumb = buildBreadcrumbList([
+    { name: t('nav.home'), url: 'https://www.yuemutuku.com/' },
+    { name: t('nav.forum'), url: 'https://www.yuemutuku.com/forum' },
+    { name: p.title || 'Post', url: window.location.href },
+  ])
+  useStructuredData({ '@context': 'https://schema.org', '@graph': [articleData, breadcrumb] })
+}, { immediate: true })
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
 }
 </script>
 

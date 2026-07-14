@@ -1,6 +1,7 @@
 import router from '@/router';
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts';
 import { message } from 'ant-design-vue';
+import i18n from '@/locales';
 
 // 是否为首次获取登录用户
 let firstFetchLoginUser = true;
@@ -20,7 +21,7 @@ router.beforeEach(async (to, from, next) => {
   // 可以自己定义权限校验逻辑，比如管理员才能访问 /admin 开头的页面
   if (toUrl.startsWith('/admin')) {
     if (!loginUser || loginUser.userRole!== 'admin') {
-      message.error('没有权限');
+      message.error(i18n.global.t('common.message.noPermission'));
       next(`/user/login?redirect=${to.fullPath}`);
       return;
     }

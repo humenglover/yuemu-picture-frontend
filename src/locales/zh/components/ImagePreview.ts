@@ -6,8 +6,15 @@ export default {
     qrCodeFound: '识别成功！',
     noQRCode: '未发现可识别的二维码',
     qrCodeDetectFailed: '识别失败，该图片可能不支持分析',
+    qrCodeContentPrefix: '内容：',
     qrCodeExternalLinkTitle: '跳转提示',
     qrCodeExternalLinkContent: '即将前往非本站链接，请注意账号及财产安全。是否继续跳转？',
     btnConfirm: '继续跳转',
-    btnCancel: '取消'
+    btnCancel: '取消',
+    fit: '适应',
+    actualSize: '实际大小 100%',
+    zoomIn: '放大 200%',
+    zoomInMore: '放大 400%',
+    flipHorizontal: '水平镜像',
+    flipVertical: '垂直镜像',
 };

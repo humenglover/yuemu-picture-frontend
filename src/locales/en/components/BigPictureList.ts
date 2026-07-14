@@ -15,5 +15,6 @@ export default {
     modalTitleRejected: 'Review Rejected',
     modalTitleStatus: 'Publishing Status',
     sponsored: 'Sponsored Ad',
-    sponsoredTitle: 'Featured Sponsored Content'
+    sponsoredTitle: 'Featured Sponsored Content',
+    emptyAlt: 'No content',
 };

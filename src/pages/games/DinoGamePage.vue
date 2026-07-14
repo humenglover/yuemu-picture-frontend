@@ -76,7 +76,7 @@
             </div>
           </button>
           <button class="sys-btn" @click="toggleSound">
-            <div class="sys-icon-btn">音效: {{ isSoundEnabled ? '开' : t('pages.games.dinoGamePage.off') }}</div>
+            <div class="sys-icon-btn">{{ t('pages.games.dinoGamePage.sound') }}: {{ isSoundEnabled ? t('pages.games.dinoGamePage.on') : t('pages.games.dinoGamePage.off') }}</div>
           </button>
         </div>
 

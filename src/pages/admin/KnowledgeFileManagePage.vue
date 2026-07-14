@@ -91,7 +91,7 @@
                   </span>
                 </template>
                 <template v-if="column.dataIndex === 'vectorCount'">
-                  <span class="yuemu-tag yuemu-blue">{{ record.vectorCount || 0 }} 向量</span>
+                  <span class="yuemu-tag yuemu-blue">{{ t('pages.admin.knowledgeFileManagePage.vectorCount', { count: record.vectorCount || 0 }) }}</span>
                 </template>
                 <template v-if="column.dataIndex === 'uploadTime'">
                   <span class="yuemu-text-secondary">{{ dayjs(record.uploadTime).format('YYYY-MM-DD HH:mm') }}</span>
@@ -112,7 +112,7 @@
             v-model:current="searchParams.current"
             :page-size-options="['10', '20', '30', '50']"
             :total="total"
-            :show-total="(total) => `共 ${total} 个文件`"
+            :show-total="(total) => t('pages.admin.knowledgeFileManagePage.totalFiles', { total })"
             show-size-changer
             :page-size="searchParams.pageSize"
             @change="doTableChange"
@@ -149,7 +149,7 @@
           </div>
 
           <div class="yuemu-batch-action-bar" :class="{ 'yuemu-is-active': hasSelected }">
-            <span class="yuemu-text-secondary">已选 {{ state.selectedRowKeys.length }} 项</span>
+            <span class="yuemu-text-secondary">{{ t('pages.admin.knowledgeFileManagePage.selectedCount', { count: state.selectedRowKeys.length }) }}</span>
             <van-button size="mini" round type="danger" @click="handleBatchDelete"> {{ t('pages.admin.knowledgeFileManagePage.batchDelete') }} </van-button>
           </div>
         </div>
@@ -182,10 +182,10 @@
                         {{ file.fileType.toUpperCase() }}
                      </span>
                     <span class="yuemu-tag yuemu-mini yuemu-blue">
-                        {{ file.vectorCount || 0 }} 向量
+                        {{ t('pages.admin.knowledgeFileManagePage.vectorCount', { count: file.vectorCount || 0 }) }}
                      </span>
                     <span class="yuemu-tag yuemu-mini yuemu-gray">
-                        @{{ file.userId || '未知' }}
+                        @{{ file.userId || t('common.message.unknown') }}
                      </span>
                   </div>
                 </div>
@@ -200,7 +200,7 @@
 
           <div class="yuemu-mobile-pagination">
             <div class="yuemu-page-info yuemu-text-secondary">
-              <span>共 {{ total }} 个文件</span>
+              <span>{{ t('pages.admin.knowledgeFileManagePage.totalFiles', { total }) }}</span>
               <span class="yuemu-page-size-trigger" @click="showPageSizeSheet = true">
                 {{ searchParams.pageSize }} {{ t('pages.admin.knowledgeFileManagePage.recordsPerPageText') }}
                 <van-icon name="arrow-down" />
@@ -245,7 +245,7 @@
         <p class="yuemu-confirm-desc">
           文件：{{ selectedFile?.originalName }}<br>
           大小：{{ selectedFile?.fileSizeDisplay }}<br>
-          删除后知识库向量将同步移除，不可恢复。
+          {{ t('pages.admin.knowledgeFileManagePage.deleteVectorWarning') }}
         </p>
         <div class="yuemu-confirm-actions">
           <button class="yuemu-cancel-btn" @click="deleteConfirmVisible = false"> {{ t('pages.admin.knowledgeFileManagePage.cancel') }} </button>
@@ -286,10 +286,10 @@ onMounted(async () => {
 });
 
 const columns = [
-  { title: '文件信息', dataIndex: 'originalName', width: 260 },
-  { title: '大小', dataIndex: 'fileSizeDisplay', width: 100 },
-  { title: '格式', dataIndex: 'fileType', width: 100 },
-  { title: '向量数量', dataIndex: 'vectorCount', width: 120 },
+  { title: t('pages.admin.knowledgeFileManagePage.colFileInfoText'), dataIndex: 'originalName', width: 260 },
+  { title: t('pages.admin.knowledgeFileManagePage.colSizeText'), dataIndex: 'fileSizeDisplay', width: 100 },
+  { title: t('pages.admin.knowledgeFileManagePage.colFormatText'), dataIndex: 'fileType', width: 100 },
+  { title: t('pages.admin.knowledgeFileManagePage.colVectorCountText'), dataIndex: 'vectorCount', width: 120 },
   { title: t('pages.admin.knowledgeFileManagePage.colUploadTime'), dataIndex: 'uploadTime', width: 160 },
   { title: t('pages.admin.knowledgeFileManagePage.colActionText'), key: 'action', width: 140, align: 'right' },
 ];
@@ -324,10 +324,10 @@ const fetchData = async () => {
       dataList.value = res.data.data.records || [];
       total.value = res.data.data.total || 0;
     } else {
-      message.error('获取数据失败，' + res.data.message);
+      message.error(t('common.message.operationFailed') + '，' + res.data.message);
     }
   } catch (error) {
-    message.error('获取数据失败');
+    message.error(t('common.message.operationFailed'));
   } finally {
     loading.value = false;
   }
@@ -353,14 +353,14 @@ const handleBatchDelete = async () => {
   try {
     const res = await batchDeleteKnowledgeFilesUsingPost(state.selectedRowKeys);
     if (res.data.code === 0) {
-      message.success('批量删除成功');
+      message.success(t('common.message.batchDeleteSuccess'));
       state.selectedRowKeys = [];
       fetchData();
     } else {
-      message.error('批量删除失败：' + res.data.message);
+      message.error(t('common.message.batchDeleteFailed') + '：' + res.data.message);
     }
   } catch (error) {
-    message.error('批量删除异常');
+    message.error(t('common.message.batchDeleteFailed'));
   }
 };
 
@@ -368,7 +368,7 @@ const handleView = (record) => {
   if (record.fileUrl) {
     window.open(record.fileUrl, '_blank');
   } else {
-    message.warning('文件链接不可用');
+    message.warning(t('common.message.fileLinkUnavailable'));
   }
 };
 
@@ -385,14 +385,14 @@ const confirmDelete = async () => {
   try {
     const res = await batchDeleteKnowledgeFilesUsingPost([selectedFile.value.id]);
     if (res.data.code === 0) {
-      message.success('删除成功');
+      message.success(t('common.message.deleteSuccess'));
       deleteConfirmVisible.value = false;
       fetchData();
     } else {
-      message.error('删除失败：' + res.data.message);
+      message.error(t('common.message.deleteFailed') + '：' + res.data.message);
     }
   } catch (error) {
-    message.error('删除异常');
+    message.error(t('common.message.deleteFailed'));
   }
 };
 
@@ -428,14 +428,14 @@ const handleUploadChange = (info) => {
   const allowedExtensions = ['pdf', 'txt', 'docx', 'md'];
 
   if (!allowedExtensions.includes(fileExtension)) {
-    message.error(`不支持该格式，仅支持 ${allowedExtensions.join(', ')}`);
+    message.error(`${t('common.message.unsupportedFormat')}: ${allowedExtensions.join(', ')}`);
     return;
   }
   if (info.file.status === 'done') {
-    message.success(`${info.file.name} 上传成功`);
+    message.success(t('pages.admin.knowledgeFileManagePage.uploadSuccess', { name: info.file.name }));
     fetchData();
   } else if (info.file.status === 'error') {
-    message.error(`${info.file.name} 上传失败`);
+    message.error(t('pages.admin.knowledgeFileManagePage.uploadFail', { name: info.file.name }));
   }
 };
 </script>

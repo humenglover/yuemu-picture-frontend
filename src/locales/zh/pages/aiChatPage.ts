@@ -117,5 +117,16 @@ export default {
     createError: '创建异常',
     selectOrCreateSession: '请选择或创建会话',
     uploadTo: '上传至',
-  }
+    copied: '已复制',
+    copyFailed: '复制失败',
+  },
+  editTip: '编辑',
+  deleteTip: '删除',
+  toggleSidebarTip: '隐藏/显示侧边栏',
+  backTip: '返回',
+  stopReading: '停止朗读',
+  voiceReading: '语音朗读',
+  copyTip: '复制',
+  altAttachment: '附图',
+  aiAssistantName: 'AI 助手',
 };

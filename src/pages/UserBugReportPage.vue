@@ -28,7 +28,7 @@
         >
           <a-input
             v-model:value="formState.title"
-            placeholder="请简明扼要地描述遇到的问题"
+            :placeholder="$t('pages.userBugReportPage.fields.title.desc')"
             :maxlength="100"
           />
         </a-form-item>
@@ -111,7 +111,7 @@
         >
           <a-input
             v-model:value="formState.deviceInfo"
-            placeholder="例如：iPhone 13, Android 12, Windows 10 等"
+            :placeholder="$t('pages.userBugReportPage.fields.device.placeholder')"
             :maxlength="200"
           />
         </a-form-item>
@@ -122,7 +122,7 @@
         >
           <a-input
             v-model:value="formState.browserInfo"
-            placeholder="例如：Chrome 98.0, Safari 15.0, Firefox 96.0 等"
+            :placeholder="$t('pages.userBugReportPage.fields.browser.placeholder')"
             :maxlength="200"
           />
         </a-form-item>
@@ -134,7 +134,7 @@
             :loading="submitting"
             :style="{ backgroundColor: '#52c41a', borderColor: '#52c41a' }"
           >
-            {{ submitting ? '提交中...' : '提交漏洞报告' }}
+            {{ submitting ? $t('pages.userBugReportPage.btns.submitting') : $t('pages.userBugReportPage.btns.submit') }}
           </a-button>
           <a-button
             style="margin-left: 12px;"
@@ -153,14 +153,14 @@
         <div class="list-controls">
           <a-input
             v-model:value="searchKeyword"
-            placeholder="搜索标题或描述..."
+            :placeholder="$t('pages.userBugReportPage.list.search')"
             allow-clear
             @change="handleSearch"
             style="width: 250px; margin-right: 16px;"
           />
           <a-select
             v-model:value="filterStatus"
-            placeholder="筛选状态"
+            :placeholder="$t('pages.userBugReportPage.list.filterStatus')"
             allow-clear
             @change="handleFilterChange"
             style="width: 150px; margin-right: 16px;"
@@ -208,27 +208,27 @@
 
             <div class="feedback-details">
               <div class="detail-row">
-                <span class="detail-label">重现步骤：</span>
+                <span class="detail-label">{{ $t('pages.userBugReportPage.list.columns.steps') }}：</span>
                 <span class="detail-value">{{ item.reproduceSteps?.substring(0, 100) }}{{ item.reproduceSteps?.length > 100 ? '...' : '' }}</span>
               </div>
               <div class="detail-row" v-if="item.expectedResult">
-                <span class="detail-label">预期结果：</span>
+                <span class="detail-label">{{ $t('pages.userBugReportPage.list.columns.expected') }}：</span>
                 <span class="detail-value">{{ item.expectedResult }}</span>
               </div>
               <div class="detail-row" v-if="item.actualResult">
-                <span class="detail-label">实际结果：</span>
+                <span class="detail-label">{{ $t('pages.userBugReportPage.list.columns.actual') }}：</span>
                 <span class="detail-value">{{ item.actualResult }}</span>
               </div>
               <div class="detail-row" v-if="item.deviceInfo">
-                <span class="detail-label">设备信息：</span>
+                <span class="detail-label">{{ $t('pages.userBugReportPage.list.columns.device') }}：</span>
                 <span class="detail-value">{{ item.deviceInfo }}</span>
               </div>
               <div class="detail-row" v-if="item.browserInfo">
-                <span class="detail-label">浏览器：</span>
+                <span class="detail-label">{{ $t('pages.userBugReportPage.list.columns.browser') }}：</span>
                 <span class="detail-value">{{ item.browserInfo }}</span>
               </div>
               <div class="detail-row" v-if="item.solveTime && item.status === 1">
-                <span class="detail-label">解决时间：</span>
+                <span class="detail-label">{{ $t('pages.userBugReportPage.list.columns.resolveTime') }}：</span>
                 <span class="detail-value">{{ formatDate(item.solveTime) }}</span>
               </div>
             </div>
@@ -236,7 +236,7 @@
         </a-card>
 
         <div v-if="feedbackList.length === 0" class="empty-feedback">
-          <a-empty description="暂无反馈记录" />
+          <a-empty :description="$t('pages.userBugReportPage.list.empty')" />
         </div>
       </div>
 
@@ -313,11 +313,11 @@ const handleSubmit = async (values: any) => {
     });
 
     if (response.code === 0) {
-      message.success('漏洞报告提交成功！');
+      message.success(t('common.message.operationSuccess'));
       resetForm();
       refreshList(); // 刷新列表
     } else {
-      message.error(response.message || '提交失败');
+      message.error(response.message || t('pages.userBugReportPage.msgs.submitFailRetry'));
     }
   } catch (error: any) {
     console.error('提交漏洞报告失败:', error);

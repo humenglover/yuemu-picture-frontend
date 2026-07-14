@@ -23,5 +23,6 @@ export default {
   "finalScoreLabel": "最终得分:",
   "maxTileLabel": "最大方块:",
   "timeUsedLabel": "用时:",
-  "maxTileIs": "最大: {max}"
+  "maxTileIs": "最大: {max}",
+  "scoreUnit": "{score} 分"
 };

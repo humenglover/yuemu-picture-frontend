@@ -174,7 +174,7 @@ const markAsReadInternal = async (msg: any) => {
 }
 
 const markAsReadExplicitly = async (msg: any) => {
-  if (await markAsReadInternal(msg)) { antMessage.success('已标记为已读'); emit('refresh') }
+  if (await markAsReadInternal(msg)) { antMessage.success(t('common.message.markAsRead')); emit('refresh') }
 }
 
 const handleMessageClick = async (msg: any) => {

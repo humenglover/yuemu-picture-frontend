@@ -29,7 +29,7 @@
     </div>
 
     <div class="yuemu-header-right">
-      <div v-if="!loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-pc-only" @click="toggleLanguage" :title="locale === 'zh-CN' ? 'English' : '中文'">
+      <div v-if="!loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-pc-only" @click="toggleLanguage" :title="$t('components.globalHeader.switchLang')">
         <i class="fa-solid fa-language"></i>
       </div>
 
@@ -77,7 +77,7 @@
             </div>
             <div class="yuemu-dropdown-item" @click="toggleLanguage">
               <i class="fa-solid fa-language"></i>
-              {{ locale === 'zh-CN' ? 'English' : '中文' }}
+              {{ $t('components.globalHeader.switchLang') }}
             </div>
             <div class="yuemu-dropdown-divider"></div>
             <div class="yuemu-dropdown-item yuemu-text-danger" @click="logoutConfirmVisible = true; showUserMenu = false">
@@ -146,7 +146,7 @@
                   </button>
                   <button class="yuemu-d-action-btn" @click="toggleLanguage">
                     <i class="fa-solid fa-language"></i>
-                    {{ locale === 'zh-CN' ? 'EN' : '中' }}
+                    {{ $t('components.globalHeader.switchLangShort') }}
                   </button>
                   <button class="yuemu-d-action-btn yuemu-danger-text" @click="logoutConfirmVisible = true; showMobileMenu = false">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> {{ $t('user.logout') }}

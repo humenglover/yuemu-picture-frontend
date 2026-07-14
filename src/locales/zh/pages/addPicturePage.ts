@@ -74,5 +74,10 @@ export default {
   confirmTitleDiscardEdit: '放弃编辑',
   confirmContentDiscardEdit: '当前内容尚未发布，离开将不会保存，确定离开吗？',
   btnLeave: '离开',
-  btnContinueEdit: '继续编辑'
+  btnContinueEdit: '继续编辑',
+  allowSavePicture: '允许保存图片',
+  altSpaceAvatar: '空间头像',
+  altPreview: '预览图',
+  altDraftPreview: '草稿预览',
+  altAnnotation: '标注图',
 }

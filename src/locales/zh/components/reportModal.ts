@@ -32,5 +32,10 @@ export default {
   "descCannotBeEmpty": "详细说明不能为空",
   "descMax500": "详细说明不能超过500字符",
   "submitFailedRetry": "提交失败，请重试",
-  "networkOrSystemError": "网络或系统异常"
+  "networkOrSystemError": "网络或系统异常",
+  "max6Pics": "最多上传6张图片",
+  "onlyImageFormat": "仅支持图片格式",
+  "imageSizeLimit": "图片大小不超过5MB",
+  "uploadingWait": "照片正在上传中，请稍候",
+  "submitSuccess": "举报提交成功，我们会尽快处理！",
 };

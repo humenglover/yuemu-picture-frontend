@@ -67,6 +67,7 @@ export default {
     coverFailPrefix: '封面图上传失败：',
     coverFail: '封面图上传失败',
     selectImage: '请选择图片文件',
+    analyzingImage: '正在分析图片...',
     updateSuccess: '空间更新成功',
     updateFailPrefix: '空间更新失败：',
     updateFail: '空间更新失败',

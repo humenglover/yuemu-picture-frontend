@@ -376,7 +376,7 @@ const recommendLinks = ref<FriendLink[]>([])
 
 // {{ $t('pages.friendLinksPage.siteInfoTitle') }}
 const siteName = ref(t('pages.friendLinksPage.defaultSiteName'))
-const siteUrl = ref('https://lumenglover.com')
+const siteUrl = ref('https://www.yuemutuku.com')
 const siteLogo = ref('https://example.com/logo.png')
 const siteDesc = ref(t('pages.friendLinksPage.defaultSiteDesc'))
 

@@ -67,6 +67,7 @@ export default {
     coverFailPrefix: 'Cover upload failed: ',
     coverFail: 'Cover upload failed',
     selectImage: 'Please select an image file',
+    analyzingImage: 'Analyzing image...',
     updateSuccess: 'Space updated successfully',
     updateFailPrefix: 'Space update failed: ',
     updateFail: 'Space update failed',

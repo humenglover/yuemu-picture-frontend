@@ -26,5 +26,6 @@ export default {
   welcomeBack: 'Welcome back',
   loginFail: 'Login failed: ',
   fetchFail: 'Fetch failed',
-  loginSuccess: 'Login successful'
+  loginSuccess: 'Login successful',
+  altCaptcha: 'CAPTCHA',
 };

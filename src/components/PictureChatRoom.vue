@@ -804,7 +804,7 @@ const initWebSocket = () => {
         chatWs.value?.sendMessage(msg)
       })
       messageQueue.value = []
-      message.success('消息已发送')
+      message.success(t('components.pictureChatRoom.uploadSuccess'))
     }
   })
 
@@ -1119,7 +1119,7 @@ const reportTargetId = ref<string>('')
 
 const openReportModal = (userId: string | number) => {
   if (!userId) {
-    message.error('无法获取用户信息，无法举报')
+    message.error(t('components.pictureChatRoom.cannotReport'))
     showActions.value = false
     selectedMessage.value = null
     return
@@ -1131,7 +1131,7 @@ const openReportModal = (userId: string | number) => {
 
     reportModalRef.value.openModal(reportTargetType.value, reportTargetId.value)
   } else {
-    message.error('举报组件未加载')
+    message.error(t('components.pictureChatRoom.reportNotLoaded'))
   }
   showActions.value = false
   selectedMessage.value = null
@@ -1185,9 +1185,9 @@ const handleCopy = async (msg?: ChatMessage) => {
   if (messageToCopy?.content) {
     try {
       await navigator.clipboard.writeText(messageToCopy.content)
-      message.success('复制成功')
+      message.success(t('components.pictureChatRoom.copySuccess'))
     } catch (err) {
-      message.error('复制失败，请手动复制')
+      message.error(t('components.pictureChatRoom.copyFailed'))
     }
   }
   showActions.value = false
@@ -1201,7 +1201,7 @@ const handleTranslate = async (msg?: ChatMessage) => {
     const text = encodeURIComponent(messageToTranslate.content)
     window.open(`https://fanyi.baidu.com/#zh/en/${text}`, '_blank')
   } catch (err) {
-    message.error('翻译失败，请稍后重试')
+    message.error(t('components.pictureChatRoom.translateFailed'))
   }
   showActions.value = false
   selectedMessage.value = null
@@ -1238,7 +1238,7 @@ const handleRecall = (msg: ChatMessage) => {
     showActions.value = false
     selectedMessage.value = null
   } catch {
-    message.error('消息撤回失败，请重试')
+    message.error(t('components.pictureChatRoom.recallFailed'))
   }
 }
 
@@ -1334,14 +1334,14 @@ const checkAudioDuration = (blob: Blob): Promise<boolean> => {
     const audio = new Audio(URL.createObjectURL(blob))
     audio.onloadedmetadata = () => {
       if (audio.duration < 1) {
-        message.warning('录音时间太短，请至少录制1秒')
+        message.warning(t('components.pictureChatRoom.recordTooShort'))
         resolve(false)
       } else {
         resolve(true)
       }
     }
     audio.onerror = () => {
-      message.error('音频检查失败')
+      message.error(t('components.pictureChatRoom.audioCheckFailed'))
       resolve(false)
     }
   })
@@ -1389,15 +1389,15 @@ const handleAudioData = async (audioBlob: Blob) => {
         else if (!chatWs.value.isConnected() && !chatWs.value.isConnecting()) {
           chatWs.value.connect()
         }
-        message.info('语音消息已提交，连接建立后将自动发送')
+        message.info(t('components.pictureChatRoom.voiceSubmitted'))
       }
     } else {
       console.error('音频上传响应格式错误:', response)
-      message.error('音频上传失败')
+      message.error(t('components.pictureChatRoom.audioUploadFailed'))
     }
   } catch (error) {
     console.error('音频处理失败:', error)
-    message.error('音频处理失败')
+    message.error(t('components.pictureChatRoom.audioProcessFailed'))
   }
 }
 
@@ -1465,7 +1465,7 @@ const debouncedStartRecording = useDebounceFn(async () => {
 
   } catch (err) {
     console.error('录音失败:', err)
-    message.error('录音失败，请检查麦克风权限')
+    message.error(t('components.pictureChatRoom.recordFailed'))
     cleanupRecording()
   }
 }, 300)
@@ -1481,7 +1481,7 @@ const stopRecording = () => {
       messageInput.value?.focus()
     } catch (error) {
       console.error('停止录音失败:', error)
-      message.error('停止录音失败')
+      message.error(t('components.pictureChatRoom.stopRecordFailed'))
       cleanupRecording()
       messageInput.value?.focus()
     }
@@ -1524,14 +1524,14 @@ const handleImageUpload = async (file: File) => {
         else if (!chatWs.value.isConnected() && !chatWs.value.isConnecting()) {
           chatWs.value.connect()
         }
-        message.info('图片已提交，连接建立后将自动发送')
+        message.info(t('components.pictureChatRoom.imageSubmitted'))
       }
     } else {
-      message.error('图片上传失败')
+      message.error(t('components.pictureChatRoom.imageUploadFailed'))
     }
   } catch (error) {
     console.error('图片处理失败:', error)
-    message.error('图片处理失败')
+    message.error(t('components.pictureChatRoom.imageProcessFailed'))
   }
   return false
 }

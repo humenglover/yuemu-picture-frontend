@@ -1,11 +1,14 @@
 import { saveAs } from 'file-saver'
+import i18n from '@/locales';
+
+const t = (key: string) => i18n.global.t(key);
 
 /**
  * 格式化文件大小
  * @param size
  */
 export const formatSize = (size?: number) => {
-  if (!size) return '未知'
+  if (!size) return t('common.message.unknown')
   if (size < 1024) return size + ' B'
   if (size < 1024 * 1024) return (size / 1024).toFixed(2) + ' KB'
   return (size / (1024 * 1024)).toFixed(2) + ' MB'
@@ -27,7 +30,7 @@ export function downloadImage(url?: string, fileName?: string) {
 
     // 如果是 Base64 数据流（如 canvas 导出的图片）
     if (url.startsWith('data:image/')) {
-      plus.nativeUI.showWaiting('正在保存...');
+      plus.nativeUI.showWaiting(t('common.message.saving'));
       const bitmap = new plus.nativeObj.Bitmap('share_img');
       bitmap.loadBase64Data(
         url,
@@ -40,33 +43,33 @@ export function downloadImage(url?: string, fileName?: string) {
                 i.target,
                 function () {
                   plus.nativeUI.closeWaiting();
-                  plus.nativeUI.toast('已成功保存到系统相册');
+                  plus.nativeUI.toast(t('common.message.saveToAlbumSuccess'));
                   bitmap.clear();
                 },
                 function (e: any) {
                   plus.nativeUI.closeWaiting();
-                  plus.nativeUI.toast('保存到相册失败');
+                  plus.nativeUI.toast(t('common.message.saveToAlbumFailed'));
                   bitmap.clear();
                 }
               );
             },
             function (e: any) {
               plus.nativeUI.closeWaiting();
-              plus.nativeUI.toast('保存文件失败');
+              plus.nativeUI.toast(t('common.message.saveFileFailed'));
               bitmap.clear();
             }
           );
         },
         function (e: any) {
           plus.nativeUI.closeWaiting();
-          plus.nativeUI.toast('处理图像失败');
+          plus.nativeUI.toast(t('common.message.processingImageFailed'));
         }
       );
       return;
     }
 
     // 常规网络图片下载
-    plus.nativeUI.showWaiting('正在下载...');
+    plus.nativeUI.showWaiting(t('common.message.downloading'));
     const dtask = plus.downloader.createDownload(
       url,
       {},
@@ -77,16 +80,16 @@ export function downloadImage(url?: string, fileName?: string) {
             d.filename,
             function () {
               plus.nativeUI.closeWaiting();
-              plus.nativeUI.toast('已成功保存到系统相册');
+              plus.nativeUI.toast(t('common.message.saveToAlbumSuccess'));
             },
             function (e: any) {
               plus.nativeUI.closeWaiting();
-              plus.nativeUI.toast('保存到相册失败: ' + JSON.stringify(e));
+              plus.nativeUI.toast(t('common.message.saveToAlbumFailed') + ': ' + JSON.stringify(e));
             }
           );
         } else {
           plus.nativeUI.closeWaiting();
-          plus.nativeUI.toast('下载失败');
+          plus.nativeUI.toast(t('common.message.downloadFailed'));
         }
       }
     );

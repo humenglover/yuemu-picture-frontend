@@ -1,5 +1,8 @@
 import axios from "axios";
-import {message} from "ant-design-vue";
+import { message } from "ant-design-vue";
+import i18n from '@/locales';
+
+const t = (key: string) => i18n.global.t(key);
 
 // 创建 Axios 实例
 const myAxios = axios.create({
@@ -31,21 +34,21 @@ myAxios.interceptors.response.use(
         !response.request.responseURL.includes('user/get/login') &&
         !window.location.pathname.includes('/user/login')
       ) {
-        message.warning('请先登录')
+        message.warning(t('common.message.pleaseLogin'))
         window.location.href = `/user/login?redirect=${window.location.href}`
       }
     }
     // 限流
     else if (data.code === 42900) {
-      message.warning(data.message || '请求过于频繁，请稍后再试')
+      message.warning(data.message || t('common.message.rateLimit'))
     }
     // 图像审核失败
     else if (data.code === 50001 && data.message && data.message.includes('图像审核')) {
-      message.error('图像审核未通过')
+      message.error(t('common.message.imageReviewFailed'))
     }
     // 图像审核失败
     else if (data.code === 50000 && data.message && data.message.includes('图像审核')) {
-      message.error('图像审核未通过')
+      message.error(t('common.message.imageReviewFailed'))
     }
 
 
@@ -58,7 +61,7 @@ myAxios.interceptors.response.use(
     if (error.response && error.response.data) {
       const { data } = error.response;
       if (data.code === 42900) {
-        message.warning(data.message || '请求过于频繁，请稍后再试')
+        message.warning(data.message || t('common.message.rateLimit'))
       }
     }
     return Promise.reject(error)

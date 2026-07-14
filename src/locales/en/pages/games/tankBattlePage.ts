@@ -36,5 +36,6 @@ export default {
   "enemiesDestroyedVal": "Enemies Destroyed: {enemies}",
   "playerRankingBracket": "Player Ranking [RANKING]",
   "personalHistoryBracket": "Personal History [HISTORY]",
-  "levelValueText": "Level {level}"
+  "levelValueText": "Level {level}",
+  "finalScoreIs": "Final Score: {score}"
 };

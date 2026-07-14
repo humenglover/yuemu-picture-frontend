@@ -28,6 +28,8 @@ export default {
   "fetchDataError": "获取数据失败",
   "batchDeleteSuccess": "批量删除成功",
   "batchDeleteFail": "批量删除失败",
+  "selectedCount": "已选 {count} 项",
+  "updatedAt": "更新于",
   "batchDeleteException": "批量删除异常",
   "ascendText": "升序",
   "descendText": "降序",

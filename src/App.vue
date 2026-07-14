@@ -36,8 +36,9 @@ import enUS from 'ant-design-vue/es/locale/en_US';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import 'dayjs/locale/en';
-import { ref, onMounted, onUnmounted, computed, provide } from 'vue';
+import { ref, onMounted, onUnmounted, computed, provide, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import { respondExitConfirm } from '@/utils/back';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { theme } from 'ant-design-vue';
@@ -77,6 +78,23 @@ const onCancel = () => {
 const handleShowExitConfirm = () => {
   showExitDialog.value = true;
 };
+
+// ── 页面标题随语言切换动态更新 ─────────────────────────────
+const route = useRoute();
+watch(
+  [() => locale.value, () => route.name],
+  () => {
+    const routeName = route.name as string | undefined
+    if (routeName) {
+      const key = `pageTitles.${routeName}`
+      const translated = t(key)
+      if (translated && translated !== key) {
+        document.title = translated
+      }
+    }
+  },
+  { immediate: false }
+);
 
 // ── 纯 JS 动态清除选中状态 ───────────────────────────────
 const isEditable = (el: Element | null): boolean => {

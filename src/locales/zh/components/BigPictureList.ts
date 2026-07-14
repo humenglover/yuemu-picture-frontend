@@ -15,5 +15,6 @@ export default {
     modalTitleRejected: '审核未通过',
     modalTitleStatus: '发布状态',
     sponsored: '赞助商广告',
-    sponsoredTitle: '精选赞助内容'
+    sponsoredTitle: '精选赞助内容',
+    emptyAlt: '暂无内容',
 };

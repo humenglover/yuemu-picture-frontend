@@ -50,5 +50,15 @@ export default {
   "emojiPlaces": "Places",
   "emojiObjects": "Objects",
   "emojiSymbols": "Symbols",
-  "emojiFlags": "Flags"
+  "emojiFlags": "Flags",
+  "publishedAt": "Published at",
+  "commentsCount": "{count} comments",
+  "addCommentPlaceholder": "Add a comment...",
+  "commentsClosed": "Comments closed",
+  "replyTo": "Reply to @",
+  "noCommentsAlt": "No comments",
+  "anonymousUser": "Anonymous",
+  "follow": "Follow",
+  "unnamedPicture": "Untitled",
+  "viewCount": "{count} views",
 };

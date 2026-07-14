@@ -23,8 +23,8 @@
             <template v-else>{{ item.sessionName || t('pages.aiChatPage.newSession') }}</template>
           </div>
           <div class="session-actions">
-            <button class="action-btn" @click.stop="startEditingSession(item.id, item.sessionName)" title="编辑"><i class="fas fa-pen"></i></button>
-            <button class="action-btn delete" @click.stop="confirmDeleteSession(item.id)" title="删除"><i class="fas fa-trash-alt"></i></button>
+            <button class="action-btn" @click.stop="startEditingSession(item.id, item.sessionName)" :title="$t('pages.aiChatPage.editTip')"><i class="fas fa-pen"></i></button>
+            <button class="action-btn delete" @click.stop="confirmDeleteSession(item.id)" :title="$t('pages.aiChatPage.deleteTip')"><i class="fas fa-trash-alt"></i></button>
           </div>
         </div>
         <div class="load-more" v-if="sessionLoadingMore"><i class="fas fa-circle-notch fa-spin"></i></div>
@@ -118,7 +118,7 @@
       </div>
 
       <div class="pc-header" v-if="!isMobile && currentSessionId">
-        <button class="pc-sidebar-toggle" @click="toggleSidebar" title="隐藏/显示侧边栏"><i class="fas fa-bars"></i></button>
+        <button class="pc-sidebar-toggle" @click="toggleSidebar" :title="$t('pages.aiChatPage.toggleSidebarTip')"><i class="fas fa-bars"></i></button>
         <div class="pc-header-center" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 12px; overflow: hidden;">
           <h3 class="session-title-text" style="flex: 0 1 auto; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right;">
             <template v-if="autoNamingSessionId === currentSessionId">
@@ -130,7 +130,7 @@
             <a-select v-model:value="selectedModel" :options="models" class="yuemu-ant-select" style="width: 230px; text-align: left;" />
           </div>
         </div>
-        <button class="pc-back-btn" @click="goBack" title="返回"><i class="fas fa-arrow-left"></i></button>
+        <button class="pc-back-btn" @click="goBack" :title="$t('pages.aiChatPage.backTip')"><i class="fas fa-arrow-left"></i></button>
       </div>
 
       <div class="chat-messages-wrapper" ref="messagesContainerRef" @scroll="handleMessagesScroll" @click="handleChatAreaClick">
@@ -233,7 +233,7 @@
                   </div>
                 </div>
                 <div class="yuemu-mobile-avatar-info" v-if="isMobile">
-                  <span class="yuemu-ai-name">AI 助手</span>
+                  <span class="yuemu-ai-name">{{ $t('pages.aiChatPage.aiAssistantName') }}</span>
                   <span class="yuemu-ai-time">{{ formatTime(item.createTime) }}</span>
                 </div>
               </div>
@@ -280,7 +280,7 @@
                     <div v-else-if="seg.type === 'gallery'" class="yuemu-gallery-grid">
                       <div v-for="(gItem, gIdx) in seg.items" :key="gIdx" class="gallery-item">
                         <div class="attachment-img-wrap" @click="openImagePreview(seg.items.map(i => i.url), gIdx)">
-                          <img :src="gItem.url" alt="附图" referrerpolicy="no-referrer-when-downgrade" @error="handleImgError($event, gItem.url, item)" @load="handleImgLoad(gItem.url)" />
+                          <img :src="gItem.url" :alt="$t('pages.aiChatPage.altAttachment')" referrerpolicy="no-referrer-when-downgrade" @error="handleImgError($event, gItem.url, item)" @load="handleImgLoad(gItem.url)" />
                           <div class="img-error-mask" v-if="failedImageUrls.has(gItem.url) && !item.isStreaming"><i class="fas fa-image-slash"></i></div>
                         </div>
                         <div v-if="gItem.caption" class="gallery-caption markdown-body yuemu-markdown" v-html="parseMarkdown(gItem.caption)"></div>
@@ -300,10 +300,10 @@
                 <div class="message-actions" v-if="!isThinkingMessage(item)">
                   <span class="time">{{ formatTime(item.createTime) }}</span>
                   <template v-if="!item.isStreaming">
-                    <button v-if="item.messageType === 2 && item.content !== '上下文已清理'" class="action-icon" @click="toggleTTS(item)" :title="playingMessageId === item.id ? '停止朗读' : '语音朗读'">
+                    <button v-if="item.messageType === 2 && item.content !== '上下文已清理'" class="action-icon" @click="toggleTTS(item)" :title="playingMessageId === item.id ? $t('pages.aiChatPage.stopReading') : $t('pages.aiChatPage.voiceReading')">
                       <i class="fas" :class="playingMessageId === item.id ? 'fa-stop-circle' : 'fa-volume-up'"></i>
                     </button>
-                    <button v-if="item.content !== '上下文已清理'" class="action-icon" @click="copyMessage(item)" title="复制"><i class="far fa-copy"></i></button>
+                    <button v-if="item.content !== '上下文已清理'" class="action-icon" @click="copyMessage(item)" :title="$t('pages.aiChatPage.copyTip')"><i class="far fa-copy"></i></button>
                   </template>
                 </div>
               </div>
@@ -1084,8 +1084,8 @@ const shouldShowTimestamp = (current: API.RagMessageVO, prev: API.RagMessageVO |
 const formatMessageDivider = (time: string) => { const t = dayjs(time), now = dayjs(); if (t.isSame(now, 'day')) return t.format('HH:mm'); if (t.isSame(now.subtract(1, 'day'), 'day')) return '昨天 ' + t.format('HH:mm'); return t.format('MM-DD HH:mm'); }
 const formatTime = (timeStr: string) => dayjs(timeStr).format('HH:mm');
 
-const copyMessage = (item: API.RagMessageVO) => { const text = getCleanContent(item.content); if (!text) return; if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => showSuccessMessage('已复制')).catch(() => fallbackCopy(text)); else fallbackCopy(text); }
-const fallbackCopy = (text: string) => { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showSuccessMessage('已复制'); } catch(e) { showErrorMessage('复制失败'); } document.body.removeChild(ta); }
+const copyMessage = (item: API.RagMessageVO) => { const text = getCleanContent(item.content); if (!text) return; if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => showSuccessMessage(t('pages.aiChatPage.msgs.copied'))).catch(() => fallbackCopy(text)); else fallbackCopy(text); }
+const fallbackCopy = (text: string) => { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showSuccessMessage(t('pages.aiChatPage.msgs.copied')); } catch(e) { showErrorMessage(t('pages.aiChatPage.msgs.copyFailed')); } document.body.removeChild(ta); }
 
 // ================= ★ 语音朗读 TTS (后端云服务升级) ★ =================
 const playingMessageId = ref<number | null>(null);

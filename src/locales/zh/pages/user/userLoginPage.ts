@@ -26,5 +26,6 @@ export default {
   welcomeBack: '欢迎回来',
   loginFail: '登录失败：',
   fetchFail: '获取失败',
-  loginSuccess: '登录成功'
+  loginSuccess: '登录成功',
+  altCaptcha: '验证码',
 };

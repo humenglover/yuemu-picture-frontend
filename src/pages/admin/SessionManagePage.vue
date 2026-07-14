@@ -124,7 +124,7 @@
               {{ sortOrder === 'ascend' ? t('pages.admin.sessionManagePage.timeAscend') : t('pages.admin.sessionManagePage.timeDescend') }} <van-icon :name="sortOrder === 'ascend' ? 'ascending' : 'descending'" />
             </div>
             <div class="yuemu-m-batch-bar" :class="{ 'is-active': hasSelected }">
-              <span class="yuemu-m-batch-text">已选 {{ state.selectedRowKeys.length }} 项</span>
+              <span class="yuemu-m-batch-text">{{ t('pages.admin.sessionManagePage.selectedCount', { count: state.selectedRowKeys.length }) }}</span>
               <button class="yuemu-m-batch-btn" @click="batchDeleteSelectedSessions"> {{ t('pages.admin.sessionManagePage.delete') }} </button>
             </div>
           </div>
@@ -140,7 +140,7 @@
                   </div>
                   <div class="yuemu-m-main-info">
                     <span class="yuemu-m-card-title">{{ session.sessionName || t('pages.admin.sessionManagePage.unnamedSession') }}</span>
-                    <span class="yuemu-text-secondary" style="font-size: 12px; margin-top: 4px;">更新于 {{ dayjs(session.updateTime).format('MM-DD HH:mm') }}</span>
+                    <span class="yuemu-text-secondary" style="font-size: 12px; margin-top: 4px;">{{ t('pages.admin.sessionManagePage.updatedAt') }} {{ dayjs(session.updateTime).format('MM-DD HH:mm') }}</span>
                   </div>
                   <van-checkbox :name="session.id" class="yuemu-m-checkbox" @click.stop />
                 </div>
@@ -389,7 +389,7 @@ const batchDeleteSelectedSessions = async () => {
   const deleteRequests = state.selectedRowKeys.map(id => ({ id }))
   const res = await deleteBatchSessionsUsingPost(deleteRequests)
   if (res.data.code === 0) {
-    message.success(`成功删除 ${state.selectedRowKeys.length} 个会话`)
+    message.success(t('common.message.deleteSuccess') + ` (${state.selectedRowKeys.length})`)
     state.selectedRowKeys = []
     fetchData()
   }

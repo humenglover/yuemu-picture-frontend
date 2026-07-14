@@ -330,6 +330,20 @@ import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import CustomPcCarousel from '@/components/CustomPcCarousel.vue'
 import FollowUserList from '@/components/FollowUserList.vue'
 import GlowingVine from '@/components/GlowingVine.vue'
+import { useStructuredData } from '@/composables/useStructuredData'
+
+// ── SEO: Organization JSON-LD ──
+useStructuredData({
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: '悦木图库',
+  alternateName: 'yuemutuku',
+  url: 'https://www.yuemutuku.com',
+  logo: 'https://www.yuemutuku.com/logo.png',
+  sameAs: [
+    'https://github.com/WangShengQiang/yuemu-picture-frontend',
+  ],
+})
 
 // 关注用户列表相关状态
 const followUsers = ref<any[]>([])

@@ -112,7 +112,7 @@ export default {
     },
     about: {
       title: 'About Us',
-      app: 'Yuemu Gallery',
+      app: 'yuemutuku',
       docs: 'Official Docs',
       author: 'Lumeng'
     },

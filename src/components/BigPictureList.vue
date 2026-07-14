@@ -19,7 +19,7 @@
 
     <div v-else-if="!loading && (!props.dataList || props.dataList.length === 0)" class="yuemu-empty-state">
       <div class="yuemu-custom-empty-state">
-        <img :src="emptyImage" alt="暂无内容" class="yuemu-empty-illustration" />
+        <img :src="emptyImage" :alt="$t('components.bigPicture.emptyAlt')" class="yuemu-empty-illustration" />
         <h3 class="yuemu-empty-title">{{ t('components.bigPicture.noDataTitle') }}</h3>
         <p class="yuemu-empty-desc">{{ t('components.bigPicture.noDataDesc') }}</p>
       </div>
@@ -51,7 +51,7 @@
 
             <img
               :src="picture.thumbnailUrl || picture.url || '/default-image.png'"
-              :alt="picture.name || '图片'"
+              :alt="picture.name || $t('components.bigPicture.emptyAlt')"
               class="yuemu-j-image"
               :class="{ 'yuemu-is-loaded': imageLoadedMap[picture.id] }"
               referrerpolicy="no-referrer-when-downgrade"
@@ -96,14 +96,14 @@
             </template>
             <template v-else>
               <div class="yuemu-bottom-title" style="color: var(--text-secondary);">
-                {{ t('components.bigPicture.sponsoredTitle') || '精选赞助内容' }}
+                {{ t('components.bigPicture.sponsoredTitle') }}
               </div>
               <div class="yuemu-bottom-meta">
                 <div class="yuemu-user-meta">
                   <div class="yuemu-u-avatar yuemu-loaded" style="background: #52c41a; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px;">
                     <i class="fas fa-ad"></i>
                   </div>
-                  <span class="yuemu-u-name" style="color: var(--text-secondary); font-size: 12px;">{{ t('components.bigPicture.sponsored') || '赞助商广告' }}</span>
+                  <span class="yuemu-u-name" style="color: var(--text-secondary); font-size: 12px;">{{ t('components.bigPicture.sponsored') }}</span>
                 </div>
                 <span class="yuemu-view-count" style="font-size: 12px; color: var(--text-secondary);">{{ t('components.globalAd.adsense') || 'AdSense' }}</span>
               </div>

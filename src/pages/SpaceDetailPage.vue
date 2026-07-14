@@ -411,21 +411,21 @@ const handleCameraUpload = async (e: Event) => {
   const file = target.files?.[0]
   if (!file) return
   if (!file.type.startsWith('image/')) {
-    message.warning(t('pages.spaceDetailPage.msgs.selectImage') || '请上传图片')
+    message.warning(t('pages.spaceDetailPage.msgs.selectImage'))
     return
   }
   
-  message.loading({ content: '正在分析图片...', key: 'imageSearch', duration: 0 })
+  message.loading({ content: t('pages.spaceDetailPage.msgs.analyzingImage'), key: 'imageSearch', duration: 0 })
   try {
     const res = await uploadPostImageUsingPost({}, { headers: { 'Content-Type': 'multipart/form-data' } }, file)
     if (res.data.code === 0 && res.data.data) {
-      message.success({ content: '上传成功，开始搜索', key: 'imageSearch', duration: 2 })
+      message.success({ content: t('common.message.uploadSuccess'), key: 'imageSearch', duration: 2 })
       onPictureSearch(res.data.data.url)
     } else {
-      throw new Error(res.data.message || '上传失败')
+      throw new Error(res.data.message || t('common.message.uploadFailed'))
     }
   } catch (error: any) {
-    message.error({ content: '失败: ' + error.message, key: 'imageSearch', duration: 2 })
+    message.error({ content: t('common.message.operationFailed') + ': ' + error.message, key: 'imageSearch', duration: 2 })
   } finally {
     if (target) target.value = ''
     fabExpanded.value = false

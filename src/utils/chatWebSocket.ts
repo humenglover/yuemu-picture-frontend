@@ -1,4 +1,5 @@
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
+import i18n from '@/locales'
 
 // 添加类型定义
 interface EventHandler {
@@ -227,7 +228,7 @@ export default class ChatWebSocket {
       console.warn('[WebSocket] 连接已断开 - %s（状态码：%d，断开原因：%s）',
         now,
         event.code,
-        event.reason || '未知原因'
+        event.reason || i18n.global.t('common.message.unknownError')
       )
       this.connecting = false
       this.triggerEvent('close', event)

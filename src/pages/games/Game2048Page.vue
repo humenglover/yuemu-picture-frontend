@@ -101,7 +101,7 @@
                 <div class="scroll-list">
                   <div v-for="(record, index) in historyList" :key="index" class="history-row">
                     <div class="h-top">
-                      <span class="h-score">{{ record.score }} 分</span>
+                      <span class="h-score">{{ t('pages.games.game2048Page.scoreUnit', { score: record.score }) }}</span>
                       <span class="h-tile">{{ t('pages.games.game2048Page.maxTileIs', { max: record.maxTile }) }}</span>
                     </div>
                     <div class="h-bottom">

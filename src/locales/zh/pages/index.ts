@@ -59,6 +59,7 @@ import browseHistoryPage from './browseHistoryPage';
 import barragePage from './barragePage';
 import aiResourcePage from './aiResourcePage';
 import privacyPage from './privacyPage';
+import notFoundPage from './notFoundPage';
 
 export default {
   app,
@@ -121,5 +122,6 @@ export default {
   browseHistoryPage,
   barragePage,
   aiResourcePage,
-  privacyPage
+  privacyPage,
+  notFoundPage
 };

@@ -117,5 +117,16 @@ export default {
     createError: 'Error creating',
     selectOrCreateSession: 'Please select or create a session',
     uploadTo: 'Upload to',
-  }
+    copied: 'Copied',
+    copyFailed: 'Copy failed',
+  },
+  editTip: 'Edit',
+  deleteTip: 'Delete',
+  toggleSidebarTip: 'Toggle Sidebar',
+  backTip: 'Back',
+  stopReading: 'Stop Reading',
+  voiceReading: 'Read Aloud',
+  copyTip: 'Copy',
+  altAttachment: 'Attachment',
+  aiAssistantName: 'AI Assistant',
 };

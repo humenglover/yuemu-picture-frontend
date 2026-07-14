@@ -1,9 +1,24 @@
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
+import 'dayjs/locale/en'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import i18n from '@/locales'
 
 dayjs.extend(relativeTime)
-dayjs.locale('zh-cn')
+
+const t = (key: string) => i18n.global.t(key)
+
+/** 设置 dayjs 语言跟随 i18n */
+const syncLocale = () => {
+  const locale = i18n.global.locale.value
+  dayjs.locale(locale === 'en-US' ? 'en' : 'zh-cn')
+}
+// 立即同步一次
+syncLocale()
+// 监听语言切换
+i18n.global.locale.value && syncLocale()
+
+const isZh = () => i18n.global.locale.value !== 'en-US'
 
 /**
  * 格式化时间
@@ -12,17 +27,22 @@ dayjs.locale('zh-cn')
  * @returns 格式化后的时间字符串
  */
 export const formatTime = (time: string | number | Date | undefined, type: 'relative' | 'date' | 'full' = 'relative'): string => {
-  if (!time) return '未知时间'
+  if (!time) return t('common.message.unknownTime')
 
+  syncLocale()
   const date = dayjs(time)
   const now = dayjs()
 
-  // 如果是未来时间，根据是否跨年显示不同格式
+  // 如果是未来时间
   if (date.isAfter(now)) {
-    if (date.year() === now.year()) {
-      return date.format('MM月DD日 HH:mm')
+    if (isZh()) {
+      return date.year() === now.year()
+        ? date.format('MM月DD日 HH:mm')
+        : date.format('YYYY年MM月DD日 HH:mm')
     }
-    return date.format('YYYY年MM月DD日 HH:mm')
+    return date.year() === now.year()
+      ? date.format('MM/DD HH:mm')
+      : date.format('YYYY/MM/DD HH:mm')
   }
 
   switch (type) {
@@ -33,11 +53,11 @@ export const formatTime = (time: string | number | Date | undefined, type: 'rela
       }
       // 如果是昨天
       if (date.isSame(now.subtract(1, 'day'), 'day')) {
-        return '昨天 ' + date.format('HH:mm')
+        return t('common.message.yesterday') + ' ' + date.format('HH:mm')
       }
       // 如果是前天
       if (date.isSame(now.subtract(2, 'day'), 'day')) {
-        return '前天 ' + date.format('HH:mm')
+        return t('common.message.dayBeforeYesterday') + ' ' + date.format('HH:mm')
       }
       // 如果是本周
       if (date.isSame(now, 'week')) {
@@ -45,20 +65,19 @@ export const formatTime = (time: string | number | Date | undefined, type: 'rela
       }
       // 如果是今年
       if (date.isSame(now, 'year')) {
-        return date.format('MM月DD日 HH:mm')
+        return isZh() ? date.format('MM月DD日 HH:mm') : date.format('MM/DD HH:mm')
       }
       // 其他情况
-      return date.format('YYYY年MM月DD日 HH:mm')
+      return isZh() ? date.format('YYYY年MM月DD日 HH:mm') : date.format('YYYY/MM/DD HH:mm')
 
     case 'date':
-      // 如果不是今年，显示年份
       if (!date.isSame(now, 'year')) {
-        return date.format('YYYY年MM月DD日')
+        return isZh() ? date.format('YYYY年MM月DD日') : date.format('YYYY/MM/DD')
       }
-      return date.format('MM月DD日')
+      return isZh() ? date.format('MM月DD日') : date.format('MM/DD')
 
     case 'full':
-      return date.format('YYYY年MM月DD日 HH:mm:ss')
+      return isZh() ? date.format('YYYY年MM月DD日 HH:mm:ss') : date.format('YYYY/MM/DD HH:mm:ss')
 
     default:
       return date.format('YYYY-MM-DD HH:mm:ss')
@@ -73,20 +92,17 @@ export const formatTime = (time: string | number | Date | undefined, type: 'rela
 export const formatMessageTime = (date: Date | string | number | undefined): string => {
   if (!date) return ''
 
+  syncLocale()
   const now = dayjs()
   const target = dayjs(date)
 
   if (target.isSame(now, 'day')) {
-    // 当天消息只显示时间
     return target.format('HH:mm')
   } else if (target.isSame(now.subtract(1, 'day'), 'day')) {
-    // 昨天的消息显示"昨天"
-    return '昨天'
+    return t('common.message.yesterday')
   } else if (target.isSame(now, 'year')) {
-    // 今年的消息显示月日
     return target.format('MM-DD')
   } else {
-    // 往年的消息显示年月日
     return target.format('YYYY-MM-DD')
   }
 }
@@ -97,6 +113,7 @@ export const formatMessageTime = (date: Date | string | number | undefined): str
  * @returns 相对时间字符串
  */
 export const getRelativeTime = (date: Date | string | number): string => {
+  syncLocale()
   return dayjs(date).fromNow()
 }
 

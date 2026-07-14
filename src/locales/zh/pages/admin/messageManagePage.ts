@@ -31,5 +31,6 @@ export default {
   "batchDeleteErrText": "批量删除异常",
   "totalRecordsText3": "共 {total} 条",
   "prevPage": "上一页",
-  "nextPage": "下一页"
+  "nextPage": "下一页",
+  "selectedCount": "已选 {count} 项",
 };
