@@ -66,6 +66,20 @@ export default defineConfig(({ command, mode }) => {
           comments: false,
         }
       },
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-antd': ['ant-design-vue', '@ant-design/icons-vue'],
+            'vendor-echarts': ['echarts', 'vue-echarts', 'echarts-wordcloud'],
+            'vendor-three': ['three'],
+            'vendor-vant': ['vant'],
+            'vendor-markdown': ['bytemd', '@bytemd/vue-next', 'markdown-it', 'markdown-it-image'],
+            'vendor-swiper': ['swiper'],
+            'vendor-utils': ['lodash-es', 'date-fns', 'axios', 'file-saver', 'browser-image-compression'],
+          },
+        },
+      },
+      chunkSizeWarningLimit: 1000,
     },
     define: {
       // 开启/关闭全局广告

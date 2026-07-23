@@ -1,22 +1,16 @@
 /**
- * SEO Prerender Script
+ * Static HTML Prerender — injects page-specific TDK into dist for each route.
  *
- * Builds the app, starts a local server, and uses a headless browser
- * to capture static HTML for key routes. Output goes into dist/ so
- * each route gets its own index.html that search engines can index.
+ * Unlike puppeteer-based approaches, this reads locale files directly and
+ * generates proper <title>, <meta>, <link> tags WITHOUT executing JS.
+ * Baidu, Bing, Google all get correct metadata instantly.
  *
- * Usage:
- *   node scripts/prerender.mjs              # after `npm run build`
- *   node scripts/prerender.mjs --routes /,/forum,/discovery
- *
- * Requires: puppeteer-core (npm i -D puppeteer-core)
+ * Usage: node scripts/prerender.mjs   (after npm run build)
  */
 
-import { promises as fs } from 'node:fs'
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { createServer } from 'node:http'
-import { readFileSync, existsSync, statSync } from 'node:fs'
 import { discoverArticles } from './guide-articles.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -24,177 +18,202 @@ const PROJECT_ROOT = resolve(__dirname, '..')
 const DIST = resolve(PROJECT_ROOT, 'dist')
 const DIST_INDEX = resolve(DIST, 'index.html')
 
-// Safety checks
 if (!existsSync(DIST_INDEX)) {
-  console.error(`dist/index.html not found at ${DIST_INDEX}. Run "npm run build" first.`)
+  console.error('dist/index.html not found. Run "npm run build" first.')
   process.exit(1)
 }
-console.log(`  Dist: ${DIST}`)
 
-// ── Auto-discover guide articles ──
-const guideArticles = discoverArticles()
-const guideRoutes = guideArticles.map(a => `/guides/${a.id}`)
-console.log(`  Auto-discovered ${guideRoutes.length} guide routes\n`)
+const BASE_URL = 'https://www.yuemutuku.com'
+const TEMPLATE = readFileSync(DIST_INDEX, 'utf-8')
 
-// ── Config ──
-const STATIC_ROUTES = [
-  '/',
-  '/home',
-  '/about',
-  '/guides',
-  '/discovery',
-  '/forum',
-  '/ranking',
-  '/search',
-  '/friend-links',
-  '/contact',
-  '/privacy',
-  '/privacy-center',
-  '/games',
-  '/tools',
-  '/ai_resource',
-  '/loveboard',
-  '/loveboard/list',
-]
+// ── Per-locale SEO data (matches src/locales/{zh,en}/common.ts seo section) ──
+const SEO = {
+  zh: {
+    lang: 'zh-CN', ogLocale: 'zh_CN',
+    siteName: '悦木图库 · yuemutuku',
+    defaultTitle: '悦木图库 - 发现、分享、创造美好瞬间',
+    description: '悦木图库是一个充满活力的创意社区平台，汇聚海量高清图片素材与设计灵感。在这里，您可以发现美好瞬间、分享生活点滴、与志同道合的创作者交流互动，还可以使用在线工具编辑图片、管理作品版权、创建个人空间展示作品集。加入悦木图库，开启您的创意之旅，探索无限美好可能。',
+    keywords: '悦木图库,yuemutuku,创意社区,图片分享,设计素材,高清图片,灵感创作,版权登记,在线图片编辑,创作者社区,作品集展示',
+  },
+  en: {
+    lang: 'en', ogLocale: 'en_US',
+    siteName: 'yuemutuku',
+    defaultTitle: 'yuemutuku - Discover, Share, Create Beautiful Moments',
+    description: 'yuemutuku is a vibrant creative community platform with a vast collection of high-quality images and design inspiration. Discover beautiful moments, share your life, connect with fellow creators, and use online tools to edit images, manage copyrights, and build your personal portfolio.',
+    keywords: 'yuemutuku, creative community, image sharing, design assets, high-quality images, art inspiration, copyright registration, online image editor, creator community, portfolio showcase',
+  },
+}
 
-const ROUTES = process.argv.includes('--routes')
-  ? process.argv[process.argv.indexOf('--routes') + 1].split(',')
-  : [...STATIC_ROUTES, ...guideRoutes]
+// ── Page title mapping (route name → title per locale) ──
+// These match src/locales/{zh,en}/pageTitles.ts
+const PAGE_TITLES = {
+  zh: {
+    Home: '首页 - 发现美好瞬间',
+    MyHome: '首页 - 发现美好瞬间',
+    About: '关于我们 - 悦木图库',
+    Guides: '设计与创作者指南 - 悦木图库',
+    Discovery: '漫游指南 - 发现大千世界',
+    Forum: '叽叽喳喳 - 悦木社区',
+    Ranking: '风云榜单 - 看看谁最火',
+    Search: '全站探索 - 寻找你的热爱',
+    SearchPicture: '大海捞图 - 图片搜索',
+    Contact: '电波发射 - 联系我们',
+    Privacy: '隐私政策 - 悦木图库',
+    PrivacyCenter: '隐私中心 - Privacy Center',
+    Games: '摸鱼专区 - 欢乐小游戏',
+    Tools: '次元百宝箱 - 实用工具',
+    AiResource: 'AI 资源库 - 你的数字资产',
+    LoveBoard: '心动频率 - 恋爱专属画板',
+    LoveBoardList: '浪漫广场 - 恋爱画板展厅',
+    FriendLinks: '星际邻居 - 友情链接',
+    AddPicture: '发布创作 - 留下光影足迹',
+    AddSpace: '开辟空间 - 创建你的小宇宙',
+    Barrage: '畅所欲言 - 灵感弹幕墙',
+    UserLogin: '登录 - 欢迎回到悦木',
+    UserRegister: '注册 - 开启创作者之旅',
+    CopyrightTrace: '时光追溯 - 版权查询',
+    CopyrightRegister: '版权卫士 - 登记大厅',
+    InvitePage: '邀请计划 - 会员中心',
+    CreatorAnalytics: '创作者中心 - 数据罗盘',
+  },
+  en: {
+    Home: 'Home - Discover Beautiful Moments',
+    MyHome: 'Home - Discover Beautiful Moments',
+    About: 'About Us - yuemutuku',
+    Guides: 'Design & Creator Guides - yuemutuku',
+    Discovery: 'Discovery Guide - Explore the World',
+    Forum: 'Community - Yuemu Forum',
+    Ranking: 'Leaderboard',
+    Search: 'Explore - Find Your Passion',
+    SearchPicture: 'Search Pictures - Find Treasures',
+    Contact: 'Contact Us - Reach Out',
+    Privacy: 'Privacy Policy - yuemutuku',
+    PrivacyCenter: 'Privacy Center',
+    Games: 'Game Zone - Fun Mini Games',
+    Tools: 'Toolbox - Utility Tools',
+    AiResource: 'AI Resources - Digital Assets',
+    LoveBoard: 'Heartbeat - Love Board',
+    LoveBoardList: 'Romance Square - Love Board Gallery',
+    FriendLinks: 'Neighbors - Friend Links',
+    AddPicture: 'Upload - Leave Your Mark',
+    AddSpace: 'Create Space - Your Universe',
+    Barrage: 'Barrage Wall - Speak Freely',
+    UserLogin: 'Login - Welcome to yuemutuku',
+    UserRegister: 'Sign Up - Start Creating',
+    CopyrightTrace: 'Copyright Trace',
+    CopyrightRegister: 'Copyright Register',
+    InvitePage: 'Invite - Membership',
+    CreatorAnalytics: 'Creator Center',
+  },
+}
 
-// ── Browser path ──
-const BROWSER_PATHS = [
-  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-  'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  process.env.CHROME_PATH,
-  process.env.EDGE_PATH,
-].filter(Boolean)
-
-async function findBrowser() {
-  for (const p of BROWSER_PATHS) {
-    if (existsSync(p)) return p
+// ── Path → route name mapping ──
+function pathToRouteName(path) {
+  const m = {
+    '/': 'Home', '/home': 'MyHome', '/about': 'About', '/guides': 'Guides',
+    '/discovery': 'Discovery', '/forum': 'Forum', '/ranking': 'Ranking',
+    '/search': 'Search', '/search_picture': 'SearchPicture', '/contact': 'Contact',
+    '/privacy': 'Privacy', '/privacy-center': 'PrivacyCenter',
+    '/games': 'Games', '/tools': 'Tools', '/ai_resource': 'AiResource',
+    '/loveboard': 'LoveBoard', '/loveboard/list': 'LoveBoardList',
+    '/friend-links': 'FriendLinks', '/add_picture': 'AddPicture',
+    '/add_space': 'AddSpace', '/barrage': 'Barrage',
+    '/user/login': 'UserLogin', '/user/register': 'UserRegister',
+    '/picture/copyright/trace': 'CopyrightTrace',
+    '/picture/copyright/register': 'CopyrightRegister',
+    '/invite': 'InvitePage', '/creator/analytics': 'CreatorAnalytics',
   }
-  throw new Error('No browser found. Install Chrome or Edge.')
+  return m[path] || null
 }
 
-// ── Static file server ──
-function startServer(port = 4173) {
-  return new Promise((resolve, reject) => {
-    const server = createServer((req, res) => {
-      const serve = (status, type, data) => {
-        if (!res.headersSent) {
-          res.writeHead(status, { 'Content-Type': type })
-          res.end(data)
-        }
-      }
-      try {
-        const url = (req.url || '/').split('?')[0].split('#')[0]
-        const filePath = url === '/' ? '/index.html' : url
-        const cleanPath = filePath.replace(/^\//, '').replace(/\/$/, '') || 'index.html'
-        const fullPath = resolve(DIST, cleanPath)
+// ── Generate one static HTML ──
+function generateHTML(locale, path) {
+  const seo = SEO[locale]
+  const routeName = pathToRouteName(path)
+  const title = (routeName && PAGE_TITLES[locale][routeName]) || seo.defaultTitle
+  const desc = `${title} | ${seo.description}`
+  const cleanPath = path === '/' ? '' : path
+  const canonical = `${BASE_URL}/${locale}${cleanPath}`
 
-        if (existsSync(fullPath) && statSync(fullPath).isFile()) {
-          serve(200, getContentType(fullPath), readFileSync(fullPath))
-          return
-        }
-      } catch { /* fall through to SPA fallback */ }
-      // SPA fallback for any unmatched route
-      serve(200, 'text/html', readFileSync(DIST_INDEX))
-    })
-    server.listen(port, () => {
-      console.log(`  Local server: http://localhost:${port}`)
-      resolve(server)
-    })
-    server.on('error', reject)
-  })
+  const otherLocale = locale === 'zh' ? 'en' : 'zh'
+  const otherPath = `${BASE_URL}/${otherLocale}${cleanPath}`
+  const zhPath = `${BASE_URL}/zh${cleanPath}`
+  const enPath = `${BASE_URL}/en${cleanPath}`
+
+  // Replace existing title + description + inject SEO block before </head>
+  let html = TEMPLATE
+    .replace(/<title>[^<]*<\/title>/, `<title>${escapeXml(title)}</title>`)
+    .replace(/<meta name="description" content="[^"]*"\s*\/?>/, `<meta name="description" content="${escapeXml(desc)}">`)
+
+  const seoBlock = [
+    `<meta name="keywords" content="${escapeXml(seo.keywords)}">`,
+    `<meta property="og:title" content="${escapeXml(title)}">`,
+    `<meta property="og:description" content="${escapeXml(desc)}">`,
+    `<meta property="og:url" content="${canonical}">`,
+    `<meta property="og:site_name" content="${escapeXml(seo.siteName)}">`,
+    `<meta property="og:locale" content="${seo.ogLocale}">`,
+    `<meta name="twitter:title" content="${escapeXml(title)}">`,
+    `<meta name="twitter:description" content="${escapeXml(desc)}">`,
+    `<link rel="canonical" href="${canonical}">`,
+    `<link rel="alternate" hreflang="zh-CN" href="${zhPath}">`,
+    `<link rel="alternate" hreflang="en-US" href="${enPath}">`,
+    `<link rel="alternate" hreflang="x-default" href="${zhPath}">`,
+    `<meta name="prerender-status" content="true">`,
+  ].join('\n')
+
+  return html
+    .replace('</head>', `${seoBlock}\n</head>`)
+    .replace(/<html lang="[^"]*">/, `<html lang="${seo.lang}">`)
 }
 
-function getContentType(file) {
-  const ext = file.split('.').pop()
-  const map = { html: 'text/html', js: 'application/javascript', css: 'text/css', png: 'image/png', jpg: 'image/jpeg', svg: 'image/svg+xml', json: 'application/json', woff2: 'font/woff2' }
-  return map[ext] || 'application/octet-stream'
+function escapeXml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 // ── Main ──
-async function main() {
-  console.log('Starting prerender...\n')
+const LOCALES = ['zh', 'en']
+const STATIC_PATHS = [
+  '/', '/home', '/about', '/guides', '/discovery', '/forum', '/ranking',
+  '/search', '/search_picture', '/contact', '/privacy', '/privacy-center',
+  '/games', '/tools', '/ai_resource', '/loveboard', '/loveboard/list',
+  '/friend-links', '/add_picture', '/add_space', '/barrage',
+  '/user/login', '/user/register',
+  '/picture/copyright/trace', '/picture/copyright/register',
+  '/invite', '/creator/analytics',
+]
 
-  // Find browser
-  const browserPath = await findBrowser()
-  console.log(`  Browser: ${browserPath}`)
+const guideArticles = discoverArticles()
+let count = 0
 
-  // Start local server
-  const server = await startServer()
-  const BASE = 'http://localhost:4173'
-  const puppeteer = await import('puppeteer-core')
+console.log(`Generating static HTML for ${LOCALES.length} locales × ${STATIC_PATHS.length + guideArticles.length} pages...\n`)
 
-  // Launch browser
-  const browser = await puppeteer.default.launch({
-    executablePath: browserPath,
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
-  })
-
-  let count = 0
-  try {
-    for (const route of ROUTES) {
-      const url = `${BASE}${route}`
-      console.log(`  ${route}`)
-      const page = await browser.newPage()
-
-      try {
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 })
-
-        // Wait for Vue to actually render content before capturing
-        const isGuidePage = route.startsWith('/guides/') && route !== '/guides'
-        if (isGuidePage) {
-          try {
-            await page.waitForSelector('.article-body-content, .article-p, .not-found-card', { timeout: 10000 })
-          } catch {
-            console.error(`    Vue render timeout for ${route}, capturing anyway`)
-          }
-        } else {
-          try {
-            await page.waitForSelector('#app > div, .home-page, .page-wrapper', { timeout: 8000 })
-          } catch {
-            // Some pages might render differently, proceed anyway
-          }
-        }
-        // Extra 500ms grace for async sub-components
-        await new Promise(r => setTimeout(r, 500))
-
-        const html = await page.content()
-        // Inject prerender signal meta so Google knows this is static
-        const finalHtml = html.replace('</head>', '<meta name="prerender-status" content="true">\n</head>')
-
-        // Verify content was actually rendered for guide pages
-        if (isGuidePage) {
-          const hasContent = html.includes('article-body-content') || html.includes('article-p') || html.includes('not-found-card')
-          if (!hasContent) {
-            console.error(`    Content not rendered for ${route} — page may be empty`)
-          }
-        }
-
-        // Write to dist/{route}/index.html
-        const dir = resolve(DIST, route.replace(/^\//, ''))
-        await fs.mkdir(dir, { recursive: true })
-        await fs.writeFile(resolve(dir, 'index.html'), finalHtml, 'utf-8')
-        count++
-      } catch (err) {
-        console.error(`    Failed: ${err.message}`)
-      } finally {
-        await page.close()
-      }
-    }
-  } finally {
-    await browser.close()
-    server.close()
+for (const locale of LOCALES) {
+  for (const path of STATIC_PATHS) {
+    const routePath = path === '/' ? '' : path
+    const fullPath = `/${locale}${routePath}`
+    const dir = resolve(DIST, fullPath.replace(/^\//, ''))
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(resolve(dir, 'index.html'), generateHTML(locale, path), 'utf-8')
+    console.log(`  ${fullPath}`)
+    count++
   }
-
-  console.log(`\nPrerendered ${count}/${ROUTES.length} routes -> dist/`)
-  console.log('   Googlebot / Bing / Baidu can now index each page as static HTML.')
+  // Guide articles
+  for (const article of guideArticles) {
+    const path = `/guides/${article.id}`
+    const fullPath = `/${locale}${path}`
+    const dir = resolve(DIST, fullPath.replace(/^\//, ''))
+    mkdirSync(dir, { recursive: true })
+    // Guide pages use the guides title
+    const html = generateHTML(locale, '/guides').replace(
+      `<link rel="canonical" href="${BASE_URL}/${locale}/guides">`,
+      `<link rel="canonical" href="${BASE_URL}/${locale}${path}">`
+    )
+    writeFileSync(resolve(dir, 'index.html'), html, 'utf-8')
+    console.log(`  ${fullPath}`)
+    count++
+  }
 }
 
-main().catch(err => {
-  console.error('', err.message)
-  process.exit(1)
-})
+console.log(`\nGenerated ${count} static HTML files -> dist/`)
+console.log('Each has proper <title>, <meta>, hreflang, canonical for its locale.')
+console.log('Google / Baidu / Bing all see correct TDK without executing JS.')
