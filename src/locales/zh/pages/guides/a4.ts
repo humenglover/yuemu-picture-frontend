@@ -11,7 +11,7 @@
 
 看到 Lighthouse 跑出来 8.4 秒的那一刻，屏幕前所有人的反应：
 
-![看着无压缩原图导致 8.4 秒的 LCP 加载卡顿时的现场写真](/gifs/lcp_rage.gif)
+![看着无压缩原图导致 8.4 秒的 LCP 加载卡顿时的现场写真](/webm/lcp_rage.webm)
 *▲ 图：看到 LCP 8.4 秒那一刻，想把整个 assets 文件夹删了重来的冲动*
 
 三周之后，LCP 压到了 1.2 秒——降了 85%。跳出率断崖式下降。那个酸爽，比任何设计改版带来的数据提升都过瘾。
@@ -71,7 +71,7 @@
 
 你是不是遇到过——正看得好好的，突然一张图加载出来把整个页面往下蹬了三屏？
 
-![未预留尺寸导致的 CLS 布局剧烈跳跃](/gifs/cls_shake.gif)
+![未预留尺寸导致的 CLS 布局剧烈跳跃](/webm/cls_shake.webm)
 *▲ 图：图片加载完页面疯狂跳动——CLS 直接飙红*
 
 解法简单到离谱：**给所有 img 标签加 width 和 height 属性。** 浏览器会自动根据这两个属性计算出宽高比，在图片加载前就把位置给你预留好。配合 CSS 的 \`width: 100%; height: auto;\`，响应式和防抖动一举两得。那个古老的 padding-bottom hack 可以彻底扔进历史垃圾桶了。
@@ -114,12 +114,12 @@ preload 的图一定要带 \`imagesrcset\` 和 \`imagesizes\`，不然移动端�
 
 把这些骚操作全部配置完的那一刻：
 
-![黑客级性能优化操作](/gifs/hacker.gif)
+![黑客级性能优化操作](/webm/hacker.webm)
 *▲ 图：AVIF、srcset、fetchpriority 一套连招，感觉自己像个性能黑客*
 
 Lighthouse 跑分飙到 98 分的那个瞬间：
 
-![Lighthouse 跑分 98 分狂欢](/gifs/celebrate.gif)
+![Lighthouse 跑分 98 分狂欢](/webm/celebrate.webm)
 *▲ 图：LCP 1.2 秒、跑分 98——那一刻的快乐，懂的都懂*
 
 ## 四、最后说一嘴

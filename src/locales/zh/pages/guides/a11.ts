@@ -11,7 +11,7 @@
 
 更刺激的是——2026 年涌现的工具不再是"AI 生成一张好看的图"，而是"AI 生成可直接部署的代码"。设计到代码的鸿沟正在被填平。
 
-![AI 设计工具速度](/gifs/a11_stitch.gif)
+![AI 设计工具速度](/webm/a11_stitch.webm)
 *▲ 图：Google Stitch 一句描述到五屏交互原型，全程 20 分钟。两年前这要两天的活儿*
 
 今天就把 2026 年最能打的 AI 设计工具和实战工作流全部拆给你。
@@ -132,7 +132,7 @@ Cursor 通过 MCP（Model Context Protocol）直接读取 Figma 文件，这是 
 
 ## 七、实战工作流：从零到部署的推荐管线
 
-![AI 工作流管线](/gifs/a11_flow.gif)
+![AI 工作流管线](/webm/a11_flow.webm)
 *▲ 图：四层工具串联——Stitch 探索到 Figma 精修到 v0 出组件到 Cursor 组装部署，全程节省 60-75% 时间*
 
 | Phase | 工具 | 输入 | 产出 | 耗时 |
@@ -156,7 +156,7 @@ Cursor 通过 MCP（Model Context Protocol）直接读取 Figma 文件，这是 
 
 ## 九、最后一句
 
-![AI 赋能设计师](/gifs/a11_make.gif)
+![AI 赋能设计师](/webm/a11_make.webm)
 *▲ 图：AI 不是来替代你的——它是来让你从"像素搬运工"升级成"设计导演"的*
 
 2026 年设计师的核心竞争力不再是手速和像素精度，而是三个能力：**知道什么方向是对的（判断力）、知道怎么让 AI 往那个方向走（Prompt Engineering）、知道 AI 产出的东西哪里会出问题（审查力）。**

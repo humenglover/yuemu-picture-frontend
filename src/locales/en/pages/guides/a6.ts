@@ -13,7 +13,7 @@ And here's the even more pragmatic angle — international markets and B2B enter
 
 Now unplug your mouse, open your own website, and try navigating with just the Tab key. If the focus indicator jumps around randomly — or worse, you can't find it at all:
 
-![Keyboard focus loss panic](/gifs/tab_rage.gif)
+![Keyboard focus loss panic](/webm/tab_rage.webm)
 *▲ Mashing Tab while having absolutely no idea where focus is — peak frontend despair*
 
 Here's how to get your a11y above the bar with minimal time and effort.
@@ -29,7 +29,7 @@ WCAG 2.2 AA level has exactly two contrast requirements you need to know:
 
 Sounds simple, right? Now go check how many sites use a soft gray like \`#94A3B8\` as body text on a white background. That clocks in at… 2.8:1. Under direct sunlight. On the train. For users with low vision. That text isn't text — it's fog.
 
-![Squinting at unreadable low-contrast text](/gifs/a11y_squint.gif)
+![Squinting at unreadable low-contrast text](/webm/a11y_squint.webm)
 *▲ Squinting helplessly at #94A3B8 text on a white background — "is this even a real sentence or am I hallucinating"*
 
 ### How to Self-Check
@@ -65,7 +65,7 @@ If the answer to any of these is "no" — congratulations, you've built a keyboa
 1. **When a modal opens, trap focus inside it.** Tab cycles through focusable elements within the modal. Shift+Tab reverses the cycle. Everything outside the modal gets \`inert\`.
 2. **When the modal closes, return focus to the trigger button.** Users end up exactly where they started. Nobody thanks you for this — but miss it, and keyboard users just bounce.
 
-![Lost keyboard focus wandering aimlessly](/gifs/a11y_lost.gif)
+![Lost keyboard focus wandering aimlessly](/webm/a11y_lost.webm)
 *▲ Tab Tab Tab — where the hell did the focus go? Users wandering around your page like a headless chicken*
 
 ## Part 3: Semantic HTML — Stop Using Divs for Everything
@@ -81,7 +81,7 @@ A real \`<button>\` gives you all of this for free:
 
 Replicate all that with a div? You'll write 200 lines of JavaScript and still miss things. One \`<button>\` tag versus 200 lines of fragile JS — come on.
 
-![Keyboard smash rage at div soup](/gifs/a11y_rage.gif)
+![Keyboard smash rage at div soup](/webm/a11y_rage.webm)
 *▲ Seeing someone use a div with onclick and 200 lines of ARIA instead of a single <button> — instant keyboard-smash material*
 
 ### ARIA Is a Patch, Not a Blueprint
@@ -109,7 +109,7 @@ Screen reader users don't listen to entire pages top to bottom. They jump betwee
 
 At minimum, you need \`<main>\`. So many sites are missing this one tag, and screen reader users have no way to jump to the primary content. They're just… stuck.
 
-![Lost on inaccessible mobile page](/gifs/a11y_phone.gif)
+![Lost on inaccessible mobile page](/webm/a11y_phone.webm)
 *▲ Opening a page with zero semantic structure on mobile — the screen reader just goes "div, div, div" and the user has absolutely no clue what's happening*
 
 ### Auto-Playing Content Is Actually Dangerous

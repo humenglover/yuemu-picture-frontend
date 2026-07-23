@@ -11,7 +11,7 @@
 
 I still remember my first Midjourney prompt: "beautiful girl portrait." Hit enter. The result? Twisted limbs, three extra fingers, one eye higher than the other. The shock was real:
 
-![First AI image render surprise](/gifs/confused.gif)
+![First AI image render surprise](/webm/confused.webm)
 *▲ The pure bewilderment of seeing AI generate a random number of fingers — what the hell is this*
 
 But now? My team's AI workflow has gone from "slot machine pulls" to "surgical precision." Here's the whole playbook.
@@ -34,7 +34,7 @@ Fill all five, and your output has direction. Just writing "pretty girl" — dud
 
 The vibe of endlessly tweaking weights and rolling seeds in the ControlNet matrix:
 
-![AI Prompting and Seed Rolling](/gifs/ai_roll.gif)
+![AI Prompting and Seed Rolling](/webm/ai_roll.webm)
 *▲ Trying to figure out which parameter is actually doing the work — peak "am I a wizard or just lucky" energy*
 
 ### MJ Parameters That'll Save You Hundreds of Hours
@@ -73,7 +73,7 @@ When you're producing a series, nothing is more frustrating than the character l
 
 That moment after countless failures when the AI finally renders the perfect masterpiece:
 
-![Masterpiece AI render celebration](/gifs/gatsby_toast.gif)
+![Masterpiece AI render celebration](/webm/gatsby_toast.webm)
 *▲ The Gatsby-level satisfaction when the render finally, finally comes out perfect*
 
 ## Part 3: The 70/30 Rule for Commercial Production — AI Does 70%, You Do 30%
@@ -92,7 +92,7 @@ One sentence to tattoo on your brain: **AI is an amplifier, not a replacement.**
 
 Watching the artist community and AI companies go to war over training data, all of us just:
 
-![AI debate spectating](/gifs/popcorn.gif)
+![AI debate spectating](/webm/popcorn.webm)
 *▲ Watching the copyright battle unfold from the sidelines — popcorn status: ready*
 
 Seriously though — AI-generated image copyright is a gray zone worldwide. The US Copyright Office is clear: purely AI-generated content gets no protection. But works with sufficient human authorship? Potentially protectable. The key is whether you can **prove** your human input. Save your prompt history. Keep step-by-step process files. Screenshot your workflows. That's your evidence chain for any future dispute.

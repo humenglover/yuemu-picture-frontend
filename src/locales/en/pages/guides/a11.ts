@@ -11,7 +11,7 @@
 
 What's even more striking — the 2026 tools don't just "generate a pretty picture." They generate deployable code. The design-to-code gap is closing fast.
 
-![AI design speed](/gifs/a11_stitch.gif)
+![AI design speed](/webm/a11_stitch.webm)
 *▲ Google Stitch: one sentence to five-screen interactive prototype. Twenty minutes total. Two years ago this was two days of work.*
 
 Here's the complete breakdown of the best AI design tools in 2026 and the workflow that actually ships.
@@ -132,7 +132,7 @@ Flow: Figma design → Cursor reads it → AI writes code in your project. Desig
 
 ## Part 7: The Production Workflow — Zero to Deploy
 
-![AI workflow pipeline](/gifs/a11_flow.gif)
+![AI workflow pipeline](/webm/a11_flow.webm)
 *▲ Four-layer pipeline — Stitch explore to Figma refine to v0 components to Cursor assemble. 60-75% time savings.*
 
 | Phase | Tool | Input | Output | Time |
@@ -156,7 +156,7 @@ Flow: Figma design → Cursor reads it → AI writes code in your project. Desig
 
 ## Part 9: The Bottom Line
 
-![AI empowering designers](/gifs/a11_make.gif)
+![AI empowering designers](/webm/a11_make.webm)
 *▲ AI isn't here to replace you — it's here to upgrade you from pixel pusher to design director*
 
 The core competency for designers in 2026 has shifted. It's no longer about speed or pixel perfection. It's three things: **knowing which direction is right (judgment), knowing how to steer AI toward that direction (prompt engineering), and knowing where AI output will break (review skills).**

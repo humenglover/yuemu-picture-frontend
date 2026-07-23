@@ -9,7 +9,7 @@
   date: '2026-07-05',
   content: `If you've worked on more than three projects as a frontend developer, you know this pain: every project has different colors, different spacing, different border radii. The same button looks different on every page. The designer changed three times. The design file has four slightly different blues — #2563eb, #1d4ed8, #3b82f6, #2083f2 — and nobody knows which one is "the brand blue."
 
-![Design system chaos](/gifs/a10_chaos.gif)
+![Design system chaos](/webm/a10_chaos.webm)
 *▲ Life without a design system — every page has its own color palette, and changing a button means touching twenty files*
 
 That's what happens without a design system. Here's how to build one from zero — one that actually ships, stays in sync with code, and doesn't rot.
@@ -91,7 +91,7 @@ Don't build 50 components on day one. Start with these 10 core primitives: Butto
 
 The #1 killer of design systems isn't "we couldn't build it." It's "design changed and code didn't follow."
 
-![Design-to-code sync pipeline](/gifs/a10_sync.gif)
+![Design-to-code sync pipeline](/webm/a10_sync.webm)
 *▲ Design system CI/CD pipeline — Figma variable update triggers Git push, Style Dictionary build, npm publish*
 
 ### Recommended Sync Architecture
@@ -157,7 +157,7 @@ Figma approach: use Extended Collections. A Parent Collection holds shared Seman
 
 ## Part 7: What a Design System Actually Is
 
-![Design system built](/gifs/a10_build.gif)
+![Design system built](/webm/a10_build.webm)
 *▲ A design system isn't "a pretty component doc." It's turning your design decisions into reusable, syncable, traceable code assets.*
 
 Design System = Design Decisions × Engineering. Design Tokens map to CSS Variables. Figma Variables map to Style Dictionary. Components map to Component Library. CI/CD pipeline ties them together.

@@ -187,13 +187,12 @@
             </ol>
             <blockquote v-else-if="block.type === 'quote'" class="article-quote" v-html="block.html"></blockquote>
             <div v-else-if="block.type === 'image'" class="article-img-container">
-              <!-- GIF → WebM: use <video> for animations, much smaller than GIF -->
+              <!-- WebM animations: use <video> autoplay instead of static <img> -->
               <video
-                v-if="block.src?.endsWith('.gif')"
-                :src="block.src.replace('.gif', '.webm')"
+                v-if="block.src?.endsWith('.webm')"
+                :src="block.src"
                 autoplay loop muted playsinline
                 class="article-img-element"
-                :style="{ background: `url(${block.src}) center/contain no-repeat` }"
                 @error="handleVideoFallback($event, block)"
               />
               <img v-else :src="block.src" :alt="block.alt" class="article-img-element" loading="lazy" referrerpolicy="no-referrer" @error="handleImgError" />

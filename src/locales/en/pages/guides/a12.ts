@@ -11,7 +11,7 @@ export default {
 
 Motion isn't decoration. It's a language. Here's how to build a professional motion system.
 
-![Smooth motion satisfaction](/gifs/a12_smooth.gif)
+![Smooth motion satisfaction](/webm/a12_smooth.webm)
 *▲ Carefully tuned motion — it's not "pretty," it's "right"*
 
 ## Part 1: The 100/300/500 Duration Rule
@@ -60,7 +60,7 @@ When list items appear sequentially, delay each item by 40-80ms. Cap total stagg
 | ease-in | \`(0.5, 0, 0.75, 0)\` | Exits: accelerate away |
 | ease-in-out | \`(0.65, 0, 0.35, 1)\` | State toggles: symmetric back-and-forth |
 
-![Easing comparison](/gifs/a12_easing.gif)
+![Easing comparison](/webm/a12_easing.webm)
 *▲ Same displacement, different easing — linear feels robotic, ease-out breathes, bounce screams 2015*
 
 ### What to Avoid
@@ -182,7 +182,7 @@ Roughly 35% of adults over 40 have some form of vestibular disorder. Animation c
 
 ## Part 8: The Bottom Line
 
-![Micro-interaction delight](/gifs/a12_micro.gif)
+![Micro-interaction delight](/webm/a12_micro.webm)
 *▲ Good motion doesn't speak — but it makes you feel "this product gets me"*
 
 Motion design boils down to three principles:

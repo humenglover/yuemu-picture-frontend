@@ -11,7 +11,7 @@ export default {
 
 动效不是装饰，是交互语言。今天聊聊怎么建立一套专业的动效体系。
 
-![顺畅动效的快感](/gifs/a12_smooth.gif)
+![顺畅动效的快感](/webm/a12_smooth.webm)
 *▲ 图：精心调校的动效带来的体感——不是"好看"，是"对了"*
 
 ## 一、时长法则（The 100/300/500 Rule）
@@ -60,7 +60,7 @@ export default {
 | ease-in | \`(0.5, 0, 0.75, 0)\` | 退出动画：加速离开 |
 | ease-in-out | \`(0.65, 0, 0.35, 1)\` | 状态切换：来回对称 |
 
-![缓动曲线对比](/gifs/a12_easing.gif)
+![缓动曲线对比](/webm/a12_easing.webm)
 *▲ 图：同一位移、不同缓动——linear 像机器人，ease-out 像呼吸，bounce 像十年前的网页*
 
 ### 避坑
@@ -182,7 +182,7 @@ Disney 的 Ollie Johnston 和 Frank Thomas 在 1981 年总结的动画原则，�
 
 ## 八、总结
 
-![微交互的愉悦](/gifs/a12_micro.gif)
+![微交互的愉悦](/webm/a12_micro.webm)
 *▲ 图：好的动效不说话，但它让你觉得"这个产品懂我"*
 
 动效设计的核心就三句话：

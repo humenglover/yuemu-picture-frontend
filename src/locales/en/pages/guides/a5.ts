@@ -11,7 +11,7 @@
 
 I've seen too many genuinely powerful products die on the altar of bad typography. Font sizes with no scale logic — just random numbers someone typed and shipped. Line heights so tight reading feels like rush hour on the subway. Cross-platform font fallbacks that collapse straight into Times New Roman. And the worst — four completely incompatible fonts mashed into the same page:
 
-![Typography disaster](/gifs/typography_choke.gif)
+![Typography disaster](/webm/typography_choke.webm)
 *▲ When Comic Sans, cursive, and system fonts collide — your eyes just give up*
 
 What follows isn't art school theory. It's engineering — how to build a web typography system that doesn't break.

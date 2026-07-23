@@ -13,7 +13,7 @@ My friend was stunned. "How was I supposed to know?"
 
 The moment that ¥80,000 demand letter landed, the scene was pretty much like this:
 
-![Receiving copyright demand letter](/gifs/panic.gif)
+![Receiving copyright demand letter](/webm/panic.webm)
 *▲ Receiving an ¥80,000 copyright infringement claim out of nowhere*
 
 Here's the thing — courts don't care that you "didn't know." Image copyright is a strange beast: the barrier to entry is near zero (anyone can download an image), but the cost of getting it wrong can wipe out a small team (a single infringement lawsuit ranges from tens of thousands to hundreds of thousands). I've spent a lot of time studying CC licenses, commercial authorization boundaries, and AIGC copyright edges. Here's everything you actually need to know.
@@ -53,7 +53,7 @@ I've seen the most painful case: a nonprofit organization used CC BY-NC images, 
 
 When you try explaining to a client that "NC means no commercial use," and they hit you with "but I found it on Google, why can't I just use it?":
 
-![Client confusion on copyright](/gifs/confused.gif)
+![Client confusion on copyright](/webm/confused.webm)
 *▲ The face everyone makes when a client says "but images on the internet are free, right?"*
 
 ## Part 2: Four Iron Rules for Commercial Projects
@@ -64,7 +64,7 @@ On my machine, there's a folder organized by project and date, containing screen
 
 The moment you think you can just quietly delete the infringing image and pretend nothing happened — only to discover the original creator already took webpage snapshots as evidence:
 
-![Sneaking away quietly](/gifs/sneak.gif)
+![Sneaking away quietly](/webm/sneak.webm)
 *▲ Realizing the infringement notice already comes with Wayback Machine snapshots*
 
 ### Rule 2: Model Releases and Property Releases Are Completely Separate Things
@@ -81,7 +81,7 @@ Build a simple four-column spreadsheet: filename, source, license type, expirati
 
 Once you've built the habit of "screenshot on download," when the opposing lawyer questions you, you'll be holding a solid shield:
 
-![Compliance screenshot proof](/gifs/thuglife.gif)
+![Compliance screenshot proof](/webm/thuglife.webm)
 *▲ Holding a complete chain of authorization evidence — no panic whatsoever*
 
 ## Part 3: The Bottom Line — Become a "Visual Architect"

@@ -11,7 +11,7 @@
 
 The moment that Lighthouse report spat out 8.4s, everyone at their screen looked exactly like this:
 
-![Slow LCP loading panic](/gifs/lcp_rage.gif)
+![Slow LCP loading panic](/webm/lcp_rage.webm)
 *▲ The raw urge to delete the entire assets folder and start over*
 
 Three weeks later: LCP down to 1.2 seconds — an 85% reduction. Bounce rate fell off a cliff. The satisfaction was unreal. Better than any design refresh metric I've ever seen.
@@ -71,7 +71,7 @@ Two critical things: **First, never omit \`sizes\`.** Without it, the browser as
 
 You know that thing where you're reading, then an image suddenly loads and yeets the entire page down three screens?
 
-![Layout shift jump](/gifs/cls_shake.gif)
+![Layout shift jump](/webm/cls_shake.webm)
 *▲ CLS gone wild — because nobody reserved space for the images*
 
 The fix is almost insultingly simple: **put \`width\` and \`height\` on every \`<img>\` tag.** The browser uses these as aspect-ratio hints, reserving the exact space before a single byte arrives. Combine with \`width: 100%; height: auto;\` in CSS, and you've killed both the responsive problem and the layout shift problem in one shot. That ancient \`padding-bottom\` hack? Throw it in the trash where it belongs.
@@ -114,12 +114,12 @@ Manually generating AVIF, WebP, and JPEG versions for every single image is a sp
 
 The moment you wire all of this up:
 
-![Pro web media optimization](/gifs/hacker.gif)
+![Pro web media optimization](/webm/hacker.webm)
 *▲ AVIF, srcset, fetchpriority combo — feeling like a performance wizard*
 
 And when Lighthouse scores smash through 98:
 
-![Lighthouse 98 score celebration](/gifs/celebrate.gif)
+![Lighthouse 98 score celebration](/webm/celebrate.webm)
 *▲ LCP 1.2s, Lighthouse 98 — if you know, you know*
 
 ## Part 4: One Last Thing

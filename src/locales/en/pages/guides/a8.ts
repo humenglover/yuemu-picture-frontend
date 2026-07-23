@@ -11,7 +11,7 @@
 
 Here's a test. Take a screenshot of your product. Cover the logo. Can you still tell it's yours? If covering the logo makes your product indistinguishable from competitors —
 
-![Cover the logo, instant identity crisis](/gifs/slap.gif)
+![Cover the logo, instant identity crisis](/webm/slap.webm)
 *▲ When you cover the logo and realize your product looks exactly like everyone else's — direct hit to the ego*
 
 A logo is not a brand. A logo is your brand's signature. But your brand is how you speak, what you wear, the tone you use, the feeling you give off — none of which a logo can solve on its own. Here's the real question: **what actually goes into a usable brand visual identity system, and what's changing in 2026?**
@@ -53,7 +53,7 @@ Here's a perspective that might shake you: **the core metric for judging brand d
 
 What's mental availability? It's the probability that your target user thinks of you first in a specific situation. Thirsty → Coca-Cola. Search → Google. Books → Amazon. These brands have sky-high mental availability.
 
-![The real brand test](/gifs/a8_think.gif)
+![The real brand test](/webm/a8_think.webm)
 *▲ Can users still recognize you with the logo covered? Mental availability is the real moat — not that mark you paid three grand for*
 
 ### The Ultimate Test: De-Branded Recognition
@@ -67,7 +67,7 @@ No? Your brand still lives at the logo level. You have a nice mark. You don't ha
 
 The entire industry is facing a lethal problem: **AI has made brand design too easy.** Midjourney generates a logo in one click. AI color tools spit out a palette in one second. The result? Everyone's brand is starting to look the same.
 
-![AI homogenization terror](/gifs/a8_clone.gif)
+![AI homogenization terror](/webm/a8_clone.webm)
 *▲ AI-generated brand proposals — they all look polished, but cover the logo and they're the same template. Pure "AI mass production" plastic energy*
 
 AI gives you the "averaged" answer — the safest, most inoffensive option learned from training data. But brands don't need "not wrong." They need "different."

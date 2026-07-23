@@ -13,7 +13,7 @@ Real minimalism is that "just right" feeling — one more thing and it's clutter
 
 Then you open the client brief and it says "I want colorful black with a touch of bright green-red." That moment:
 
-![Client demanding colorful black](/gifs/eyeroll.gif)
+![Client demanding colorful black](/webm/eyeroll.webm)
 *▲ The universal eye-roll when a client asks for "colorful black" for the fifth time*
 
 Anyway. This piece is everything I've learned about negative space, color, and dark mode over years of designing — the wins, the faceplants, all of it.
@@ -24,7 +24,7 @@ Anyway. This piece is everything I've learned about negative space, color, and d
 
 Ever tried cramming ten different neon colors into a single page? Here's how that feels:
 
-![Blinding neon color palette](/gifs/myeyes.gif)
+![Blinding neon color palette](/webm/myeyes.webm)
 *▲ The moment your eyes physically reject a page drowning in high-saturation chaos*
 
 Negative space — or white space, call it what you want — isn't about "saving room." It's the opposite: **you're building a visual gravity field around your core content.** Think of a concert spotlight. The entire arena goes dark, one beam hits the lead singer. Where are your eyes going? Exactly.
@@ -55,7 +55,7 @@ The real sauce:
 
 When the color hierarchy finally clicks into place, you get this feeling:
 
-![Refreshing minimal design](/gifs/refreshed.gif)
+![Refreshing minimal design](/webm/refreshed.webm)
 *▲ That moment when the visual hierarchy locks in and everything just breathes*
 
 ## Part 3: Dark Mode — It's Way More Than Flipping Colors

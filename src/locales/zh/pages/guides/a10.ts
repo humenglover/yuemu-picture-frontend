@@ -9,7 +9,7 @@
   date: '2026-07-05',
   content: `做过三个以上项目的前端应该都有这种体验：每个项目颜色不一样、间距不一样、圆角不一样，甚至同一个按钮在各个页面长得都不一样。设计师换了三轮，设计稿里光蓝色就有 #2563eb、#1d4ed8、#3b82f6、#2083f2 四种——没人分得清哪个才是"品牌蓝"。
 
-![设计系统混乱现场](/gifs/a10_chaos.gif)
+![设计系统混乱现场](/webm/a10_chaos.webm)
 *▲ 图：没有设计系统的团队日常——每个页面颜色都不一样，每次改个按钮要改二十个文件*
 
 这就是没有设计系统的下场。今天聊的，就是怎么从零搭一套能真正落地、能跟代码同步、不会烂尾的设计系统。
@@ -91,7 +91,7 @@ Figma Variables 是 Figma 原生实现 Design Tokens 的机制。2026 年支持�
 
 设计系统最大的敌人不是"做不出来"，是"设计改了代码没改"。
 
-![设计代码同步](/gifs/a10_sync.gif)
+![设计代码同步](/webm/a10_sync.webm)
 *▲ 图：设计系统 CI/CD 管线——Figma 变量更新后自动推送到 Git，触发构建，发布到 npm*
 
 ### 推荐同步架构
@@ -159,7 +159,7 @@ Figma 的做法是使用 Extended Collections：Parent Collection 存放共享�
 
 ## 七、总结
 
-![设计系统搭建完成](/gifs/a10_build.gif)
+![设计系统搭建完成](/webm/a10_build.webm)
 *▲ 图：设计系统不是"做一套好看的组件文档"——它是让你的设计决策变成可复用、可同步、可追溯的代码资产*
 
 设计系统 = 设计决策 × 工程化。Design Tokens 对应 CSS Variables，Figma Variables 对应 Style Dictionary，Components 对应 Component Library，中间由 CI/CD 管线自动同步。

@@ -11,7 +11,7 @@
 
 Scroll-driven animations, smooth view transitions, native top-layer popovers, and anchor positioning are now fully supported across all major browser engines. This shift marks a fundamental milestone from script-driven DOM manipulation toward declarative browser rendering.
 
-![Modern CSS Features](/gifs/a9_flex.gif)
+![Modern CSS Features](/webm/a9_flex.webm)
 *Figure: Overview of 2026 CSS W3C Feature Specification Standards*
 
 Chrome 130+, Safari 18+, and Firefox 130+ provide stable, cross-browser native support. Zero polyfills or external dependencies required:
