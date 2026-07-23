@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="post-draft-list">
     <!-- 草稿列表 -->
     <div v-if="drafts && drafts.length > 0" class="drafts-container">
@@ -165,7 +165,7 @@ const editDraft = (draft: Draft) => {
 };
 // 跳转到发布帖子页面
 const goToPostEdit = () => {
-  router.push('/post/edit');
+  router.push({ name: 'PostEdit' });
 };
 // 格式化时间
 const formatDate = (dateString?: string) => {

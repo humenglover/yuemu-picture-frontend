@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-love-album-container">
     <div class="yuemu-dynamic-bg-layer">
       <div id="yuemu-nm-container"></div>
@@ -338,7 +338,7 @@ const fetchAlbumInfo = async () => {
       await fetchPictures()
     } else if (res.data.code === 40101) {
       sessionStorage.removeItem(`album_${albumId}_password`)
-      router.replace('/time-album')
+      router.replace({ name: 'TimeAlbumDetail' })
     } else {
       throw new Error(res.data.message)
     }

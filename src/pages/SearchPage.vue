@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="search-page">
     <div class="search-header-sticky">
       <div class="layout-center-800">
@@ -470,14 +470,15 @@ const searchByTag = (text: string) => {
 const handleUserClick = (user: any) => {
   if (!user) return
   router.push({
-    path: `/user/${user.id}`,
+    name: 'UserDetail',
+    params: { id: user.id },
     query: { userName: user.userName, userAvatar: user.userAvatar, userAccount: user.userAccount, userProfile: user.userProfile }
   })
 }
 
 const goToSpaceDetail = (space: API.SpaceVO) => {
   if (!space || !space.id) return
-  router.push(`/space/${space.id}`)
+  router.push({ name: 'SpaceDetail', params: { id: space.id } })
 }
 </script>
 

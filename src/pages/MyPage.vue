@@ -13,7 +13,7 @@
             <div class="icon-bg scan-icon-wrap" @click="qrScannerVisible = true" :title="$t('pages.myPage.scanIcon')">
               <img :src="scanIcon" class="custom-scan-icon" :alt="$t('pages.myPage.scan')" />
             </div>
-            <div v-if="device === DEVICE_TYPE_ENUM.MOBILE" class="icon-bg ai-icon-wrap" @click="router.push('/chat/ai')" :title="$t('pages.myPage.aiAssistant')">
+            <div v-if="device === DEVICE_TYPE_ENUM.MOBILE" class="icon-bg ai-icon-wrap" @click="router.push({ name: 'AIChat' })" :title="$t('pages.myPage.aiAssistant')">
               <img :src="aiIcon" class="ai-icon-img" alt="AI" />
             </div>
           </div>
@@ -72,7 +72,7 @@
 
           <div class="profile-btn-group">
             <template v-if="!loginUserStore.loginUser.id">
-              <button class="tk-btn tk-btn-primary" @click="router.push('/user/login')">{{ $t('pages.myPage.loginNow') }}</button>
+              <button class="tk-btn tk-btn-primary" @click="router.push({ name: 'UserLogin' })">{{ $t('pages.myPage.loginNow') }}</button>
             </template>
             <template v-else>
               <button class="tk-btn tk-btn-default" @click="openModal">{{ $t('pages.myPage.editProfile') }}</button>
@@ -613,24 +613,24 @@ const handleMySpaceClick = async () => {
     })
     if (res.data.code === 0 && res.data.data.records.length > 0) {
       const space = res.data.data.records[0]
-      router.push(`/space/${space.id}`)
+      router.push({ name: 'SpaceDetail', params: { id: space.id } })
     } else {
-      router.push('/add_space')
+      router.push({ name: 'AddSpace' })
     }
   } catch (error: any) {
     message.error(t('pages.myPage.msgs.noPrivateSpace'))
-    router.push('/my_space')
+    router.push({ name: 'MySpace' })
   } finally {
     hide()
   }
 }
-const handleSettingClick = () => router.push('/user/setting')
-const showAdminModal = () => router.push('/admin/manage')
-const handleMyPostsClick = () => router.push('/my_ports')
-const handleMyTeamsClick = () => router.push('/my_teams')
-const handleFollowClick = () => router.push({ path: '/follow-list', query: { tab: 'follow' } })
-const handleFansClick = () => router.push({ path: '/follow-list', query: { tab: 'fans' } })
-const handleAnalyticsClick = () => router.push('/creator/analytics')
+const handleSettingClick = () => router.push({ name: 'UserSetting' })
+const showAdminModal = () => router.push({ name: 'AdminManage' })
+const handleMyPostsClick = () => router.push({ name: 'MyPosts' })
+const handleMyTeamsClick = () => router.push({ name: 'MyTeams' })
+const handleFollowClick = () => router.push({ name: 'FollowList', query: { tab: 'follow' } })
+const handleFansClick = () => router.push({ name: 'FollowList', query: { tab: 'fans' } })
+const handleAnalyticsClick = () => router.push({ name: 'CreatorAnalytics' })
 
 const getDefaultAvatar = (userName: string) => `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(userName || 'Guest')}&backgroundColor=ffd5dc,ffdfbf,ffd5dc`
 
@@ -653,7 +653,7 @@ onUnmounted(() => {
   if (scrollTimer.value !== null) { clearTimeout(scrollTimer.value); scrollTimer.value = null }
 })
 
-const handleMessageCenter = () => router.push('/message-center')
+const handleMessageCenter = () => router.push({ name: 'MessageCenter' })
 const getEmptyDescription = () => ({ picture: t('pages.myPage.empty.picture'), post: t('pages.myPage.empty.post'), likes: t('pages.myPage.empty.likes'), favorites: t('pages.myPage.empty.favorites'), shares: t('pages.myPage.empty.shares'), comments: t('pages.myPage.empty.comments') }[activeTab.value])
 
 const switchTab = async (tab: string) => {

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-unread-share-list">
     <div
       v-for="(share, i) in safeShares"
@@ -85,9 +85,9 @@ const formatTime = (time: string) => {
 // 处理目标点击
 const handleTargetClick = (share: any) => {
   if (share.targetType === 1 && share.target?.id) {
-    router.push(`/picture-redirect/${share.target.id}`)
+    router.push({ name: 'PictureRedirect', params: { id: share.target.id } })
   } else if (share.targetType === 2 && share.target?.id) {
-    router.push(`/post/${share.target.id}`)
+    router.push({ name: 'PostDetail', params: { id: share.target.id } })
   }
 }
 

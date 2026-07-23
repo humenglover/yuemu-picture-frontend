@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="yuemu-chatListPage" class="yuemu-chat-list-page">
     <div class="yuemu-main-content" :class="{ 'pc-mode': device === DEVICE_TYPE_ENUM.PC }">
 
@@ -88,23 +88,23 @@
 
         <div :class="['yuemu-more-content', 'yuemu-tab-panel', { 'yuemu-tab-panel-active': activeTab === 'more' }]" ref="moreListRef">
           <div class="yuemu-discovery-actions">
-            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${treeHoleImg})` }" @click="$router.push('/barrage')">
+            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${treeHoleImg})` }" @click="$router.push({ name: 'Barrage' })">
               <div class="yuemu-action-label">{{ $t('pages.chatListPage.discover.treeHole') }}</div>
               <div class="yuemu-action-desc">{{ $t('pages.chatListPage.discover.treeHoleDesc') }}</div>
             </div>
-            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${friendLinkImg})` }" @click="$router.push('/friend-links')">
+            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${friendLinkImg})` }" @click="$router.push({ name: 'FriendLinks' })">
               <div class="yuemu-action-label">{{ $t('pages.chatListPage.discover.friendLink') }}</div>
               <div class="yuemu-action-desc">{{ $t('pages.chatListPage.discover.friendLinkDesc') }}</div>
             </div>
-            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${loveImg})` }" @click="$router.push('/loveboard/list')">
+            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${loveImg})` }" @click="$router.push({ name: 'LoveBoardList' })">
               <div class="yuemu-action-label">{{ $t('pages.chatListPage.discover.loveSquare') }}</div>
               <div class="yuemu-action-desc">{{ $t('pages.chatListPage.discover.loveSquareDesc') }}</div>
             </div>
-            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${toolsImg})` }" @click="$router.push('/tools')">
+            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${toolsImg})` }" @click="$router.push({ name: 'Tools' })">
               <div class="yuemu-action-label">{{ $t('pages.chatListPage.discover.tools') }}</div>
               <div class="yuemu-action-desc">{{ $t('pages.chatListPage.discover.toolsDesc') }}</div>
             </div>
-            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${gamesImg})` }" @click="$router.push('/games')">
+            <div class="yuemu-action-card bg-image-card" :style="{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)), url(${gamesImg})` }" @click="$router.push({ name: 'Games' })">
               <div class="yuemu-action-label">{{ $t('pages.chatListPage.discover.games') }}</div>
               <div class="yuemu-action-desc">{{ $t('pages.chatListPage.discover.gamesDesc') }}</div>
             </div>
@@ -599,13 +599,15 @@ const handleSearch = () => { fetchChatList(true); pcfetchChatList(true) }
 const handleChatClick = async (chat: PrivateChat) => {
   if (String(chat.id) === '-2') {
     router.push({
-      path: `/chat/${String(chat.targetUser?.id)}`,
+      name: 'PrivateChat',
+      params: { userId: String(chat.targetUser?.id) },
       query: { privateChatId: String(chat.id), userName: chat.targetUserChatName, userAvatar: chat.targetUser?.userAvatar, userAccount: chat.targetUser?.userAccount, createTime: String(chat.targetUser?.createTime), spaceId: '-2', type: 'group' }
     })
   } else if (chat.targetUser) {
     try { await clearUnreadCountUsingPost({ targetUserId: String(chat.targetUser.id), isSender: chat.isSender }); chat.userUnreadCount = 0 } catch (error) {}
     router.push({
-      path: `/chat/${String(chat.targetUser.id)}`,
+      name: 'PrivateChat',
+      params: { userId: String(chat.targetUser.id) },
       query: { privateChatId: String(chat.id), userName: chat.isSender ? chat.userChatName : chat.targetUserChatName, userAvatar: chat.targetUser.userAvatar, userAccount: chat.targetUser.userAccount, createTime: String(chat.targetUser.createTime), isSender: String(chat.isSender) }
     })
   }

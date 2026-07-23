@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-ai-chat-page">
     <div class="drawer-mask" v-if="showSessionDrawer && isMobile" @click="toggleSessionDrawer"></div>
 
@@ -7,7 +7,7 @@
         <button class="new-session-btn" @click="showCreateSessionModal" :disabled="creatingSession">
           <i class="fas fa-plus"></i><span>{{ creatingSession ? t('pages.aiChatPage.creating') : t('pages.aiChatPage.newChat') }}</span>
         </button>
-        <button class="resource-btn" @click="$router.push('/ai_resource')" :title="$t('pages.aiChatPage.resourceLibrary')">
+        <button class="resource-btn" @click="$router.push({ name: 'AiResource' })" :title="$t('pages.aiChatPage.resourceLibrary')">
           <i class="fas fa-folder-open"></i>
         </button>
       </div>

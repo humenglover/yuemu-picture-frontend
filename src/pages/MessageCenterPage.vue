@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="message-center" :class="{ 'pc-message-center': !isMobile }">
     <div class="message-header">
       <div class="header-left">
@@ -373,7 +373,7 @@ const handleMarkAllRead = async () => {
   }
 }
 
-const goToHistory = () => router.push('/message/history')
+const goToHistory = () => router.push({ name: 'InteractionHistory' })
 
 const handleMessageUnreadCountsUpdate = (event: CustomEvent) => {
   const data = event.detail

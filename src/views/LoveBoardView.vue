@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-love-board-container">
     <div class="yuemu-global-romantic-bg" v-if="!noPermission">
       <canvas ref="treeCanvasRef" class="yuemu-heart-tree-canvas"></canvas>
@@ -263,7 +263,7 @@
         <div class="yuemu-lock-icon yuemu-heartbeat"><i class="fa-solid fa-lock"></i></div>
         <h2>{{ $t('pages.loveBoardView.secret.title') }}</h2>
         <p>{{ $t('pages.loveBoardView.secret.desc') }}</p>
-        <button class="yuemu-btn-primary" @click="$router.push('/home')">{{ $t('pages.loveBoardView.secret.leave') }}</button>
+        <button class="yuemu-btn-primary" @click="$router.push({ name: 'MyHome' })">{{ $t('pages.loveBoardView.secret.leave') }}</button>
       </div>
     </div>
 

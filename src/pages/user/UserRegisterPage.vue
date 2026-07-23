@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-box" :class="{ 'yuemu-is-loaded': bgLoaded }">
     <div class="yuemu-content">
       <div class="yuemu-mobile-overlay"></div>
@@ -199,7 +199,7 @@ const handleSubmit = async (values: any) => {
   const res = await userRegisterUsingPost(values)
   if (res.data.code === 0 && res.data.data) {
     message.success(t('pages.user.userRegisterPage.registerSuccess'))
-    await router.push('/user/login')
+    await router.push({ name: 'UserLogin' })
   } else {
     message.error(t('pages.user.userRegisterPage.registerFail') + res.data.message)
   }

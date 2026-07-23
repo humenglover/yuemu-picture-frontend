@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-love-board-list">
     <div class="yuemu-main-container">
       <!-- Compact Dashboard Header -->
@@ -9,7 +9,7 @@
             <button v-if="loginUserStore.loginUser?.id" class="modern-cta-btn" @click="goToMyBoard">
               {{ $t('pages.loveBoardListView.myBoard') }}
             </button>
-            <button v-else class="modern-cta-btn" @click="router.push('/loveboard')">
+            <button v-else class="modern-cta-btn" @click="router.push({ name: 'LoveBoard' })">
               {{ $t('pages.loveBoardListView.createBoard') }}
             </button>
           </div>
@@ -56,7 +56,7 @@
           <p class="yuemu-empty-desc">
         {{ $t('pages.loveBoardListView.emptyDesc') }}
       </p>
-          <a-button type="primary" shape="round" class="yuemu-empty-cta" @click="router.push('/loveboard')">
+          <a-button type="primary" shape="round" class="yuemu-empty-cta" @click="router.push({ name: 'LoveBoard' })">
         {{ $t('pages.loveBoardListView.createMyBoard') }}
       </a-button>
         </div>
@@ -145,13 +145,13 @@ const handleSearch = () => {
   loadBoardList()
 }
 
-const goBoardDetail = (id: number) => router.push(`/loveboard/${id}`)
+const goBoardDetail = (id: number) => router.push({ name: 'LoveBoardShare', params: { id: id } })
 
 const goToMyBoard = async () => {
   try {
     const res = await getMyLoveBoardUsingGet()
     if (res.data?.id) router.push({ name: 'LoveBoardDetail', params: { id: res.data.id } })
-    else router.push('/loveboard')
+    else router.push({ name: 'LoveBoard' })
   } catch (err: any) {
     message.error(t('pages.loveBoardListView.msgs.fetchFail') + (err.message || t('pages.loveBoardListView.unknownError')))
   }

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-c-end-creator-list">
     <div v-if="loading && current === 1" class="yuemu-creator-grid">
       <div v-for="n in 6" :key="n" class="yuemu-creator-card yuemu-skeleton-card">
@@ -132,7 +132,7 @@ const getWorkThumbnail = (work: any) => {
   return props.type === "picture" ? (work.thumbnailUrl || work.url) : (work.coverUrl || "/default-post-cover.jpg");
 };
 
-const goToUserPage = (userId: string) => router.push(`/user/${userId}`);
+const goToUserPage = (userId: string) => router.push({ name: 'UserDetail', params: { id: userId } });
 const goToWorkDetail = (work: any) => router.push(props.type === "picture" ? `/picture/${work.id}` : `/post/${work.id}`);
 
 const getPostTextCover = (work: any) => {

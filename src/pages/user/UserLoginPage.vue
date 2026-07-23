@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-box" :class="{ 'yuemu-is-loaded': bgLoaded }">
     <div class="yuemu-content">
       <div class="yuemu-mobile-overlay"></div>
@@ -328,7 +328,7 @@ const handleSubmit = async (values: any) => {
   if (res.data.code === 0 && res.data.data) {
     await loginUserStore.fetchLoginUser()
     message.success(t('pages.user.userLoginPage.welcomeBack'))
-    router.push({ path: '/home', replace: true })
+    router.push({ name: 'MyHome', replace: true })
   } else {
     message.error(t('pages.user.userLoginPage.loginFail') + res.data.message)
     getVerifyCode()
@@ -361,7 +361,7 @@ const startCheckStatusTimer = () => {
       stopCheckStatusTimer()
       await loginUserStore.fetchLoginUser()
       message.success(t('pages.user.userLoginPage.loginSuccess'))
-      router.push({ path: '/home', replace: true })
+      router.push({ name: 'MyHome', replace: true })
     } else if (res.data.code !== 0) {
       stopCheckStatusTimer()
       wxReqCode.value = t('pages.user.userLoginPage.expiredText')
@@ -401,7 +401,7 @@ const startQrCheckTimer = () => {
         stopQrCheckTimer()
         await loginUserStore.fetchLoginUser()
         message.success(t('pages.user.userLoginPage.loginSuccess'))
-        router.push({ path: '/home', replace: true })
+        router.push({ name: 'MyHome', replace: true })
       } else if (res.data.code !== 0) {
         stopQrCheckTimer()
         qrStatus.value = 'expired'

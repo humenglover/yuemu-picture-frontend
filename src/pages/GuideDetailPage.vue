@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="GuideDetailPage">
     <div v-if="article" class="detail-page-wrapper">
       
@@ -31,7 +31,7 @@
       <main class="center-article-read-container">
         <!-- 返回导航 -->
         <nav class="top-back-nav">
-          <a class="back-text-btn" @click="$router.push('/guides')">
+          <a class="back-text-btn" @click="$router.push(guidePrefix)">
             <i class="fas fa-arrow-left"></i>
             <span>{{ $t('pages.guidesPage.backToCatalog') }}</span>
           </a>
@@ -255,7 +255,7 @@
     <!-- 404 / 未找到文章 -->
     <div v-else class="not-found-card">
       <h2>{{ $t('pages.guidesPage.notFoundTitle') }}</h2>
-      <router-link to="/guides" class="btn-primary">{{ $t('pages.guidesPage.backToCatalog') }}</router-link>
+      <router-link :to="guidePrefix" class="btn-primary">{{ $t('pages.guidesPage.backToCatalog') }}</router-link>
     </div>
   </div>
 </template>
@@ -267,7 +267,13 @@ import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const router = useRouter()
-const { tm, rt } = useI18n()
+const { tm, rt, locale } = useI18n()
+
+// 从路由 meta 或 locale 推断指南路径前缀
+const guidePrefix = computed(() => {
+  const metaLocale = route.meta?.locale as string | undefined
+  return metaLocale === 'en-US' ? '/en/guides' : '/zh/guides'
+})
 
 const activeTocId = ref<string>('')
 const mobileTocOpen = ref(false)
@@ -624,7 +630,7 @@ const handleImgError = (evt: Event) => {
 }
 
 const goArticle = (id: string) => {
-  router.push(`/guides/${id}`)
+  router.push({ name: 'GuideDetail', params: { id: id } })
   window.scrollTo(0, 0)
 }
 </script>

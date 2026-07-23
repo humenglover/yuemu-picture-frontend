@@ -1,4 +1,12 @@
 export default {
+  // ── SEO / TDK ──
+  seo: {
+    siteName: 'yuemutuku',
+    defaultTitle: 'yuemutuku - Discover, Share, Create Beautiful Moments',
+    description: 'yuemutuku is a vibrant creative community platform with a vast collection of high-quality images and design inspiration. Discover beautiful moments, share your life, connect with fellow creators, and use online tools to edit images, manage copyrights, and build your personal portfolio. Join yuemutuku to start your creative journey and explore infinite possibilities.',
+    keywords: 'yuemutuku, creative community, image sharing, design assets, high-quality images, art inspiration, copyright registration, online image editor, creator community, portfolio showcase',
+  },
+
   confirm: 'Confirm',
   cancel: 'Cancel',
   save: 'Save',

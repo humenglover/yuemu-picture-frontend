@@ -1,3 +1,5 @@
+import { stripLocalePrefix } from '@/router/localeRouter'
+
 /**
  * 不需要显示PC端底部信息的路由路径
  */
@@ -58,10 +60,11 @@ export const HIDE_PC_FOOTER_ROUTES = [
  * @param path 当前路由路径
  */
 export const shouldHidePCFooter = (path: string): boolean => {
+  const cleanPath = stripLocalePrefix(path)
   return HIDE_PC_FOOTER_ROUTES.some(route => {
     // 处理动态路由参数
     const routePattern = new RegExp('^' + route.replace(/:[^/]+/g, '[^/]+') + '$')
-    return routePattern.test(path)
+    return routePattern.test(cleanPath)
   })
 }
 
@@ -110,10 +113,11 @@ export const HIDE_MOBILE_FOOTER_ROUTES = [
  * @param path 当前路由路径
  */
 export const shouldHideMobileFooter = (path: string): boolean => {
+  const cleanPath = stripLocalePrefix(path)
   return HIDE_MOBILE_FOOTER_ROUTES.some(route => {
     // 处理动态路由参数
     const routePattern = new RegExp('^' + route.replace(/:[^/]+/g, '[^/]+') + '$')
-    return routePattern.test(path)
+    return routePattern.test(cleanPath)
   })
 }
 
@@ -151,10 +155,11 @@ export const HIDE_PC_HEADER_ROUTES = [
  * @param path 当前路由路径
  */
 export const shouldHidePCHeader = (path: string): boolean => {
+  const cleanPath = stripLocalePrefix(path)
   return HIDE_PC_HEADER_ROUTES.some(route => {
     // 处理动态路由参数
     const routePattern = new RegExp('^' + route.replace(/:[^/]+/g, '[^/]+') + '$')
-    return routePattern.test(path)
+    return routePattern.test(cleanPath)
   })
 }
 
@@ -172,10 +177,11 @@ export const HIDE_BACK_BUTTON_ROUTES = [
  * @param path 当前路由路径
  */
 export const shouldHideBackButton = (path: string): boolean => {
+  const cleanPath = stripLocalePrefix(path)
   return HIDE_BACK_BUTTON_ROUTES.some(route => {
     // 处理动态路由参数
     const routePattern = new RegExp('^' + route.replace(/:[^/]+/g, '[^/]+') + '$')
-    return routePattern.test(path)
+    return routePattern.test(cleanPath)
   })
 }
 
@@ -196,9 +202,10 @@ export const SAVE_SCROLL_POSITION_ROUTES = [
  * @param path 当前路由路径
  */
 export const shouldSaveScrollPosition = (path: string): boolean => {
+  const cleanPath = stripLocalePrefix(path)
   return SAVE_SCROLL_POSITION_ROUTES.some(route => {
     // 处理动态路由参数
     const routePattern = new RegExp('^' + route.replace(/:[^/]+/g, '[^/]+') + '$')
-    return routePattern.test(path)
+    return routePattern.test(cleanPath)
   })
 }

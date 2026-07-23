@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-unread-like-list">
     <div
       v-for="(like, i) in safeLikes"
@@ -81,9 +81,9 @@ const formatTime = (time: string) => {
 
 const handleTargetClick = (like: any) => {
   if (like.targetType === 1 && like.target?.id) {
-    router.push(`/picture-redirect/${like.target.id}`)
+    router.push({ name: 'PictureRedirect', params: { id: like.target.id } })
   } else if (like.targetType === 2 && like.target?.id) {
-    router.push(`/post/${like.target.id}`)
+    router.push({ name: 'PostDetail', params: { id: like.target.id } })
   }
 }
 

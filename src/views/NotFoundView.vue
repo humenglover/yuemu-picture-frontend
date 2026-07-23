@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="NotFoundView">
     <div class="not-found-container">
       <!-- 插图区域：图片本身已传达 404 -->
@@ -59,7 +59,7 @@ const router = useRouter()
 const { t } = useI18n()
 
 const goHome = () => {
-  router.push('/')
+  router.push({ name: 'Home' })
 }
 
 const getParticleStyle = (index: number) => {

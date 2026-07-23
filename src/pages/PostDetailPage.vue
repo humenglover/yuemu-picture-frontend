@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="post-detail-page">
 
     <div v-if="showAutoScrollIndicator" class="floating-scroll-controls">
@@ -693,7 +693,7 @@ const handleInputBlur = (e: FocusEvent) => {
 const fetchPostDetail = async () => {
   const id = route.params.id as string
   if (!id) {
-    router.push('/forum')
+    router.push({ name: 'Forum' })
     return
   }
   try {
@@ -712,7 +712,7 @@ const fetchPostDetail = async () => {
     }
   } catch (error: unknown) {
     message.error((error as Error)?.message || t('pages.postDetailPage.msgs.getDetailFail'))
-    router.push('/forum')
+    router.push({ name: 'Forum' })
   }
 }
 
@@ -1250,7 +1250,8 @@ const scrollToLatestComment = () => {
 const handleUserClick = (user) => {
   if (!user) return
   router.push({
-    path: `/user/${user.id}`,
+    name: 'UserDetail',
+    params: { id: user.id },
     query: {
       userName: user.userName,
       userAvatar: user.userAvatar,
@@ -1265,12 +1266,13 @@ const handleUserClick = (user) => {
 const goToAnalytics = () => {
   if (!post.value.id) return message.warning(t('pages.postDetailPage.msgs.noPostId'))
   showMoreModal.value = false
-  router.push(`/item/analytics/post/${post.value.id}`)
+  router.push({ name: 'ItemAnalytics', params: { type: 'post', id: post.value.id } })
 }
 
 const handleEdit = () => {
   router.push({
-    path: `/post/edit/${post.value.id}`,
+    name: 'PostEdit',
+    params: { id: post.value.id },
     query: {
       post: JSON.stringify({
         id: post.value.id,
@@ -1299,7 +1301,7 @@ const confirmDelete = async () => {
     const res = await deletePostUsingPost({ id: post.value.id })
     if (res.data.code === 0) {
       message.success(t('pages.postDetailPage.msgs.delSuccess'))
-      router.push('/forum')
+      router.push({ name: 'Forum' })
     } else {
       message.error(t('pages.postDetailPage.msgs.delFail'))
     }

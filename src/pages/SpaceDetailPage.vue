@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="apple-page-container">
     <div id="spaceDetailPage" :class="{ 'is-pulling': refreshDistance > 0 }">
       <div class="glass-header">
@@ -90,7 +90,7 @@
             <div class="radial-icon"><i class="fas fa-upload"></i></div>
             <span class="radial-label">{{ $t('pages.spaceDetailPage.fab.upload') }}</span>
           </button>
-          <button class="radial-item item-1" @click="router.push(`/space_chat/${id}`); fabExpanded = false" v-if="space.spaceType === SPACE_TYPE_ENUM.TEAM">
+          <button class="radial-item item-1" @click="router.push({ name: 'SpaceChat', params: { id: id } }); fabExpanded = false" v-if="space.spaceType === SPACE_TYPE_ENUM.TEAM">
             <div class="radial-icon"><i class="fas fa-comments"></i></div>
             <span class="radial-label">{{ $t('pages.spaceDetailPage.fab.chat') }}</span>
           </button>
@@ -153,19 +153,19 @@
 
             <div v-if="!isStatusLoading && userSpaceStatus.isMember" class="action-grid-card">
               <div class="action-grid">
-                <div v-if="canManageSpaceUser && space.spaceType === SPACE_TYPE_ENUM.TEAM" class="grid-item" @click="handleNavigate(`/spaceUserManage/${id}`)">
+                <div v-if="canManageSpaceUser && space.spaceType === SPACE_TYPE_ENUM.TEAM" class="grid-item" @click="handleNavigate({ name: 'SpaceUserManage', params: { id } })">
                   <div class="icon-wrap bg-blue"><i class="fas fa-users-cog"></i><div v-if="pendingApplicationsCount > 0" class="red-dot"></div></div>
                   <span>{{ $t('pages.spaceDetailPage.actions.members') }}</span>
                 </div>
-                <div v-if="space.spaceType === SPACE_TYPE_ENUM.TEAM" class="grid-item" @click="handleNavigate(`/space_chat/${id}`)">
+                <div v-if="space.spaceType === SPACE_TYPE_ENUM.TEAM" class="grid-item" @click="handleNavigate({ name: 'SpaceChat', params: { id } })">
                   <div class="icon-wrap bg-green"><i class="fas fa-comments"></i></div>
                   <span>{{ $t('pages.spaceDetailPage.actions.chat') }}</span>
                 </div>
-                <div v-if="canManageSpaceUser" class="grid-item" @click="handleNavigate(`/space_analyze?spaceId=${id}`)">
+                <div v-if="canManageSpaceUser" class="grid-item" @click="handleNavigate({ name: 'SpaceAnalyze', query: { spaceId: id } })">
                   <div class="icon-wrap bg-purple"><i class="fas fa-chart-pie"></i></div>
                   <span>{{ $t('pages.spaceDetailPage.actions.analyze') }}</span>
                 </div>
-                <div v-if="canManageSpaceUser && space.spaceType !== SPACE_TYPE_ENUM.PRIVATE" class="grid-item" @click="handleNavigate(`/space/${String(id)}/activityManage`)">
+                <div v-if="canManageSpaceUser && space.spaceType !== SPACE_TYPE_ENUM.PRIVATE" class="grid-item" @click="handleNavigate({ name: 'SpaceActivityManage', params: { spaceId: id } })">
                   <div class="icon-wrap bg-cyan"><i class="fas fa-calendar-alt"></i></div>
                   <span>{{ $t('pages.spaceDetailPage.actions.activity') }}</span>
                 </div>
@@ -507,9 +507,9 @@ const searchFormRef = ref()
 const activities = ref([])
 const activitiesLoading = ref(false)
 
-const handleNavigate = (path: string) => {
+const handleNavigate = (options: { name: string; params?: Record<string, any>; query?: Record<string, any> }) => {
   toggleMoreModal()
-  router.push(path)
+  router.push(options)
 }
 
 const fetchActivities = async () => {
@@ -533,7 +533,7 @@ const fetchActivities = async () => {
 }
 
 const handleActivityClick = (activityId: string | number) => {
-  router.push(`/activity/detail/${activityId}`)
+  router.push({ name: 'ActivityDetail', params: { id: activityId } })
 }
 
 const formatTime = (time: string | number | Date) => {
@@ -549,7 +549,7 @@ const formatTime = (time: string | number | Date) => {
 }
 
 const handleUploadClick = () => {
-  router.push(`/add_picture?spaceId=${props.id}`)
+  router.push({ name: 'AddPicture', query: { spaceId: props.id } })
 }
 
 function createPermissionChecker(permission: string) {
@@ -641,7 +641,7 @@ const handleQuitSpace = async () => {
             const res = await quitSpaceUsingPost({ id: props.id })
             if (res.data.code === 0) {
               message.success(t('pages.spaceDetailPage.msgs.quitSuccess'))
-              await router.push('/')
+              await router.push({ name: 'Home' })
             } else message.error(t('pages.spaceDetailPage.msgs.quitFailPrefix') + res.data.message)
           } catch (error: any) { message.error(t('pages.spaceDetailPage.msgs.quitFailPrefix') + error.message) }
         }
@@ -662,7 +662,7 @@ const confirmQuit = async () => {
     if (res.data.code === 0) {
       message.success(t('pages.spaceDetailPage.msgs.quitSuccess'))
       showQuitConfirmDialog.value = false
-      await router.push('/')
+      await router.push({ name: 'Home' })
     } else message.error(t('pages.spaceDetailPage.msgs.quitFailPrefix') + res.data.message)
   } catch (error: any) {
     message.error(t('pages.spaceDetailPage.msgs.quitFailPrefix') + error.message)
@@ -684,7 +684,7 @@ const checkPendingApplication = async () => {
   try {
     if (!loginUserStore.loginUser?.id) {
       message.error(t('pages.spaceDetailPage.msgs.notLoggedIn'))
-      router.push('/user/login')
+      router.push({ name: 'UserLogin' })
       return
     }
     const res = await checkPendingApplicationUsingPost({ userId: loginUserStore.loginUser.id, spaceId: props.id })
@@ -715,7 +715,7 @@ const applyToJoinSpace = async () => {
   try {
     if (!loginUserStore.loginUser?.id) {
       message.error(t('pages.spaceDetailPage.msgs.notLoggedIn'))
-      router.push('/user/login')
+      router.push({ name: 'UserLogin' })
       return
     }
     await updateUserSpaceStatus()
@@ -762,10 +762,10 @@ const fetchSpaceDetail = async () => {
       const res = await listSpaceVoByPageUsingPost({ userId: loginUserStore.loginUser.id, current: 1, pageSize: 1, spaceType: SPACE_TYPE_ENUM.PRIVATE })
       if (res.data.code === 0 && res.data.data?.records?.length > 0) {
         const firstSpace = res.data.data.records[0]
-        router.replace(`/space/${firstSpace.id}`)
+        router.replace({ name: 'SpaceDetail', params: { id: firstSpace.id } })
         space.value = firstSpace
       } else {
-        router.replace('/add_space')
+        router.replace({ name: 'AddSpace' })
         return
       }
     } else {
@@ -857,7 +857,7 @@ const loadMore = async () => {
 const fetchData = async () => {
   loading.value = true
   try {
-    if(!props.id){ await router.push('/'); return }
+    if(!props.id){ await router.push({ name: 'Home' }); return }
     if (!userSpaceStatus.value.isMember) {
       await updateUserSpaceStatus()
       if (!userSpaceStatus.value.isMember && !userSpaceStatus.value.hasPending) await checkPendingApplication()

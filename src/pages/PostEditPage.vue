@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="yuemu-postEditPage" class="yuemu-post-page" :class="{ 'is-ai-generating': isAiGenerating }">
     <div class="yuemu-page-inner-wrapper">
       <div class="yuemu-app-container yuemu-editor-pane">
@@ -998,7 +998,7 @@ const handleSubmit = async () => {
       draftId = null
     }
     updateInitialFormData()
-    router.push('/forum')
+    router.push({ name: 'Forum' })
   } catch (error: any) {
     showToastMessage(t('pages.postEditPage.msgs.actionFailMsg').replace('{action}', isEdit.value ? t('pages.postEditPage.header.update') : t('pages.postEditPage.header.publish')).replace('{msg}', String(error.message || t('pages.postEditPage.msgs.unknownError'))), 'error');
   } finally { submitting.value = false }

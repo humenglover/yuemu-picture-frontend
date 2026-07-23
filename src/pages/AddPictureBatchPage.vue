@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="yuemu-addPictureBatchPage">
     <div class="yuemu-batch-container yuemu-fade-in-up">
       <header class="yuemu-batch-header">
@@ -279,7 +279,7 @@ const handleReset = () => {
   formData.count = 10
 }
 
-const handleGoHome = () => { router.push('/') }
+const handleGoHome = () => { router.push({ name: 'Home' }) }
 
 onMounted(() => { getTagCategoryOptions() })
 onUnmounted(() => { closeWebSocket() })

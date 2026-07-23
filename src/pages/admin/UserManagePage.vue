@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="userManagePage">
     <template v-if="device === DEVICE_TYPE_ENUM.PC">
       <div class="pc-container">
@@ -600,7 +600,7 @@ const handleBanOrUnban = async (user: API.UserVO) => {
   }
 }
 
-const goToUserDetail = (userId: string) => { router.push(`/user/${userId}`) }
+const goToUserDetail = (userId: string) => { router.push({ name: 'UserDetail', params: { id: userId } }) }
 </script>
 
 <style scoped>

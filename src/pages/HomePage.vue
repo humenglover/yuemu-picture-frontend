@@ -88,8 +88,8 @@
         :loading="followUsersLoading"
         mode="stack"
         :maxCount="6"
-        @item-click="id => $router.push(`/user/${id}`)"
-        @more-click="$router.push('/follow-list')"
+        @item-click="id => $router.push({ name: 'UserDetail', params: { id } })"
+        @more-click="$router.push({ name: 'FollowList' })"
       />
     </div>
 
@@ -182,8 +182,8 @@
               :users="followUsers"
               mode="stack"
               :maxCount="12"
-              @item-click="id => $router.push(`/user/${id}`)"
-              @more-click="$router.push('/follow-list')"
+              @item-click="id => $router.push({ name: 'UserDetail', params: { id } })"
+              @more-click="$router.push({ name: 'FollowList' })"
             />
           </div>
         </div>
@@ -834,7 +834,7 @@ watch(activeTab, async (newTab, oldTab) => {
     // 恢复到之前的tab，防止切换
     activeTab.value = oldTab || 'all'
     // 跳转到榜单页面
-    router.push({ path: '/ranking', query: { type: 'picture' } })
+    router.push({ name: 'Ranking', query: { type: 'picture' } })
     return
   }
 
@@ -1016,17 +1016,17 @@ const handleSearchClick = () => {
       searchWrapper.style.transform = 'scaleY(0)'
       searchWrapper.style.opacity = '0'
     }
-    router.push('/search')
+    router.push({ name: 'Search' })
   }, 300)
 }
 
 // 跳转到榜单页面
 const goToRanking = () => {
-  router.push({ path: '/ranking', query: { type: 'picture' } })
+  router.push({ name: 'Ranking', query: { type: 'picture' } })
 }
 
 const handleActivityClick = (id: string) => {
-  router.push(`/activity/detail/${id}`)
+  router.push({ name: 'ActivityDetail', params: { id } })
 }
 
 const handleImageError = (e) => {

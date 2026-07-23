@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-admin-layout-wrapper">
     <div class="yuemu-admin-layout-container">
 
@@ -295,17 +295,17 @@ const chartData = ref<API.ChartVO>({
 } as API.ChartVO)
 
 const statsList = computed(() => [
-  { title: isMobile.value ? t('pages.admin.adminManagePage.statUser') : t('pages.admin.adminManagePage.statNewUser'), key: 'newUsers', icon: TeamOutlined, route: '/admin/userManage' },
-  { title: isMobile.value ? t('pages.admin.adminManagePage.statPic') : t('pages.admin.adminManagePage.statNewPic'), key: 'newPictures', icon: PictureOutlined, route: '/admin/pictureManage' },
+  { title: isMobile.value ? t('pages.admin.adminManagePage.statUser') : t('pages.admin.adminManagePage.statNewUser'), key: 'newUsers', icon: TeamOutlined, route: 'AdminUserManage' },
+  { title: isMobile.value ? t('pages.admin.adminManagePage.statPic') : t('pages.admin.adminManagePage.statNewPic'), key: 'newPictures', icon: PictureOutlined, route: 'AdminPictureManage' },
   { title: isMobile.value ? t('pages.admin.adminManagePage.statView') : t('pages.admin.adminManagePage.statNewView'), key: 'totalViews', icon: EyeOutlined, route: '' },
-  { title: isMobile.value ? t('pages.admin.adminManagePage.statSpace') : t('pages.admin.adminManagePage.statNewSpace'), key: 'newSpaces', icon: AppstoreOutlined, route: '/admin/spaceManage' },
-  { title: isMobile.value ? t('pages.admin.adminManagePage.statPost') : t('pages.admin.adminManagePage.statNewPost'), key: 'newPosts', icon: FileTextOutlined, route: '/admin/postManage' },
+  { title: isMobile.value ? t('pages.admin.adminManagePage.statSpace') : t('pages.admin.adminManagePage.statNewSpace'), key: 'newSpaces', icon: AppstoreOutlined, route: 'AdminSpaceManage' },
+  { title: isMobile.value ? t('pages.admin.adminManagePage.statPost') : t('pages.admin.adminManagePage.statNewPost'), key: 'newPosts', icon: FileTextOutlined, route: 'AdminPostManage' },
   { title: isMobile.value ? t('pages.admin.adminManagePage.statFriendLink') : t('pages.admin.adminManagePage.statNewFriendLink'), key: 'newFriendLinks', icon: LinkOutlined, route: '/admin/friendLinkManage' },
   { title: isMobile.value ? t('pages.admin.adminManagePage.statLoveBoard') : t('pages.admin.adminManagePage.statNewLoveBoard'), key: 'newLoveBoards', icon: HeartOutlined, route: '/admin/loveBoardManage' },
   { title: isMobile.value ? t('pages.admin.adminManagePage.statMessage') : t('pages.admin.adminManagePage.statNewMessage'), key: 'newMessages', icon: MessageOutlined, route: '/admin/messageManage' },
-  { title: isMobile.value ? t('pages.admin.adminManagePage.statActivity') : t('pages.admin.adminManagePage.statNewActivity'), key: 'newActivities', icon: CalendarOutlined, route: '/admin/activityManage' },
+  { title: isMobile.value ? t('pages.admin.adminManagePage.statActivity') : t('pages.admin.adminManagePage.statNewActivity'), key: 'newActivities', icon: CalendarOutlined, route: 'AdminActivityManage' },
   { title: isMobile.value ? t('pages.admin.adminManagePage.statAudio') : t('pages.admin.adminManagePage.statNewAudio'), key: 'newAudioFiles', icon: SoundOutlined, route: '/admin/audioManage' },
-  { title: isMobile.value ? t('pages.admin.adminManagePage.statReport') : t('pages.admin.adminManagePage.statNewReport'), key: 'newReports', icon: ExclamationCircleOutlined, route: '/admin/reportManage' },
+  { title: isMobile.value ? t('pages.admin.adminManagePage.statReport') : t('pages.admin.adminManagePage.statNewReport'), key: 'newReports', icon: ExclamationCircleOutlined, route: 'AdminReportManage' },
   { title: isMobile.value ? t('pages.admin.adminManagePage.statSession') : t('pages.admin.adminManagePage.statNewSession'), key: 'newChatMessages', icon: MessageOutlined, route: '/admin/sessionManage' }
 ])
 
@@ -344,7 +344,8 @@ const handleMenuClick = (route: string) => {
     document.body.style.overflow = 'auto'
   }
   if (!['dashboard', 'deepseek', 'blog', 'knowledgeGraph'].includes(route)) {
-    router.push(`/admin/${route}`)
+    const name = 'Admin' + route.charAt(0).toUpperCase() + route.slice(1)
+    router.push({ name })
   }
 }
 
@@ -354,8 +355,12 @@ const handleStatsCardClick = (route: string) => {
     isMobileMenuOpen.value = false
     document.body.style.overflow = 'auto'
   }
-  router.push(route)
-  const routeKey = route.replace('/admin/', '')
+  if (route.startsWith('/')) {
+    router.push(route)
+  } else {
+    router.push({ name: route })
+  }
+  const routeKey = route.startsWith('/') ? route.replace('/admin/', '') : route.replace('Admin', '').replace(/^[A-Z]/, c => c.toLowerCase())
   if (menuTitleMap.value[routeKey]) {
     selectedKey.value = [routeKey]
   }

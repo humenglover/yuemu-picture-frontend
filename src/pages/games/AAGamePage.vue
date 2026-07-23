@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-vintage-game-page">
     
     <!-- 脉冲链路终端 (主游戏控制台) -->
@@ -474,7 +474,7 @@ const changeHistoryPage = (delta: number) => {
 
 const handleUserClick = (item: any) => {
   if (!item || !item.userId) return;
-  router.push(`/user/${item.userId}`);
+  router.push({ name: 'UserDetail', params: { id: item.userId } });
 };
 
 // --- 保存游戏成绩逻辑 ---

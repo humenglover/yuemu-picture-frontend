@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-recommended-spaces-container" @scroll="handleScroll">
     
     <!-- 推荐空间 -->
@@ -140,7 +140,7 @@ const getSpaceCover = (space: API.SpaceVO) => {
 };
 
 const handleTeamClick = (space: API.SpaceVO) => {
-  if (space.id) router.push(`/space/${space.id}`);
+  if (space.id) router.push({ name: 'SpaceDetail', params: { id: space.id } });
 };
 
 const init = async () => {

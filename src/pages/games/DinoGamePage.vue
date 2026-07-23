@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-retro-dino-universe" :class="{ 'is-mobile': isMobile }" @touchmove.prevent>
     <div class="arcade-console">
 
@@ -372,7 +372,7 @@ const changeHistoryPage = (delta: number) => {
 
 const handleUserClick = (item: any) => {
   if (!item || !item.userId) return
-  router.push(`/user/${item.userId}`)
+  router.push({ name: 'UserDetail', params: { id: item.userId } })
 }
 
 const saveScore = async (finalScore: number) => {
@@ -835,7 +835,7 @@ const gameLoop = () => {
   animationFrameId = requestAnimationFrame(gameLoop)
 }
 
-const quitGame = () => router.push('/games')
+const quitGame = () => router.push({ name: 'Games' })
 
 // --- 修正初始化：确保 ctx 获取并且正确绘制待机状态 ---
 const resizeCanvas = () => {

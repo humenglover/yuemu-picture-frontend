@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-vintage-game-page">
     <div class="instrument-chassis">
       <div class="screw top-left"></div>
@@ -681,7 +681,7 @@ const changeHistoryPage = (delta: number) => {
 
 const handleUserClick = (item: any) => {
   if (!item || !item.userId) return;
-  router.push(`/user/${item.userId}`);
+  router.push({ name: 'UserDetail', params: { id: item.userId } });
 };
 
 // 上报最终评分

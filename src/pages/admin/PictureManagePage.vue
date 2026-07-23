@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="yuemu-picture-manage-page">
     <template v-if="device === DEVICE_TYPE_ENUM.PC">
       <div class="yuemu-pc-dashboard">
@@ -13,9 +13,9 @@
               <SortDescendingOutlined v-else />
               {{ sortOrder === 'ascend' ? t('pages.admin.pictureManagePage.ascend') : t('pages.admin.pictureManagePage.descend') }}
             </a-button>
-            <a-button class="yuemu-btn-ghost" @click="router.push('/add_picture/batch')">
+            <a-button class="yuemu-btn-ghost" @click="router.push({ name: 'AddPictureBatch' })">
               <UploadOutlined /> {{ t('pages.admin.pictureManagePage.batchImport') }} </a-button>
-            <a-button type="primary" class="yuemu-btn-primary" @click="router.push('/add_picture')">
+            <a-button type="primary" class="yuemu-btn-primary" @click="router.push({ name: 'AddPicture' })">
               <PlusOutlined /> {{ t('pages.admin.pictureManagePage.uploadPic') }} </a-button>
           </div>
         </header>
@@ -127,7 +127,7 @@
                   <div class="yuemu-action-cell">
                     <button v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS" class="yuemu-icon-text-btn yuemu-color-success" @click="handleReview(record, PIC_REVIEW_STATUS_ENUM.PASS)"> {{ t('pages.admin.pictureManagePage.pass') }} </button>
                     <button v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT" class="yuemu-icon-text-btn yuemu-color-warning" @click="showRejectModal(record)"> {{ t('pages.admin.pictureManagePage.reject') }} </button>
-                    <button class="yuemu-icon-text-btn yuemu-color-primary" @click="router.push(`/add_picture?id=${record.id}`)"> {{ t('pages.admin.pictureManagePage.edit') }} </button>
+                    <button class="yuemu-icon-text-btn yuemu-color-primary" @click="router.push({ name: 'AddPicture', query: { id: record.id } })"> {{ t('pages.admin.pictureManagePage.edit') }} </button>
                     <button class="yuemu-icon-text-btn" :class="record.isFeature ? 'yuemu-color-warning' : 'yuemu-color-gray'" @click="handleFeature(record)">
                       {{ record.isFeature ? t('pages.admin.pictureManagePage.cancelFeature') : t('pages.admin.pictureManagePage.setFeature') }}
                     </button>
@@ -159,8 +159,8 @@
           <div class="yuemu-m-header-main">
             <h1 class="yuemu-m-title"> {{ t('pages.admin.pictureManagePage.mTitle') }} </h1>
             <div class="yuemu-m-actions">
-              <van-button icon="plus" size="small" type="primary" round class="yuemu-m-primary-btn" @click="router.push('/add_picture')" />
-              <van-button icon="photograph" size="small" round class="yuemu-m-ghost-btn" @click="router.push('/add_picture/batch')" />
+              <van-button icon="plus" size="small" type="primary" round class="yuemu-m-primary-btn" @click="router.push({ name: 'AddPicture' })" />
+              <van-button icon="photograph" size="small" round class="yuemu-m-ghost-btn" @click="router.push({ name: 'AddPictureBatch' })" />
             </div>
           </div>
 
@@ -203,7 +203,7 @@
               <div class="yuemu-m-card-actions">
                 <button v-if="picture.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS" class="yuemu-m-action-btn yuemu-color-success" @click="handleReview(picture, PIC_REVIEW_STATUS_ENUM.PASS)"> {{ t('pages.admin.pictureManagePage.pass') }} </button>
                 <button v-if="picture.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT" class="yuemu-m-action-btn yuemu-color-warning" @click="showRejectModal(picture)"> {{ t('pages.admin.pictureManagePage.reject') }} </button>
-                <button class="yuemu-m-action-btn yuemu-color-primary" @click="router.push(`/add_picture?id=${picture.id}`)"> {{ t('pages.admin.pictureManagePage.edit') }} </button>
+                <button class="yuemu-m-action-btn yuemu-color-primary" @click="router.push({ name: 'AddPicture', query: { id: picture.id } })"> {{ t('pages.admin.pictureManagePage.edit') }} </button>
                 <button class="yuemu-m-action-btn" :class="picture.isFeature ? 'yuemu-color-warning' : 'yuemu-color-gray'" @click="handleFeature(picture)">
                   {{ picture.isFeature ? t('pages.admin.pictureManagePage.cancelFeature') : t('pages.admin.pictureManagePage.setFeature') }}
                 </button>

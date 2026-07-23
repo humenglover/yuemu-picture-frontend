@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="AboutPage">
     <!-- ==================== 1. HERO 商业巨幕区 (带 ParticleBackground 动态粒子) ==================== -->
     <section class="hero-section">
@@ -14,13 +14,13 @@
         </p>
 
         <div class="hero-buttons">
-          <router-link to="/discovery" class="btn-brand-primary">
+          <router-link :to="{ name: 'Discovery' }" class="btn-brand-primary">
             <span>{{ $t('pages.aboutPage.exploreBtn') }}</span>
             <div class="btn-icon-circle">
               <i class="fa-solid fa-arrow-right icon-arrow"></i>
             </div>
           </router-link>
-          <router-link to="/user/login" class="btn-brand-secondary">
+          <router-link :to="{ name: 'UserLogin' }" class="btn-brand-secondary">
             <span>{{ $t('pages.aboutPage.startBtn') }}</span>
           </router-link>
         </div>
@@ -337,7 +337,7 @@
         <div class="cta-banner">
           <h2 class="cta-title">{{ $t('pages.aboutPage.ctaTitle') }}</h2>
           <p class="cta-sub">{{ $t('pages.aboutPage.ctaSub') }}</p>
-          <router-link to="/user/login" class="btn-brand-primary btn-cta-large">
+          <router-link :to="{ name: 'UserLogin' }" class="btn-brand-primary btn-cta-large">
             <span>{{ $t('pages.aboutPage.ctaActionBtn') }}</span>
             <div class="btn-icon-circle">
               <i class="fa-solid fa-arrow-right icon-arrow"></i>

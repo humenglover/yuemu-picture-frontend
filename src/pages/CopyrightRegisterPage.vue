@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Transition name="yuemu-fade-page">
     <div class="yuemu-copyright-register-fullscreen">
 
@@ -204,13 +204,13 @@ const handleSubmit = async () => {
       res = await updateCopyrightUsingPost({ id: copyrightId.value, ...form })
       if (res.data.code === 0) {
         message.success(t('pages.copyrightRegisterPage.updateSuccess'))
-        router.push(`/picture-redirect/${form.pictureId}`)
+        router.push({ name: 'PictureRedirect', params: { id: form.pictureId } })
       } else throw new Error(res.data.message || t('pages.copyrightRegisterPage.updateFail'))
     } else {
       res = await registerCopyrightUsingPost(form)
       if (res.data.code === 0) {
         message.success(t('pages.copyrightRegisterPage.registerSuccess'))
-        router.push(`/picture-redirect/${form.pictureId}`)
+        router.push({ name: 'PictureRedirect', params: { id: form.pictureId } })
       } else throw new Error(res.data.message || t('pages.copyrightRegisterPage.registerFail'))
     }
   } catch (error: any) {

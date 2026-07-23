@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Teleport to="body">
     <Transition name="cookie-banner">
       <div v-if="visible" class="cookie-consent-backdrop">
@@ -58,9 +58,9 @@
 
           <!-- Footer link -->
           <p class="cookie-consent-footer">
-            <router-link to="/privacy">{{ $t('pages.app.cookieConsent.privacyPolicy') }}</router-link>
+            <router-link :to="{ name: 'Privacy' }">{{ $t('pages.app.cookieConsent.privacyPolicy') }}</router-link>
             <span class="cookie-divider">|</span>
-            <router-link to="/privacy-center">{{ $t('pages.app.cookieConsent.privacyCenter') }}</router-link>
+            <router-link :to="{ name: 'PrivacyCenter' }">{{ $t('pages.app.cookieConsent.privacyCenter') }}</router-link>
           </p>
         </div>
       </div>

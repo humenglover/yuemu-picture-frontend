@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-retro-snake-universe" @touchmove.prevent>
     <div class="arcade-console">
 
@@ -444,7 +444,7 @@ const changeHistoryPage = (delta: number) => {
 
 const handleUserClick = (item: any) => {
   if (!item || !item.userId) return
-  router.push(`/user/${item.userId}`)
+  router.push({ name: 'UserDetail', params: { id: item.userId } })
 }
 
 const saveScore = async () => {

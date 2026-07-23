@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-vintage-game-page" @contextmenu.prevent>
     <div class="yuemu-blueprint-chassis">
       <div class="yuemu-rivet yuemu-top-left"></div>
@@ -378,7 +378,7 @@ const changeHistoryPage = (delta: number) => {
 
 const handleUserClick = (item: any) => {
   if (!item || !item.userId) return;
-  router.push(`/user/${item.userId}`);
+  router.push({ name: 'UserDetail', params: { id: item.userId } });
 };
 
 const saveScore = async (levelNum: number) => {

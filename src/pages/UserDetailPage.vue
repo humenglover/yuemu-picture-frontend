@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="usersDetailPage" ref="pageRef" class="page-wrapper">
     <div class="top-nav">
       <div class="nav-btn" @click="goBack">
@@ -345,7 +345,7 @@ const goToFollowList = (type: string) => {
     message.info(t('pages.userDetailPage.msgs.privateFans'))
     return
   }
-  router.push({ path: '/follow-list', query: { type, userId: userInfo.value.id, userName: userInfo.value.userName, userAvatar: userInfo.value.userAvatar } })
+  router.push({ name: 'FollowList', query: { type, userId: userInfo.value.id, userName: userInfo.value.userName, userAvatar: userInfo.value.userAvatar } })
 }
 
 const pictureList = ref<API.PictureVO[]>([]), loading = ref(false), currentPage = ref(1), total = ref(0), pageSize = 12;
@@ -378,7 +378,7 @@ const getUserPublicInfo = async () => {
 }
 const startPrivateChat = async () => {
   const res = await createOrUpdatePrivateChatUsingPost({ targetUserId: userInfo.value.id, lastMessage: t('pages.userDetailPage.chatBtn') })
-  if (res.data?.code === 0) router.push({ path: `/chat/${userInfo.value.id}`, query: { privateChatId: res.data.data.id, userName: userInfo.value.userName, userAvatar: userInfo.value.userAvatar, isSender: 'true' } })
+  if (res.data?.code === 0) router.push({ name: 'PrivateChat', params: { userId: userInfo.value.id }, query: { privateChatId: res.data.data.id, userName: userInfo.value.userName, userAvatar: userInfo.value.userAvatar, isSender: 'true' } })
 }
 
 const setupScrollListener = () => { removeScrollListener(); scrollHandler = () => requestAnimationFrame(checkScrollBottom); window.addEventListener('scroll', scrollHandler, { passive: true }) }

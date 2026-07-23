@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-box" :class="{ 'yuemu-is-loaded': bgLoaded }">
     <div class="yuemu-content">
       <div class="yuemu-mobile-overlay"></div>
@@ -187,7 +187,7 @@ const handleSubmit = async (values: any) => {
     const res = await resetPasswordUsingPost(values)
     if (res.data.code === 0) {
       message.success(t('pages.user.userResetPasswordPage.resetSuccess'))
-      await router.push('/user/login')
+      await router.push({ name: 'UserLogin' })
     } else {
       message.error(res.data.message || t('pages.user.userResetPasswordPage.resetFail'))
     }

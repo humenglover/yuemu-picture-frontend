@@ -218,7 +218,7 @@ const handleTouchEnd = async () => {
 }
 
 const handleAddTeam = () => {
-  router.push('/add_space?type=' + SPACE_TYPE_ENUM.TEAM)
+  router.push({ name: 'AddSpace', query: { type: String(SPACE_TYPE_ENUM.TEAM) } })
 }
 </script>
 

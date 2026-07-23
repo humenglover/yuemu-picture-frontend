@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-sbti-codex-universe">
     <div class="zen-environment"></div>
 
@@ -238,7 +238,7 @@ function submitTest() {
 }
 
 const restartGame = () => gameState.value = 'INTRO'
-const goToGames = () => router.push('/games')
+const goToGames = () => router.push({ name: 'Games' })
 const getQuestionDim = (q: any) => q.special ? t('pages.games.sBTIGame.hiddenDimension') : (dimensionMeta[q.dim]?.name || t('pages.games.sBTIGame.psychologicalDimension'))
 </script>
 

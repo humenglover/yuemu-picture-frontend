@@ -1,4 +1,4 @@
-import router from '@/router';
+﻿import router from '@/router';
 
 // 向外暴露一个"等待用户回复"的 Promise 解析函数
 // App.vue 里的自定义弹框会调用它来传递用户选择
@@ -61,7 +61,7 @@ export const handleBackButton = () => {
               }
             } else {
               // 如果在底部其他页面（如“我的”等）且没有历史记录，尽可能先回到主页
-              router.replace('/');
+              router.replace({ name: 'Home' });
             }
           }
         });

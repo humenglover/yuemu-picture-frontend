@@ -1,9 +1,9 @@
-<template>
+﻿<template>
   <div class="yuemu-chroma-retro-universe" @touchmove.prevent>
 
     <div class="arcade-machine">
 
-      <div class="marquee" @click="router.push('/games')">
+      <div class="marquee" @click="router.push({ name: 'Games' })">
         <div class="back-btn"><i class="fas fa-arrow-left"></i> {{ t('pages.games.colorChallengePage.return') }} </div>
         <h1 class="game-title">{{ t('pages.games.colorChallengePage.colorHunter') }}</h1>
         <div class="version">V 2.0</div>
@@ -627,7 +627,7 @@ const changeHistoryPage = (delta: number) => {
 
 const handleUserClick = (item: any) => {
   if (!item || !item.userId) return
-  router.push(`/user/${item.userId}`)
+  router.push({ name: 'UserDetail', params: { id: item.userId } })
 }
 
 // 保存最终得分

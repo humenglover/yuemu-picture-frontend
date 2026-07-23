@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="PrivacyCenterView">
     <div class="privacy-container">
       <div class="privacy-header">
@@ -8,7 +8,7 @@
 
       <div class="privacy-content">
         <div class="privacy-group">
-          <div class="privacy-card" @click="router.push('/privacy#privacy-policy')">
+          <div class="privacy-card" @click="router.push({ name: 'Privacy', hash: '#privacy-policy' })">
             <div class="card-icon bg-teal"><i class="fas fa-file-contract"></i></div>
             <div class="card-text">
               <div class="card-title">{{ $t('pages.privacyPage.privacyPolicy') }}</div>
@@ -16,7 +16,7 @@
             <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
           </div>
           
-          <div class="privacy-card" @click="router.push('/privacy#cookies')">
+          <div class="privacy-card" @click="router.push({ name: 'Privacy', hash: '#cookies' })">
             <div class="card-icon bg-blue"><i class="fas fa-cookie-bite"></i></div>
             <div class="card-text">
               <div class="card-title">{{ $t('pages.privacyPage.cookiePolicy') }}</div>
@@ -24,7 +24,7 @@
             <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
           </div>
 
-          <div class="privacy-card" @click="router.push('/privacy#privacy-policy')">
+          <div class="privacy-card" @click="router.push({ name: 'Privacy', hash: '#privacy-policy' })">
             <div class="card-icon bg-purple"><i class="fas fa-gavel"></i></div>
             <div class="card-text">
               <div class="card-title">{{ $t('pages.privacyPage.termsOfService') }}</div>
@@ -35,7 +35,7 @@
 
         <div class="privacy-group">
           <div class="group-title">{{ $t('pages.privacyPage.manageCookies') }}</div>
-          <div class="privacy-card" @click="router.push('/privacy#cookies')">
+          <div class="privacy-card" @click="router.push({ name: 'Privacy', hash: '#cookies' })">
             <div class="card-icon bg-orange"><i class="fas fa-sliders-h"></i></div>
             <div class="card-text">
               <div class="card-title">{{ $t('pages.privacyPage.manageCookies') }}</div>
@@ -46,14 +46,14 @@
 
         <div class="privacy-group">
           <div class="group-title">{{ $t('pages.privacyPage.downloadMyData') }}</div>
-          <div class="privacy-card" @click="router.push('/privacy#your-rights')">
+          <div class="privacy-card" @click="router.push({ name: 'Privacy', hash: '#your-rights' })">
             <div class="card-icon bg-green"><i class="fas fa-download"></i></div>
             <div class="card-text">
               <div class="card-title">{{ $t('pages.privacyPage.downloadMyData') }}</div>
             </div>
             <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
           </div>
-          <div class="privacy-card" @click="router.push('/privacy#ai-processing')">
+          <div class="privacy-card" @click="router.push({ name: 'Privacy', hash: '#ai-processing' })">
             <div class="card-icon bg-cyan"><i class="fas fa-robot"></i></div>
             <div class="card-text">
               <div class="card-title">{{ $t('pages.privacyPage.aiDataProcessing') }}</div>
@@ -64,14 +64,14 @@
         
         <div class="privacy-group">
           <div class="group-title">{{ $t('pages.privacyPage.thirdPartyServices') }}</div>
-          <div class="privacy-card" @click="router.push('/privacy#third-party')">
+          <div class="privacy-card" @click="router.push({ name: 'Privacy', hash: '#third-party' })">
             <div class="card-icon bg-gray"><i class="fas fa-server"></i></div>
             <div class="card-text">
               <div class="card-title">{{ $t('pages.privacyPage.thirdPartyServices') }}</div>
             </div>
             <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
           </div>
-          <div class="privacy-card" @click="router.push('/privacy#privacy-policy')">
+          <div class="privacy-card" @click="router.push({ name: 'Privacy', hash: '#privacy-policy' })">
             <div class="card-icon bg-gray"><i class="fab fa-osi"></i></div>
             <div class="card-text">
               <div class="card-title">{{ $t('pages.privacyPage.openSourceLicenses') }}</div>

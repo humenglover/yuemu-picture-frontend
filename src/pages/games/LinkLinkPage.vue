@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-retro-link-universe" :class="{ 'yuemu-is-mobile': isMobile, 'yuemu-shake-screen': isShaking }" @touchmove.prevent>
     <div class="yuemu-arcade-console">
 
@@ -415,7 +415,7 @@ const changeHistoryPage = (delta: number) => {
 
 const handleUserClick = (item: any) => {
   if (!item || !item.userId) return
-  router.push(`/user/${item.userId}`)
+  router.push({ name: 'UserDetail', params: { id: item.userId } })
 }
 
 const saveScore = async (finalScore: number) => {
@@ -840,7 +840,7 @@ watch(connectionLine, (newVal) => {
 })
 
 const toggleSound = () => isSoundEnabled.value = !isSoundEnabled.value
-const quitGame = () => router.push('/games')
+const quitGame = () => router.push({ name: 'Games' })
 const formatTime = (s: number) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2, '0')}`
 
 onMounted(() => {

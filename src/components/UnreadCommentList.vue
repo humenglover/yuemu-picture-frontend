@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-unread-comment-list">
     <template v-if="safeComments && safeComments.length > 0">
       <div
@@ -114,9 +114,9 @@ const handleTargetClick = (comment: any) => {
     if (!isTargetClickable(comment)) return
 
     if (comment.targetType === 1 && comment.picture?.id) {
-      router.push(`/picture-redirect/${comment.picture.id}`)
+      router.push({ name: 'PictureRedirect', params: { id: comment.picture.id } })
     } else if (comment.targetType === 2 && comment.post?.id) {
-      router.push(`/post/${comment.post.id}`)
+      router.push({ name: 'PostDetail', params: { id: comment.post.id } })
     }
   } catch (error) {
     console.error(error)

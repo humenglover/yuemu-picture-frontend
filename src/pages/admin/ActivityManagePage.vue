@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="yuemu-activityManagePage">
     <template v-if="device === DEVICE_TYPE_ENUM.PC">
       <div class="pc-container">
@@ -472,10 +472,10 @@ const handleMobilePageChange = (page: number) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-const handleCreate = () => { router.push('/activity/edit') }
-const handleView = (record: API.Activity) => { router.push(`/activity/detail/${record.id}`) }
-const handleEdit = (record: API.Activity) => { router.push(`/activity/edit/${record.id}`) }
-const handleManageSubmissions = (record: API.Activity) => { router.push(`/activity/submission/manage?activityId=${record.id}`) }
+const handleCreate = () => { router.push({ name: 'ActivityEdit' }) }
+const handleView = (record: API.Activity) => { router.push({ name: 'ActivityDetail', params: { id: record.id } }) }
+const handleEdit = (record: API.Activity) => { router.push({ name: 'ActivityEdit', params: { id: record.id } }) }
+const handleManageSubmissions = (record: API.Activity) => { router.push({ name: 'ActivitySubmissionManage', query: { activityId: record.id } }) }
 
 // ==================== 操作逻辑 ====================
 const confirmDialogVisible = ref(false)

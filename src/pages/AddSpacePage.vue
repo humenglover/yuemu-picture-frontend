@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-space-page">
 
     <div class="yuemu-app-container">
@@ -295,7 +295,7 @@ const handleSubmit = async () => {
     }
     if (res.data.code === 0 && res.data.data) {
       message.success(t('pages.addSpacePage.toastOperationSuccess'))
-      router.push({ path: `/space/${res.data.data}` })
+      router.push({ name: 'SpaceDetail', params: { id: res.data.data } })
     } else {
       message.error(res.data.message || t('pages.addSpacePage.toastOperationFail'))
     }

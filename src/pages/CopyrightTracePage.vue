@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Transition name="fade-page">
     <div class="trace-fullscreen-page">
 
@@ -183,7 +183,7 @@ const handleSearch = async () => {
 
 const viewPicture = () => {
   if (copyrightInfo.value?.pictureId) {
-    router.push(`/picture-redirect/${String(copyrightInfo.value.pictureId)}`)
+    router.push({ name: 'PictureRedirect', params: { id: String(copyrightInfo.value.pictureId) } })
   }
 }
 

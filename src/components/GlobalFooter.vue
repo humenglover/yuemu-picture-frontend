@@ -6,16 +6,16 @@
         <span class="copyright-item">© {{ currentYear }} {{ t('components.globalFooter.brandName') }}</span>
         <span class="divider-dot">•</span>
 
-        <router-link to="/guides" class="footer-nav-link">{{ t('components.globalFooter.guides') }}</router-link>
+        <router-link :to="{ name: 'Guides' }" class="footer-nav-link">{{ t('components.globalFooter.guides') }}</router-link>
         <span class="divider-dot">•</span>
 
-        <router-link to="/privacy" class="footer-nav-link">{{ t('components.globalFooter.privacy') }}</router-link>
+        <router-link :to="{ name: 'Privacy' }" class="footer-nav-link">{{ t('components.globalFooter.privacy') }}</router-link>
         <span class="divider-dot">•</span>
 
-        <router-link to="/about" class="footer-nav-link">{{ t('components.globalFooter.about') }}</router-link>
+        <router-link :to="{ name: 'About' }" class="footer-nav-link">{{ t('components.globalFooter.about') }}</router-link>
         <span class="divider-dot">•</span>
 
-        <router-link to="/contact" class="footer-nav-link">{{ t('components.globalFooter.contact') }}</router-link>
+        <router-link :to="{ name: 'Contact' }" class="footer-nav-link">{{ t('components.globalFooter.contact') }}</router-link>
         <span class="divider-dot">•</span>
 
         <a class="beian-nav-link" href="https://beian.miit.gov.cn/" target="_blank">
@@ -107,6 +107,7 @@ import UploadActionSheet from './UploadActionSheet.vue'
 import { getCurrentYear } from '@/utils/date'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { stripLocalePrefix } from '@/router/localeRouter'
 
 const { t } = useI18n()
 
@@ -133,7 +134,7 @@ const scrollThreshold = 50
 
 const handleAddClick = () => {
   if (!loginUserStore.loginUser.id) {
-    router.push('/user/login')
+    router.push({ name: 'UserLogin' })
     return
   }
   showActionSheet.value = true
@@ -142,7 +143,8 @@ const handleAddClick = () => {
 const route = useRoute()
 
 watch(() => route.path, (newPath) => {
-  switch (newPath) {
+  const cleanPath = stripLocalePrefix(newPath)
+  switch (cleanPath) {
     case '/':
     case '/home':
       active.value = 0
@@ -157,11 +159,11 @@ watch(() => route.path, (newPath) => {
       active.value = 4
       break
     default:
-      if (newPath.startsWith('/forum')) {
+      if (cleanPath.startsWith('/forum')) {
         active.value = 1
-      } else if (newPath.startsWith('/chat-list')) {
+      } else if (cleanPath.startsWith('/chat-list')) {
         active.value = 3
-      } else if (newPath.startsWith('/my')) {
+      } else if (cleanPath.startsWith('/my')) {
         active.value = 4
       }
       break
@@ -236,14 +238,16 @@ onBeforeUnmount(() => {
 const currentYear = computed(() => getCurrentYear())
 
 const handleTabChange = (index: number, path: string) => {
-  if (active.value === index && route.path === path) {
+  const currentLocale = route.path.match(/^\/(zh|en)/)?.[1] || 'zh'
+  const localePath = `/${currentLocale}${path === '/' ? '' : path}`
+  if (active.value === index && route.path === localePath) {
     return
   }
   const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
-  sessionStorage.setItem(`${route.path}_scrollPosition`, currentScrollPosition.toString())
+  sessionStorage.setItem(`${stripLocalePrefix(route.path)}_scrollPosition`, currentScrollPosition.toString())
 
   active.value = index
-  router.replace(path)
+  router.replace(localePath)
 }
 
 const getBeianNumber = () => {

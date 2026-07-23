@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-pc-picture-list">
     <div class="yuemu-masonry-wrapper" ref="masonryRef">
       <div class="yuemu-masonry-grid" ref="gridRef">
@@ -317,7 +317,7 @@ const recalculateLayout = () => {
 
 const doClickPicture = (picture: PictureVO) => {
   if (picture.isDraft === 1) {
-    router.push({ path: '/add_picture', query: { id: picture.id } })
+    router.push({ name: 'AddPicture', query: { id: picture.id } })
   } else {
     openDetailModal(picture)
   }

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="mySpacePage" class="space-page-wrapper">
     <van-pull-refresh v-model="isRefreshing" @refresh="onRefresh" class="pull-refresh-area">
       <div class="space-loader-card">
@@ -46,7 +46,7 @@ const onRefresh = async () => {
 const checkUserSpace = async () => {
   const loginUser = loginUserStore.loginUser
   if (!loginUser?.id) {
-    router.replace('/user/login')
+    router.replace({ name: 'UserLogin' })
     return
   }
 
@@ -61,9 +61,9 @@ const checkUserSpace = async () => {
     if (res.data.code === 0) {
       if (res.data.data?.records?.length > 0) {
         const space = res.data.data.records[0]
-        router.replace(`/space/${space.id}`)
+        router.replace({ name: 'SpaceDetail', params: { id: space.id } })
       } else {
-        router.replace('/add_space')
+        router.replace({ name: 'AddSpace' })
         message.info(t('pages.mySpacePage.creatingSpace'))
       }
     } else {

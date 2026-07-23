@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <!-- Loading 骨架屏状态 -->
   <div v-if="isLoading" class="yuemu-team-space-card is-image-card">
     <div class="yuemu-card-cover yuemu-skeleton-cover-anim" style="aspect-ratio: 4 / 5;">
@@ -176,13 +176,13 @@ onMounted(() => {
 
 const handleActivityClick = (activity: API.Activity) => {
   if (activity.id) {
-    router.push(`/activity/detail/${activity.id}`)
+    router.push({ name: 'ActivityDetail', params: { id: activity.id } })
   }
 }
 
 const handleTeamClick = (space: API.SpaceVO) => {
   if (space && !(space as any).isAd && space.id) {
-    router.push(`/space/${space.id}`)
+    router.push({ name: 'SpaceDetail', params: { id: space.id } })
   }
 }
 

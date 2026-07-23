@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="modern-page-wrapper">
     <header class="blur-header">
       <div class="header-inner">
@@ -283,10 +283,10 @@ const handleUnfollow = async (user: any) => {
   } catch (error) { message.error(t('pages.followListPage.actionFail')) }
 }
 
-const goToUserSpace = (user: any) => { router.push({ path: `/user/${user.id}`, query: { userName: user.userName, userAvatar: user.userAvatar } }) }
+const goToUserSpace = (user: any) => { router.push({ name: 'UserDetail', params: { id: user.id }, query: { userName: user.userName, userAvatar: user.userAvatar } }) }
 const getDefaultAvatar = (userName: string) => `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(userName || 'Guest')}&backgroundColor=0f172a`
 const goBack = () => router.go(-1)
-const goToHome = () => router.push('/')
+const goToHome = () => router.push({ name: 'Home' })
 const handleClear = () => { searchText.value = ''; handleSearch() }
 
 const handleSearch = () => {
@@ -532,7 +532,7 @@ watch(activeTab, () => {
 })
 
 onMounted(async () => {
-  if (!loginUserStore.loginUser?.id) return router.replace('/user/login')
+  if (!loginUserStore.loginUser?.id) return router.replace({ name: 'UserLogin' })
   targetUserId.value = route.query.userId?.toString() || loginUserStore.loginUser?.id
   isViewingSelf.value = !route.query.userId || route.query.userId === loginUserStore.loginUser?.id
   loadMore(); fetchCounts();

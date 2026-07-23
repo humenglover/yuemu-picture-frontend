@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-retro-2048-universe" :class="{ 'is-mobile': isMobile }" @touchmove="handleRootTouchMove">
 
     <div class="arcade-console">
@@ -523,7 +523,7 @@ const formatDate = (timestamp: string) => {
   return `${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`
 }
 
-const quitGame = () => { router.push('/games') }
+const quitGame = () => { router.push({ name: 'Games' }) }
 
 const fetchUserHighestScore = async () => {
   try {
@@ -591,7 +591,7 @@ const handleRootTouchMove = (e: TouchEvent) => {
 
 const handleUserClick = (record: any) => {
   if (!record) return
-  router.push({ path: `/user/${record.userId}`, query: { userName: record.userName, userAvatar: record.userAvatar }})
+  router.push({ name: 'UserDetail', params: { id: record.userId }, query: { userName: record.userName, userAvatar: record.userAvatar }})
 }
 
 const checkMobile = () => { isMobile.value = window.innerWidth <= 768 }

@@ -5,7 +5,7 @@
       <div class="setting-group">
         <div class="group-title">{{ $t('pages.settingView.groups.member') }}</div>
         <div class="group-card">
-          <div class="setting-cell" @click="router.push('/invite')">
+          <div class="setting-cell" @click="router.push({ name: 'InvitePage' })">
             <div class="cell-icon bg-gold"><i class="fas fa-crown"></i></div>
             <div class="cell-content">
               <div class="cell-title">{{ $t('pages.settingView.groups.invite') }}</div>
@@ -152,7 +152,7 @@
             <div class="cell-right"><i class="fas fa-chevron-right"></i></div>
           </div>
 
-          <div class="setting-cell" @click="$router.push('/contact')">
+          <div class="setting-cell" @click="$router.push({ name: 'Contact' })">
             <div class="cell-icon bg-indigo"><i class="fas fa-paper-plane"></i></div>
             <div class="cell-content">
               <div class="cell-title">{{ $t('pages.settingView.privacy.contact') }}</div>
@@ -416,11 +416,11 @@
           <p class="info-item"><i class="fas fa-shield-alt"></i><a href="https://beian.miit.gov.cn/" target="_blank">{{ getBeianNumber() }}</a></p>
           <div class="about-links-nav">
             <span class="nav-dot">•</span>
-            <a class="nav-link-btn" @click="aboutUsOpen = false; $router.push('/guides')">{{ $t('pages.settingView.modals.about.creatorGuide') }}</a>
+            <a class="nav-link-btn" @click="aboutUsOpen = false; $router.push({ name: 'Guides' })">{{ $t('pages.settingView.modals.about.creatorGuide') }}</a>
             <span class="nav-dot">•</span>
-            <a class="nav-link-btn" @click="aboutUsOpen = false; $router.push('/privacy')">{{ $t('pages.settingView.modals.about.privacyPolicy') }}</a>
+            <a class="nav-link-btn" @click="aboutUsOpen = false; $router.push({ name: 'Privacy' })">{{ $t('pages.settingView.modals.about.privacyPolicy') }}</a>
             <span class="nav-dot">•</span>
-            <a class="nav-link-btn" @click="aboutUsOpen = false; $router.push('/about')">{{ $t('pages.settingView.modals.about.aboutUs') }}</a>
+            <a class="nav-link-btn" @click="aboutUsOpen = false; $router.push({ name: 'About' })">{{ $t('pages.settingView.modals.about.aboutUs') }}</a>
             <span class="nav-dot">•</span>
           </div>
           <p class="copyright">© {{ currentYear }} {{ $t('pages.settingView.modals.about.author') }}. All rights reserved.</p>
@@ -841,7 +841,7 @@ const handleLogoutConfirm = async () => {
     await userLogoutUsingPost()
     loginUserStore.setLoginUser({ userName: t('pages.settingView.msgs.notLogin'), id: 0 })
     message.success(t('pages.settingView.msgs.logoutSuccess'))
-    router.push('/user/login')
+    router.push({ name: 'UserLogin' })
   } catch (err) { message.error(t('pages.settingView.msgs.logoutFail')) }
 }
 
@@ -874,7 +874,7 @@ const confirmSecureDestroy = async () => {
     if (res.data.code === 0 && res.data.data) {
       message.success(t('pages.settingView.msgs.accountDeleted'))
       loginUserStore.logout()
-      router.push('/user/login')
+      router.push({ name: 'UserLogin' })
     } else message.error(t('pages.settingView.msgs.deleteFail'))
   } catch (err) { message.error(t('pages.settingView.msgs.deleteFail')) }
 }
@@ -893,14 +893,14 @@ const toggleMultiDeviceLogin = async (checked: boolean) => {
 }
 
 const getDefaultAvatar = (name: string) => `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name || 'Guest')}`
-const handleFollowClick = () => router.push({ path: '/follow-list', query: { tab: 'follow' } })
-const handleFansClick = () => router.push({ path: '/follow-list', query: { tab: 'fans' } })
-const handleLoveBoard = () => router.push('/loveboard')
-const handleForgotPassword = () => { modifyPasswordOpen.value = false; router.push('/user/reset-password') }
+const handleFollowClick = () => router.push({ name: 'FollowList', query: { tab: 'follow' } })
+const handleFansClick = () => router.push({ name: 'FollowList', query: { tab: 'fans' } })
+const handleLoveBoard = () => router.push({ name: 'LoveBoard' })
+const handleForgotPassword = () => { modifyPasswordOpen.value = false; router.push({ name: 'UserResetPassword' }) }
 const handlePrivacySettingClick = async () => { await loadUserPermissions(); userPermissionSettingOpen.value = true }
-const handleReportCenter = () => router.push('/user/report-center')
-const handleBrowseHistory = () => router.push('/browse-history')
-const handleLoginRecords = () => router.push('/login-records')
+const handleReportCenter = () => router.push({ name: 'UserReportCenter' })
+const handleBrowseHistory = () => router.push({ name: 'BrowseHistory' })
+const handleLoginRecords = () => router.push({ name: 'LoginRecords' })
 const getBeianNumber = () => import.meta.env.VITE_APP_ENV === 'production' ? 'Long ICP Bei 2024012699-3' : 'Long ICP Bei 2024012699-1'
 
 const showStreamRecommendations = () => {

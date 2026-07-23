@@ -76,7 +76,7 @@
     <div v-if="isLoginOrRegisterPage" class="yuemu-tool-buttons">
       <div
         class="yuemu-tool-btn yuemu-home-btn"
-        @click="router.push('/home')"
+        @click="router.push({ name: 'MyHome' })"
         :title="t('layouts.basicLayout.backToHome')"
       >
         <svg class="yuemu-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -150,6 +150,7 @@ import GlobalSider from '@/components/GlobalSider.vue'
 import { useThemeStore } from '@/stores/useThemeStore'
 import { useLayoutStore } from '@/stores/useLayoutStore'
 import { shouldHidePCFooter, shouldHidePCHeader, shouldHideMobileFooter as shouldHideMobileFooterRoute } from '@/constants/route'
+import { stripLocalePrefix } from '@/router/localeRouter'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { chatListWebSocket } from '@/utils/chatListWebSocket'
 import { messageWebSocketService } from '@/utils/messageWebSocketService'
@@ -399,7 +400,8 @@ onUnmounted(() => {
 })
 
 const isLoginOrRegisterPage = computed(() => {
-  return route.path === '/user/login' || route.path === '/user/register'
+  const cleanPath = stripLocalePrefix(route.path)
+  return cleanPath === '/user/login' || cleanPath === '/user/register'
 })
 
 const toggleSider = () => {

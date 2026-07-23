@@ -1,19 +1,20 @@
 /**
- * 动态 Sitemap 生成脚本
+ * 完整 Sitemap 生成脚本
  *
  * 功能：
- * 1. 从后端 API 拉取所有公开的动态内容（图片、空间、用户、帖子、活动、时光相册、恋爱画板）
- * 2. 生成 sitemap-dynamic.xml（动态路由条目）
- * 3. 与 public/sitemap.xml（静态路由）合并为完整的 sitemap
+ * 1. 生成所有静态路由的双语 sitemap 条目（zh + en，带 hreflang）
+ * 2. 自动注入指南文章（从 articles 目录发现）
+ * 3. 从后端 API 拉取动态内容（图片、空间、用户、帖子、活动等）
+ * 4. 输出完整的 public/sitemap.xml
  *
  * 使用方式：
- *   node scripts/generate-sitemap.mjs
- *   node scripts/generate-sitemap.mjs --output public/sitemap.xml  # 生成完整 sitemap
+ *   node scripts/generate-sitemap.mjs                 # 完整生成（静态 + 动态）
+ *   node scripts/generate-sitemap.mjs --static-only   # 仅静态路由 + 指南文章
  *
  * 建议在 CI/CD 中定时运行（如每天一次），确保新内容被搜索引擎收录。
  */
 
-import { writeFileSync, readFileSync, existsSync } from 'node:fs'
+import { writeFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { discoverArticles } from './guide-articles.mjs'
@@ -23,31 +24,113 @@ const PROJECT_ROOT = resolve(__dirname, '..')
 
 // ==================== 配置 ====================
 const CONFIG = {
-  // 后端 API 地址（根据环境调整）
   apiBase: process.env.API_BASE || 'https://www.yuemutuku.com',
-  // 网站域名
   siteUrl: 'https://www.yuemutuku.com',
-  // 每个类型最多拉取条数（避免 sitemap 过大，Google 限制单文件 50000 条）
   maxPerType: 5000,
-  // 请求间隔（ms），避免打爆服务器
   requestDelay: 200,
-  // 输出路径
   outputDir: resolve(PROJECT_ROOT, 'public'),
-  // 静态 sitemap 路径
-  staticSitemap: resolve(PROJECT_ROOT, 'public', 'sitemap.xml'),
+  outputPath: resolve(PROJECT_ROOT, 'public', 'sitemap.xml'),
 }
+
+// ==================== 静态路由定义 ====================
+// { path, changefreq, priority } — path 不含 locale 前缀，脚本自动生成 zh/en 两条
+const STATIC_ROUTES = [
+  // 首页
+  { path: '/', changefreq: 'hourly', priority: '1.0' },
+  { path: '/home', changefreq: 'hourly', priority: '0.9' },
+
+  // 发现 & 搜索
+  { path: '/discovery', changefreq: 'daily', priority: '0.9' },
+  { path: '/search', changefreq: 'daily', priority: '0.8' },
+  { path: '/search_picture', changefreq: 'daily', priority: '0.8' },
+  { path: '/guess_you_like', changefreq: 'daily', priority: '0.8' },
+
+  // 社区
+  { path: '/forum', changefreq: 'hourly', priority: '0.9' },
+  { path: '/ranking', changefreq: 'daily', priority: '0.8' },
+  { path: '/barrage', changefreq: 'hourly', priority: '0.6' },
+
+  // 创作入口
+  { path: '/add_picture', changefreq: 'weekly', priority: '0.6' },
+  { path: '/add_picture/batch', changefreq: 'weekly', priority: '0.5' },
+  { path: '/add_space', changefreq: 'weekly', priority: '0.6' },
+
+  // 版权
+  { path: '/picture/copyright/trace', changefreq: 'weekly', priority: '0.6' },
+  { path: '/picture/copyright/register', changefreq: 'weekly', priority: '0.6' },
+
+  // 邀请 & 创作者
+  { path: '/invite', changefreq: 'weekly', priority: '0.6' },
+  { path: '/creator/analytics', changefreq: 'weekly', priority: '0.6' },
+
+  // AI 资源
+  { path: '/ai_resource', changefreq: 'daily', priority: '0.7' },
+
+  // 恋爱画板
+  { path: '/loveboard', changefreq: 'daily', priority: '0.7' },
+  { path: '/loveboard/list', changefreq: 'daily', priority: '0.7' },
+
+  // 工具
+  { path: '/tools', changefreq: 'weekly', priority: '0.6' },
+  { path: '/tools/calculator', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/timer', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/food-wheel', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/sticky-wall', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/pomodoro', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/random', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/base-converter', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/unit-converter', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/text-lab', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/vault-key', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/grid-ruler', changefreq: 'monthly', priority: '0.4' },
+  { path: '/tools/color-picker', changefreq: 'monthly', priority: '0.4' },
+
+  // 用户（公开页）
+  { path: '/user/login', changefreq: 'monthly', priority: '0.3' },
+  { path: '/user/register', changefreq: 'monthly', priority: '0.3' },
+
+  // 友情链接
+  { path: '/friend-links', changefreq: 'weekly', priority: '0.6' },
+
+  // 关于 & 指南 & 联系 & 隐私
+  { path: '/about', changefreq: 'monthly', priority: '0.7' },
+  { path: '/guides', changefreq: 'weekly', priority: '0.8' },
+  { path: '/contact', changefreq: 'monthly', priority: '0.5' },
+  { path: '/privacy', changefreq: 'monthly', priority: '0.5' },
+  { path: '/privacy-center', changefreq: 'monthly', priority: '0.5' },
+
+  // 游戏
+  { path: '/games', changefreq: 'weekly', priority: '0.5' },
+  { path: '/games/snake', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/2048', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/queens', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/tetris', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/sliding-puzzle', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/color-challenge', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/link-link', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/brick', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/dino', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/memory-card', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/minesweeper', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/sbti', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/aa-game', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/sudoku', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/box-jump', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/maze-runner', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/tank-battle', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/cat-trap', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/whack-mole', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/plane-war', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/draw-line', changefreq: 'monthly', priority: '0.3' },
+  { path: '/games/fruit-slice', changefreq: 'monthly', priority: '0.3' },
+]
 
 // ==================== HTTP 工具 ====================
 async function apiGet(path) {
   const url = `${CONFIG.apiBase}${path}`
   console.log(`  GET ${url}`)
-  const res = await fetch(url, {
-    headers: { 'Accept': 'application/json' },
-  })
-  if (!res.ok) {
-    console.error(`  ⚠ 请求失败: ${res.status} ${res.statusText}`)
-    return null
-  }
+  const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
+  if (!res.ok) { console.error(`  ⚠ 请求失败: ${res.status}`); return null }
   return res.json()
 }
 
@@ -56,16 +139,10 @@ async function apiPost(path, body = {}) {
   console.log(`  POST ${url}`)
   const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify(body),
   })
-  if (!res.ok) {
-    console.error(`  ⚠ 请求失败: ${res.status} ${res.statusText}`)
-    return null
-  }
+  if (!res.ok) { console.error(`  ⚠ 请求失败: ${res.status}`); return null }
   return res.json()
 }
 
@@ -74,318 +151,268 @@ async function fetchAllPages(fetchFn, pageSize = 100) {
   const items = []
   let current = 1
   let hasMore = true
-
   while (hasMore && items.length < CONFIG.maxPerType) {
     try {
       const data = await fetchFn(current, pageSize)
       if (!data) break
-
-      // 适配不同的后端响应格式
       const records = data?.data?.records || data?.records || data?.data || []
       const total = data?.data?.total || data?.total || 0
-
       if (records.length === 0) break
-
       items.push(...records)
       console.log(`    已获取 ${items.length}/${Math.min(total, CONFIG.maxPerType)} 条`)
-
-      if (items.length >= total || records.length < pageSize) {
-        hasMore = false
-      } else {
-        current++
-        // 请求间隔
-        await sleep(CONFIG.requestDelay)
-      }
-    } catch (err) {
-      console.error(`    分页拉取出错: ${err.message}`)
-      break
-    }
+      if (items.length >= total || records.length < pageSize) { hasMore = false }
+      else { current++; await sleep(CONFIG.requestDelay) }
+    } catch (err) { console.error(`    分页拉取出错: ${err.message}`); break }
   }
-
   return items
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
 
-// ==================== 各类型数据拉取 ====================
-
-/** 拉取公开图片 */
 async function fetchPictures() {
   console.log('\n📷 拉取公开图片...')
   return fetchAllPages((current, size) =>
-    apiPost('/api/picture/list/page/vo/cache', {
-      current,
-      size,
-      sortField: 'createTime',
-      sortOrder: 'desc',
-    })
-  )
+    apiPost('/api/picture/list/page/vo/cache', { current, size, sortField: 'createTime', sortOrder: 'desc' }))
 }
-
-/** 拉取公开空间 */
 async function fetchSpaces() {
   console.log('\n🌌 拉取公开空间...')
   return fetchAllPages((current, size) =>
-    apiPost('/api/space/list/page', {
-      current,
-      size,
-      sortField: 'createTime',
-      sortOrder: 'desc',
-    })
-  )
+    apiPost('/api/space/list/page', { current, size, sortField: 'createTime', sortOrder: 'desc' }))
 }
-
-/** 拉取用户 */
 async function fetchUsers() {
   console.log('\n👤 拉取用户...')
   return fetchAllPages((current, size) =>
-    apiPost('/api/user/list/page/vo', {
-      current,
-      size,
-      sortField: 'id',
-      sortOrder: 'desc',
-    })
-  )
+    apiPost('/api/user/list/page/vo', { current, size, sortField: 'id', sortOrder: 'desc' }))
 }
-
-/** 拉取公开帖子 */
 async function fetchPosts() {
   console.log('\n📝 拉取公开帖子...')
   return fetchAllPages((current, size) =>
-    apiPost('/api/post/list/page', {
-      current,
-      size,
-      sortField: 'createTime',
-      sortOrder: 'desc',
-    })
-  )
+    apiPost('/api/post/list/page', { current, size, sortField: 'createTime', sortOrder: 'desc' }))
 }
-
-/** 拉取活动 */
 async function fetchActivities() {
   console.log('\n🎉 拉取活动...')
   return fetchAllPages((current, size) =>
-    apiPost('/api/activity/list/page', {
-      current,
-      size,
-      sortField: 'createTime',
-      sortOrder: 'desc',
-    })
-  )
+    apiPost('/api/activity/list/page', { current, size, sortField: 'createTime', sortOrder: 'desc' }))
 }
-
-/** 拉取公开恋爱画板 */
 async function fetchLoveBoards() {
   console.log('\n💕 拉取恋爱画板...')
   return fetchAllPages((current, size) =>
-    apiGet(`/api/love-board/list/public?current=${current}&size=${size}`)
-  )
+    apiGet(`/api/love-board/list/public?current=${current}&size=${size}`))
 }
-
-/** 拉取时光相册 */
 async function fetchTimeAlbums() {
   console.log('\n📸 拉取时光相册...')
   return fetchAllPages((current, size) =>
-    apiGet(`/api/timeAlbum/list?current=${current}&size=${size}`)
-  )
+    apiGet(`/api/timeAlbum/list?current=${current}&size=${size}`))
 }
 
-// ==================== Sitemap 生成 ====================
-
-/** 生成单个 URL 条目 */
-function urlEntry(loc, { changefreq = 'weekly', priority = '0.6', lastmod } = {}) {
-  const lastmodStr = lastmod
-    ? new Date(lastmod).toISOString().split('T')[0]
-    : new Date().toISOString().split('T')[0]
-
-  return `  <url>
-    <loc>${escapeXml(loc)}</loc>
-    <lastmod>${lastmodStr}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
-  </url>`
-}
-
+// ==================== XML 工具 ====================
 function escapeXml(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;')
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
+}
+
+/** 生成一个页面的双语 sitemap 条目（zh + en，带 hreflang） */
+function makeBilingualEntries({ zhLoc, enLoc, changefreq, priority, lastmod, imageXml }) {
+  const lastmodStr = lastmod ? new Date(lastmod).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+  const hreflang = [
+    `<xhtml:link rel="alternate" hreflang="zh-CN" href="${escapeXml(zhLoc)}"/>`,
+    `<xhtml:link rel="alternate" hreflang="en-US" href="${escapeXml(enLoc)}"/>`,
+    `<xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(zhLoc)}"/>`,
+  ].join('')
+
+  const zhEntry = imageXml
+    ? `  <url><loc>${escapeXml(zhLoc)}</loc>${hreflang}<lastmod>${lastmodStr}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority>${imageXml}</url>`
+    : `  <url><loc>${escapeXml(zhLoc)}</loc>${hreflang}<lastmod>${lastmodStr}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`
+
+  const enEntry = imageXml
+    ? `  <url><loc>${escapeXml(enLoc)}</loc>${hreflang}<lastmod>${lastmodStr}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority>${imageXml}</url>`
+    : `  <url><loc>${escapeXml(enLoc)}</loc>${hreflang}<lastmod>${lastmodStr}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`
+
+  return `${zhEntry}\n${enEntry}`
 }
 
 /** 生成完整 sitemap XML */
-function generateSitemapXml(entries) {
+function wrapSitemap(entries) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${entries.join('\n')}
 </urlset>
 `
 }
 
-/** 从 items 生成指定类型的 sitemap entries */
-function makeEntries(items, pathPrefix, { changefreq = 'weekly', priority = '0.6' } = {}) {
-  return items.map(item => {
-    const id = item.id
-    const loc = `${CONFIG.siteUrl}${pathPrefix}${id}`
-    return urlEntry(loc, {
-      changefreq,
-      priority,
-      lastmod: item.updateTime || item.createTime || item.editTime,
-    })
+// ==================== 静态路由条目生成 ====================
+function generateStaticEntries() {
+  return STATIC_ROUTES.flatMap(r => {
+    const cleanPath = r.path === '/' ? '/' : r.path
+    return [makeBilingualEntries({
+      zhLoc: `${CONFIG.siteUrl}/zh${cleanPath}`,
+      enLoc: `${CONFIG.siteUrl}/en${cleanPath}`,
+      changefreq: r.changefreq,
+      priority: r.priority,
+    })]
   })
 }
 
-/** 生成带 image 子标签的图片 sitemap entries（Google 图片搜索专用） */
-function makeImageEntries(pictures) {
-  return pictures.map(pic => {
-    const loc = `${CONFIG.siteUrl}/picture/${pic.id}`
-    const lastmod = (pic.updateTime || pic.createTime)
-      ? new Date(pic.updateTime || pic.createTime).toISOString().split('T')[0]
-      : new Date().toISOString().split('T')[0]
+// ==================== 指南文章条目生成 ====================
+function generateGuideEntries() {
+  const articles = discoverArticles()
+  if (articles.length === 0) {
+    console.log('  ⚠ 未发现指南文章')
+    return []
+  }
+  return articles.flatMap(a => {
+    const lastmod = a.date || new Date().toISOString().split('T')[0]
+    return [makeBilingualEntries({
+      zhLoc: `${CONFIG.siteUrl}/zh/guides/${a.id}`,
+      enLoc: `${CONFIG.siteUrl}/en/guides/${a.id}`,
+      changefreq: 'monthly',
+      priority: '0.7',
+      lastmod,
+    })]
+  })
+}
 
-    let imageXml = `  <url>\n    <loc>${escapeXml(loc)}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>`
+// ==================== 动态内容条目生成 ====================
+function generateDynamicEntries({ pictures, spaces, users, posts, activities, loveBoards, timeAlbums }) {
+  const entries = []
 
-    // 添加图片信息（如果有 URL）
+  // 图片（带 image:image 子标签，提升 Google 图片搜索收录）
+  for (const pic of pictures) {
+    const lastmod = pic.updateTime || pic.createTime
+    let imageXml = ''
     if (pic.url) {
       const imageLoc = pic.url.startsWith('http') ? pic.url : `${CONFIG.siteUrl}${pic.url}`
       const title = pic.name || pic.title || ''
       const caption = pic.introduction || pic.description || ''
-      imageXml += `\n    <image:image>\n      <image:loc>${escapeXml(imageLoc)}</image:loc>`
-      if (title) imageXml += `\n      <image:title>${escapeXml(title)}</image:title>`
-      if (caption) imageXml += `\n      <image:caption>${escapeXml(caption.substring(0, 200))}</image:caption>`
-      imageXml += `\n    </image:image>`
+      imageXml = `<image:image><image:loc>${escapeXml(imageLoc)}</image:loc>`
+      if (title) imageXml += `<image:title>${escapeXml(title)}</image:title>`
+      if (caption) imageXml += `<image:caption>${escapeXml(caption.substring(0, 200))}</image:caption>`
+      imageXml += `</image:image>`
     }
-
-    imageXml += `\n  </url>`
-    return imageXml
-  })
-}
-
-// ==================== 静态 Sitemap 生成（指南文章自动注入） ====================
-
-/** 从文章数据生成 sitemap entry */
-function makeGuideEntry(article) {
-  const loc = `${CONFIG.siteUrl}/guides/${article.id}`
-  const lastmod = article.date || new Date().toISOString().split('T')[0]
-  return `  <url><loc>${escapeXml(loc)}</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>${lastmod}</lastmod></url>`
-}
-
-/** 重新生成静态 sitemap.xml 中的指南文章部分 */
-function regenerateStaticSitemap() {
-  console.log('\n📚 重新生成静态 Sitemap（指南文章）...')
-
-  const staticPath = CONFIG.staticSitemap
-  if (!existsSync(staticPath)) {
-    console.error(`  ⚠ 静态 sitemap 不存在: ${staticPath}`)
-    return
+    entries.push(makeBilingualEntries({
+      zhLoc: `${CONFIG.siteUrl}/zh/picture/${pic.id}`,
+      enLoc: `${CONFIG.siteUrl}/en/picture/${pic.id}`,
+      changefreq: 'weekly', priority: '0.8', lastmod, imageXml,
+    }))
   }
 
-  const articles = discoverArticles()
-  const entries = articles.map(makeGuideEntry)
-
-  let content = readFileSync(staticPath, 'utf-8')
-
-  // 替换 __GUIDE_ARTICLES_START__ 和 __GUIDE_ARTICLES_END__ 之间的内容
-  const startMarker = '<!-- __GUIDE_ARTICLES_START__ -->'
-  const endMarker = '<!-- __GUIDE_ARTICLES_END__ -->'
-  const startIdx = content.indexOf(startMarker)
-  const endIdx = content.indexOf(endMarker)
-
-  if (startIdx === -1 || endIdx === -1) {
-    console.error('  ⚠ 未在 sitemap.xml 中找到 __GUIDE_ARTICLES_START__ / __GUIDE_ARTICLES_END__ 标记')
-    console.error('    请在 sitemap.xml 中添加这两个标记，脚本将自动替换中间的内容。')
-    return
+  // 空间
+  for (const item of spaces) {
+    entries.push(makeBilingualEntries({
+      zhLoc: `${CONFIG.siteUrl}/zh/space/${item.id}`,
+      enLoc: `${CONFIG.siteUrl}/en/space/${item.id}`,
+      changefreq: 'daily', priority: '0.7',
+      lastmod: item.updateTime || item.createTime,
+    }))
   }
 
-  const before = content.substring(0, startIdx + startMarker.length)
-  const after = content.substring(endIdx)
-  const newContent = before + '\n' + entries.join('\n') + '\n  ' + after
+  // 用户
+  for (const item of users) {
+    entries.push(makeBilingualEntries({
+      zhLoc: `${CONFIG.siteUrl}/zh/user/${item.id}`,
+      enLoc: `${CONFIG.siteUrl}/en/user/${item.id}`,
+      changefreq: 'weekly', priority: '0.5',
+      lastmod: item.updateTime || item.createTime,
+    }))
+  }
 
-  writeFileSync(staticPath, newContent, 'utf-8')
-  console.log(`✅ 静态 Sitemap 已更新: ${staticPath}`)
-  console.log(`   已注入 ${entries.length} 篇指南文章`)
-  articles.forEach(a => console.log(`     /guides/${a.id} — ${a.date}`))
+  // 帖子
+  for (const item of posts) {
+    entries.push(makeBilingualEntries({
+      zhLoc: `${CONFIG.siteUrl}/zh/post/${item.id}`,
+      enLoc: `${CONFIG.siteUrl}/en/post/${item.id}`,
+      changefreq: 'daily', priority: '0.7',
+      lastmod: item.updateTime || item.createTime || item.editTime,
+    }))
+  }
+
+  // 活动
+  for (const item of activities) {
+    entries.push(makeBilingualEntries({
+      zhLoc: `${CONFIG.siteUrl}/zh/activity/detail/${item.id}`,
+      enLoc: `${CONFIG.siteUrl}/en/activity/detail/${item.id}`,
+      changefreq: 'daily', priority: '0.7',
+      lastmod: item.updateTime || item.createTime,
+    }))
+  }
+
+  // 恋爱画板
+  for (const item of loveBoards) {
+    entries.push(makeBilingualEntries({
+      zhLoc: `${CONFIG.siteUrl}/zh/loveboard/${item.id}`,
+      enLoc: `${CONFIG.siteUrl}/en/loveboard/${item.id}`,
+      changefreq: 'weekly', priority: '0.6',
+      lastmod: item.updateTime || item.createTime,
+    }))
+  }
+
+  // 时光相册
+  for (const item of timeAlbums) {
+    entries.push(makeBilingualEntries({
+      zhLoc: `${CONFIG.siteUrl}/zh/time-album/${item.id}`,
+      enLoc: `${CONFIG.siteUrl}/en/time-album/${item.id}`,
+      changefreq: 'weekly', priority: '0.6',
+      lastmod: item.updateTime || item.createTime,
+    }))
+  }
+
+  return entries
 }
 
 // ==================== 主流程 ====================
-
 async function main() {
   const staticOnly = process.argv.includes('--static-only')
 
   console.log('🚀 开始生成 Sitemap...\n')
-  console.log(`   后端 API: ${CONFIG.apiBase}`)
   console.log(`   网站域名: ${CONFIG.siteUrl}`)
 
-  // 1. 始终更新静态 sitemap 中的指南文章部分
-  regenerateStaticSitemap()
+  // 1. 静态路由条目
+  console.log('\n📋 生成静态路由条目...')
+  const staticEntries = generateStaticEntries()
+  console.log(`   ✅ ${STATIC_ROUTES.length} 个静态路由 → ${staticEntries.length} 条双语条目（每个 zh+en 各一条）`)
 
-  // 2. --static-only 模式下跳过动态内容拉取
-  if (staticOnly) {
-    console.log('\n📌 --static-only 模式，跳过动态内容拉取')
-    console.log('🎉 静态 Sitemap 更新完毕!')
-    return
+  // 2. 指南文章条目
+  console.log('\n📚 生成指南文章条目...')
+  const guideEntries = generateGuideEntries()
+  const articleCount = guideEntries.length
+  console.log(`   ✅ ${articleCount} 篇文章 → ${articleCount} 条双语条目（每个 zh+en 各一条）`)
+
+  let allEntries = [...staticEntries, ...guideEntries]
+
+  // 3. 动态内容（非 --static-only 模式）
+  if (!staticOnly) {
+    console.log(`\n📡 拉取动态内容（每类型上限 ${CONFIG.maxPerType} 条）...`)
+
+    const [pictures, spaces, users, posts, activities, loveBoards, timeAlbums] =
+      await Promise.all([
+        fetchPictures(), fetchSpaces(), fetchUsers(), fetchPosts(),
+        fetchActivities(), fetchLoveBoards(), fetchTimeAlbums(),
+      ])
+
+    const dynamicEntries = generateDynamicEntries({
+      pictures, spaces, users, posts, activities, loveBoards, timeAlbums,
+    })
+    console.log(`\n   ✅ 动态内容 → ${dynamicEntries.length} 条双语条目`)
+    allEntries = [...allEntries, ...dynamicEntries]
+
+    console.log('\n📊 统计数据:')
+    console.log(`   图片:      ${pictures.length} 条`)
+    console.log(`   空间:      ${spaces.length} 条`)
+    console.log(`   用户:      ${users.length} 条`)
+    console.log(`   帖子:      ${posts.length} 条`)
+    console.log(`   活动:      ${activities.length} 条`)
+    console.log(`   恋爱画板:  ${loveBoards.length} 条`)
+    console.log(`   时光相册:  ${timeAlbums.length} 条`)
   }
 
-  console.log(`   每类型上限: ${CONFIG.maxPerType} 条`)
-  console.log('\n📡 拉取动态内容...')
-
-  // 并行拉取所有类型的数据
-  const [
-    pictures,
-    spaces,
-    users,
-    posts,
-    activities,
-    loveBoards,
-    timeAlbums,
-  ] = await Promise.all([
-    fetchPictures(),
-    fetchSpaces(),
-    fetchUsers(),
-    fetchPosts(),
-    fetchActivities(),
-    fetchLoveBoards(),
-    fetchTimeAlbums(),
-  ])
-
-  // 生成动态 sitemap entries（图片使用 image sitemap 格式）
-  const dynamicEntries = [
-    ...makeImageEntries(pictures),  // 图片带 <image:image> 子标签，提升 Google 图片搜索收录
-    ...makeEntries(spaces, '/space/', { changefreq: 'daily', priority: '0.7' }),
-    ...makeEntries(users, '/user/', { changefreq: 'weekly', priority: '0.5' }),
-    ...makeEntries(posts, '/post/', { changefreq: 'daily', priority: '0.7' }),
-    ...makeEntries(activities, '/activity/detail/', { changefreq: 'daily', priority: '0.7' }),
-    ...makeEntries(loveBoards, '/loveboard/', { changefreq: 'weekly', priority: '0.6' }),
-    ...makeEntries(timeAlbums, '/time-album/', { changefreq: 'weekly', priority: '0.6' }),
-  ]
-
-  console.log(`\n📊 共生成 ${dynamicEntries.length} 条动态路由`)
-
-  // 生成动态 sitemap → 由 GitHub Action 推送到服务器，与静态 sitemap 互补
-  const dynamicSitemap = generateSitemapXml(dynamicEntries)
-  const dynamicPath = resolve(CONFIG.outputDir, 'sitemap-dynamic.xml')
-  writeFileSync(dynamicPath, dynamicSitemap, 'utf-8')
-  console.log(`✅ 动态 Sitemap 已保存: ${dynamicPath}`)
-  console.log('   ⚠ 静态 sitemap.xml 不受影响，由 Git 版本管理')
-  console.log('   💡 部署时两个文件共同提交到 Google Search Console')
-
-  // 打印统计
-  console.log('\n📊 统计数据:')
-  console.log(`   图片:      ${pictures.length} 条`)
-  console.log(`   空间:      ${spaces.length} 条`)
-  console.log(`   用户:      ${users.length} 条`)
-  console.log(`   帖子:      ${posts.length} 条`)
-  console.log(`   活动:      ${activities.length} 条`)
-  console.log(`   恋爱画板:  ${loveBoards.length} 条`)
-  console.log(`   时光相册:  ${timeAlbums.length} 条`)
-
-  console.log('\n🎉 Sitemap 生成完毕!')
-  console.log('   提交到 Google Search Console: https://www.yuemutuku.com/sitemap.xml')
+  // 4. 写入 sitemap.xml
+  const sitemap = wrapSitemap(allEntries)
+  writeFileSync(CONFIG.outputPath, sitemap, 'utf-8')
+  console.log(`\n✅ Sitemap 已保存: ${CONFIG.outputPath}`)
+  console.log(`   总计: ${allEntries.length} 条 URL 条目`)
+  console.log(`   提交到 Google Search Console: ${CONFIG.siteUrl}/sitemap.xml`)
+  console.log('🎉 生成完毕!')
 }
 
 main().catch(err => {

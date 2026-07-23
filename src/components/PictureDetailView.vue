@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Teleport to="body">
     <div class="yuemu-picture-modal-overlay" style="background-color: transparent;" @click.self="handleClose" ref="overlayRef">
       <div class="yuemu-modal-container" :class="{ 'yuemu-is-mobile': isMobile }">
@@ -675,7 +675,7 @@ const handleImageLoad = () =>{
 const handleUserClick = (user: any) => {
   if (!user?.id) return
   handleClose()
-  router.push(`/user/${user.id}`)
+  router.push({ name: 'UserDetail', params: { id: user.id } })
 }
 const checkIsFollowed = async () => {
   if (!loginUserStore.loginUser?.id || !picture.value?.user?.id) return
@@ -882,26 +882,26 @@ const handlePermissionsUpdated = (newPermissions: any) => {
 const handleDownload = () => { downloadImage(picture.value.url, picture.value.name); showMoreModal.value = false; }
 const doEdit = () => {
   showMoreModal.value = false
-  router.push({ path: '/add_picture', query: { id: picture.value.id, spaceId: picture.value.spaceId } })
+  router.push({ name: 'AddPicture', query: { id: picture.value.id, spaceId: picture.value.spaceId } })
     .then(() => handleClose())
 }
 const goToCopyrightRegister = () => {
   showMoreModal.value = false
-  router.push({ path: '/picture/copyright/register', query: { pictureId: String(picture.value.id) } })
+  router.push({ name: 'CopyrightRegister', query: { pictureId: String() } })
 }
 const goToEditCopyright = () => {
   showMoreModal.value = false
-  router.push({ path: '/picture/copyright/register', query: { pictureId: String(picture.value.id), edit: 'true' } })
+  router.push({ name: 'CopyrightRegister', query: { pictureId: String(), edit: 'true' } })
 }
 const goToCopyrightTrace = () => {
   showMoreModal.value = false
-  router.push({ path: '/picture/copyright/trace', query: copyrightInfo.value?.copyrightCode ? { code: copyrightInfo.value.copyrightCode } : {} })
+  router.push({ name: 'CopyrightTrace', query: copyrightInfo.value?.copyrightCode ? { code: copyrightInfo.value.copyrightCode } : {} })
 }
 const goToAnalytics = () => {
   const targetId = picture.value?.id || props.id
   if (!targetId) return message.warning(t('components.pictureDetailView.cannotGetWorkId'))
   showMoreModal.value = false
-  router.push(`/item/analytics/picture/${targetId}`)
+  router.push({ name: 'ItemAnalytics', params: { type: 'picture', id: targetId } })
 }
 const loadCopyrightInfo = async () => {
   if (!picture.value?.id) return

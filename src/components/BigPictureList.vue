@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-big-picture-list" ref="containerRef">
     <div v-if="loading && (!props.dataList || props.dataList.length === 0)" class="yuemu-skeleton-wrap">
       <div class="yuemu-skeleton-row" style="height: 200px">
@@ -329,7 +329,7 @@ const handleAvatarLoad = (id: string | number) => {
 
 const doClickPicture = (picture: PictureVO) => {
   if (picture.isDraft === 1) {
-    router.push({ path: '/add_picture', query: { id: picture.id } })
+    router.push({ name: 'AddPicture', query: { id: picture.id } })
   } else {
     if (!isMobile.value) {
       openDetailModal(picture)

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="picture-detail-page" :class="{ 'is-mobile': isMobile, 'is-loaded': pageReady }">
 
     <template v-if="pictureLoaded && picture.id">
@@ -436,7 +436,7 @@ const doShare = async () => {
 const doGuessLike = () => {
   if (!picture.value.url) return message.warning(t('pages.pictureDetailPage.invalidUrl'))
   router.push({
-    path: '/guess_you_like',
+    name: 'GuessYouLike',
     query: {
       url: picture.value.url,
       id: picture.value.id
@@ -446,7 +446,7 @@ const doGuessLike = () => {
 
 // 用户与关注
 const handleUserClick = (user: any) => {
-  if (user?.id) router.push(`/user/${user.id}`)
+  if (user?.id) router.push({ name: 'UserDetail', params: { id: user.id } })
 }
 
 const checkIsFollowed = async () => {
@@ -648,7 +648,7 @@ const handlePermissionsUpdated = (newPermissions: any) => {
   showPermissionSetting.value = false
 }
 const handleDownload = () => { downloadImage(picture.value.url, picture.value.name); showMoreModal.value = false }
-const doEdit = () => router.push({ path: '/add_picture', query: { id: picture.value.id, spaceId: picture.value.spaceId } })
+const doEdit = () => router.push({ name: 'AddPicture', query: { id: picture.value.id, spaceId: picture.value.spaceId } })
 const showDeleteConfirm = () => { deleteConfirmVisible.value = true; showMoreModal.value = false }
 const confirmDelete = async () => {
   const res = await deletePictureUsingPost({ id: picture.value.id })
@@ -660,12 +660,12 @@ const loadCopyrightInfo = async () => {
     if (res.data.code === 0 && res.data.data) { copyrightInfo.value = res.data.data; hasCopyright.value = true }
   } catch (e) {}
 }
-const goToCopyrightRegister = () => router.push({ path: '/picture/copyright/register', query: { pictureId: String(props.id) } })
-const goToEditCopyright = () => router.push({ path: '/picture/copyright/register', query: { pictureId: String(props.id), edit: 'true' } })
-const goToCopyrightTrace = () => router.push(copyrightInfo.value?.copyrightCode ? { path: '/picture/copyright/trace', query: { code: copyrightInfo.value.copyrightCode } } : '/picture/copyright/trace')
+const goToCopyrightRegister = () => router.push({ name: 'CopyrightRegister', query: { pictureId: String(props.id) } })
+const goToEditCopyright = () => router.push({ name: 'CopyrightRegister', query: { pictureId: String(props.id), edit: 'true' } })
+const goToCopyrightTrace = () => router.push(copyrightInfo.value?.copyrightCode ? { name: 'CopyrightTrace', query: { code: copyrightInfo.value.copyrightCode } } : { name: 'CopyrightTrace' })
 const goToAnalytics = () => {
   if (!props.id) return message.warning(t('pages.pictureDetailPage.noPicId'))
-  router.push(`/item/analytics/picture/${props.id}`)
+  router.push({ name: 'ItemAnalytics', params: { type: 'picture', id: props.id } })
   showMoreModal.value = false
 }
 </script>

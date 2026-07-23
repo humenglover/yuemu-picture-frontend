@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="space-activity-manage-page">
 
     <!-- 内容区域 -->
@@ -172,19 +172,19 @@ const formatDate = (dateString: string | undefined) => {
 };
 
 const showAddActivityModal = () => {
-  router.push(`/activity/edit?spaceId=${spaceId.value}`);
+  router.push({ name: 'ActivityEdit', query: { spaceId: spaceId.value } });
 };
 
 const handleViewActivity = (id: string) => {
-  router.push(`/activity/detail/${id}`);
+  router.push({ name: 'ActivityDetail', params: { id: id } });
 };
 
 const handleEditActivity = (id: string) => {
-  router.push(`/activity/edit/${id}`);
+  router.push({ name: 'ActivityEdit', params: { id } });
 };
 
 const handleManageSubmissions = (id: string) => {
-  router.push(`/activity/submission/manage?activityId=${id}`);
+  router.push({ name: 'ActivitySubmissionManage', query: { activityId: id } });
 };
 
 const handleDeleteActivity = async (id: string) => {

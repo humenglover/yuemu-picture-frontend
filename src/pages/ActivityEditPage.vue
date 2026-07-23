@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-compact-editor-page">
     <header class="yuemu-compact-header">
       <button class="yuemu-nav-btn yuemu-cancel" @click="handleCancel">{{ t('pages.activityEditPage.btnCancel') }}</button>
@@ -408,7 +408,7 @@ const handleSubmit = async () => {
       const res = await editActivityUsingPost(req)
       if (res.data?.code === 0) {
         showToastMessage(t('pages.activityEditPage.toastUpdateSuccess'), 'success')
-        setTimeout(() => router.push(`/activity/detail/${formState.value.id}`), 1000)
+        setTimeout(() => router.push({ name: 'ActivityDetail', params: { id: formState.value.id } }), 1000)
       } else {
         showToastMessage(res.data?.message || t('pages.activityEditPage.toastUpdateFail'), 'error')
       }
@@ -416,7 +416,7 @@ const handleSubmit = async () => {
       const res = await addActivityUsingPost(req)
       if (res.data?.data) {
         showToastMessage(t('pages.activityEditPage.toastPublishSuccess'), 'success')
-        setTimeout(() => router.push(`/activity/detail/${res.data.data}`), 1000)
+        setTimeout(() => router.push({ name: 'ActivityDetail', params: { id: res.data.data } }), 1000)
       } else {
         showToastMessage(res.data?.message || t('pages.activityEditPage.toastPublishFail'), 'error')
       }

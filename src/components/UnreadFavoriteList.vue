@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-unread-favorite-list">
     <div
       v-for="(favorite, i) in safeFavorites"
@@ -106,9 +106,9 @@ const formatTime = (timeString: string) => {
 // 处理目标点击
 const handleTargetClick = (favorite: any) => {
   if (favorite.targetType === 1 && favorite.target?.id) {
-    router.push(`/picture-redirect/${favorite.target.id}`)
+    router.push({ name: 'PictureRedirect', params: { id: favorite.target.id } })
   } else if (favorite.targetType === 2 && favorite.target?.id) {
-    router.push(`/post/${favorite.target.id}`)
+    router.push({ name: 'PostDetail', params: { id: favorite.target.id } })
   }
 }
 

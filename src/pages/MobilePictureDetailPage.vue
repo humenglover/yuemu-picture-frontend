@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-mobile-detail">
 
     <header class="yuemu-header">
@@ -464,7 +464,7 @@ const updateLatestData = async () => {
 const handleImageLoad = () => { imgReady.value = true; }
 const showImagePreview = () => showPreview.value = true
 const closeImagePreview = () => showPreview.value = false
-const handleUserClick = (user) => { if (user) router.push(`/user/${user.id}`) }
+const handleUserClick = (user) => { if (user) router.push({ name: 'UserDetail', params: { id: user.id } }) }
 const formatNumber = (num: number) => num ? (num >= 10000 ? (num / 10000).toFixed(1) + 'w' : num.toString()) : '0'
 
 const doLike = async () => {
@@ -579,7 +579,8 @@ const switchTab = (tab: 'comments' | 'recommend') => {
 
 const handleGuessLikeClick = (newPicture: any) => {
   router.replace({
-    path: `/picture-redirect/${newPicture.id}`,
+    name: 'PictureRedirect',
+    params: { id: newPicture.id },
     state: { pictureData: JSON.parse(JSON.stringify(newPicture)) }
   })
 }
@@ -593,7 +594,7 @@ const chatRoomRef = ref()
 const handleChatMessage = (msg: any) => { if (msg.type === 'onlineUsers') onlineCount.value = msg.onlineCount }
 const openChatModal = () => { showMoreDrawer.value = false; if (loginUserStore.loginUser) showChatModal.value = true; else message.warning(t('pages.mobilePictureDetailPage.messages.needLogin')) }
 
-const doEdit = () => { showMoreDrawer.value = false; router.push({ path: '/add_picture', query: { id: picture.value.id, spaceId: picture.value.spaceId } }) }
+const doEdit = () => { showMoreDrawer.value = false; router.push({ name: 'AddPicture', query: { id: picture.value.id, spaceId: picture.value.spaceId } }) }
 const handleDownload = () => { showMoreDrawer.value = false; if (picture.value.isDownload === 0) return message.warning(t('pages.mobilePictureDetailPage.messages.downloadDisabled')); downloadImage(picture.value.url, picture.value.name || t('pages.mobilePictureDetailPage.title')); message.success(t('pages.mobilePictureDetailPage.messages.startDownload')); }
 const deleteConfirmVisible = ref(false)
 const showDeleteConfirm = () => { showMoreDrawer.value = false; deleteConfirmVisible.value = true; }
@@ -615,18 +616,18 @@ const loadCopyrightInfo = async () => {
     if (res.data.code === 0 && res.data.data) { copyrightInfo.value = res.data.data; hasCopyright.value = true; }
   } catch (error) {}
 }
-const goToCopyrightRegister = () => { showMoreDrawer.value = false; router.push({ path: '/picture/copyright/register', query: { pictureId: String(picture.value.id) } }) }
-const goToEditCopyright = () => { showMoreDrawer.value = false; router.push({ path: '/picture/copyright/register', query: { pictureId: String(picture.value.id), edit: 'true' } }) }
+const goToCopyrightRegister = () => { showMoreDrawer.value = false; router.push({ name: 'CopyrightRegister', query: { pictureId: String(picture.value.id) } }) }
+const goToEditCopyright = () => { showMoreDrawer.value = false; router.push({ name: 'CopyrightRegister', query: { pictureId: String(picture.value.id), edit: 'true' } }) }
 const goToCopyrightTrace = () => {
   showMoreDrawer.value = false
-  if (copyrightInfo.value?.copyrightCode) { router.push({ path: '/picture/copyright/trace', query: { code: copyrightInfo.value.copyrightCode } }) }
-  else { router.push({ path: '/picture/copyright/trace' }) }
+  if (copyrightInfo.value?.copyrightCode) { router.push({ name: 'CopyrightTrace', query: { code: copyrightInfo.value.copyrightCode } }) }
+  else { router.push({ name: 'CopyrightTrace' }) }
 }
 
 const goToAnalytics = () => {
   if (!props.id) return message.warning(t('pages.mobilePictureDetailPage.messages.noPicId'))
   showMoreDrawer.value = false
-  router.push(`/item/analytics/picture/${props.id}`)
+  router.push({ name: 'ItemAnalytics', params: { type: 'picture', id: props.id } })
 }
 
 const comments = ref<API.Comment[]>([])

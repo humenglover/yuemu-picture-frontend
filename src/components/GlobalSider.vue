@@ -18,7 +18,7 @@
     <div v-if="!isMinimized" class="yuemu-sider-wrapper" @mousedown="handleMouseDown">
       <div class="yuemu-fixed-header">
         <a-tooltip :placement="tooltipPlacement" :title="t('user.profile')">
-          <router-link to="/my" class="yuemu-avatar-link">
+          <router-link :to="{ name: 'MyPage' }" class="yuemu-avatar-link">
             <div class="yuemu-avatar-wrapper">
               <a-avatar :src="loginUserStore.loginUser?.userAvatar || defaultAvatarImg" :size="32" />
               <div class="yuemu-status-indicator"></div>
@@ -30,25 +30,25 @@
       <div class="yuemu-scrollable-content">
         <div class="yuemu-item-list">
           <a-tooltip :placement="tooltipPlacement" :title="t('nav.home')">
-            <router-link to="/" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/' }">
+            <router-link :to="{ name: 'Home' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === '/' }">
               <div class="yuemu-icon-box"><i class="fa-solid fa-house"></i></div>
             </router-link>
           </a-tooltip>
 
           <a-tooltip :placement="tooltipPlacement" :title="t('nav.forum')">
-            <router-link to="/forum" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/forum' }">
+            <router-link :to="{ name: 'Forum' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === '/forum' }">
               <div class="yuemu-icon-box"><i class="fa-solid fa-file-lines"></i></div>
             </router-link>
           </a-tooltip>
 
           <a-tooltip :placement="tooltipPlacement" :title="t('components.globalSider.chat')">
-            <router-link :to="chatRoute" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === chatRoute }">
+            <router-link :to="chatRoute" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === chatRoute }">
               <div class="yuemu-icon-box"><i class="fa-solid fa-comments"></i></div>
             </router-link>
           </a-tooltip>
 
           <a-tooltip :placement="tooltipPlacement" :title="t('nav.messages')">
-            <router-link to="/message-center" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/message-center' }">
+            <router-link :to="{ name: 'MessageCenter' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === '/message-center' }">
               <div class="yuemu-icon-box">
                 <i class="fa-solid fa-bell"></i>
                 <div v-if="unreadCount > 0" class="yuemu-mini-badge"></div>
@@ -57,13 +57,13 @@
           </a-tooltip>
 
           <a-tooltip :placement="tooltipPlacement" :title="t('components.globalSider.games')">
-            <router-link to="/games" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/games' }">
+            <router-link :to="{ name: 'Games' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === '/games' }">
               <div class="yuemu-icon-box"><i class="fa-solid fa-rocket"></i></div>
             </router-link>
           </a-tooltip>
 
           <a-tooltip :placement="tooltipPlacement" :title="t('components.globalSider.tools')">
-            <router-link to="/tools" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/tools' }">
+            <router-link :to="{ name: 'Tools' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === '/tools' }">
               <div class="yuemu-icon-box"><i class="fa-solid fa-cubes"></i></div>
             </router-link>
           </a-tooltip>
@@ -100,6 +100,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { stripLocalePrefix } from '@/router/localeRouter'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { useMessageCenterStore } from '@/stores/useMessageCenterStore'
 import { useLayoutStore } from '@/stores/useLayoutStore'
@@ -117,6 +118,8 @@ const messageCenterStore = useMessageCenterStore()
 const layoutStore = useLayoutStore()
 const themeStore = useThemeStore()
 const route = useRoute()
+
+const cleanPath = computed(() => stripLocalePrefix(route.path))
 
 const isMinimized = ref(getDeviceType() === DEVICE_TYPE_ENUM.MOBILE)
 const isDragging = ref(false)

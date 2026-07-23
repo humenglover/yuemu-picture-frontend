@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-redirect-page">
     <div class="yuemu-redirect-content">
       <div class="yuemu-spinner-ring">
@@ -36,12 +36,12 @@ onMounted(async () => {
       // 根据设备类型进行重定向
       if (device === DEVICE_TYPE_ENUM.PC) {
         console.log(t('pages.chatRedirectPage.detectPc'))
-        await router.replace('/pc-chat')
+        await router.replace({ name: 'PCChat' })
       } else {
         console.log(t('pages.chatRedirectPage.detectMobile'))
         await router.replace({
-          path: `/chat-list`,
-          query: route.query 
+          name: 'ChatList',
+          query: route.query
         })
       }
     }, 300)
@@ -52,7 +52,7 @@ onMounted(async () => {
 
     // 提供一个备用方案
     setTimeout(() => {
-      router.replace('/chat-list')
+      router.replace({ name: 'ChatList' })
     }, 2000)
   }
 })

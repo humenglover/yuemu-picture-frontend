@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="forumPage">
     <div class="page-container" @scroll="handleScroll" ref="pcContainer">
       <div class="content-wrapper">
@@ -85,12 +85,12 @@
                   v-for="user in followUsers"
                   :key="user.id"
                   class="follow-user-item-horizontal"
-                  @click="$router.push(`/user/${user.id}`)"
+                  @click="$router.push({ name: 'UserDetail', params: { id: user.id } })"
                 >
                   <img :src="user.userAvatar || getDefaultAvatar(user.userName)" :alt="user.userName" class="follow-user-avatar" />
                   <span class="follow-user-name">{{ user.userName }}</span>
                 </div>
-                <div class="follow-user-item-horizontal view-more-item" @click="$router.push('/follow-list')">
+                <div class="follow-user-item-horizontal view-more-item" @click="$router.push({ name: 'FollowList' })">
                   <div class="view-more-avatar">
                     <i class="fas fa-plus"></i>
                   </div>
@@ -192,12 +192,12 @@
                         v-for="user in followUsers"
                         :key="user.id"
                         class="pc-follow-user"
-                        @click="$router.push(`/user/${user.id}`)"
+                        @click="$router.push({ name: 'UserDetail', params: { id: user.id } })"
                         ::title="$t('pages.forumPage.recommend')"
                       >
                         <img :src="user.userAvatar || getDefaultAvatar(user.userName)" class="mini-avatar" />
                       </div>
-                      <div class="pc-follow-user add-follow" @click="$router.push('/follow-list')">
+                      <div class="pc-follow-user add-follow" @click="$router.push({ name: 'FollowList' })">
                         <i class="fas fa-plus mini-icon"></i>
                       </div>
                     </div>
@@ -482,7 +482,7 @@ const fetchFollowPosts = async (reset = false) => {
 
 // 跳转到排行榜
 const goToRanking = () => {
-  router.push({ path: '/ranking', query: { type: 'post' } })
+  router.push({ name: 'Ranking', query: { type: 'post' } })
 }
 
 const fetchFollowUsers = async () => {
@@ -671,7 +671,7 @@ const toggleCategoryDropdown = () => {
 // }
 
 const handleSearchClick = () => {
-  router.push({ path: '/search', query: { type: 'post' } })
+  router.push({ name: 'Search', query: { type: 'post' } })
 }
 
 const saveScrollPosition = () => {

@@ -1,28 +1,28 @@
-<template>
+﻿<template>
   <div class="yuemu-global-header-container">
 
     <div class="yuemu-header-left">
-      <router-link to="/" class="yuemu-logo-link">
+      <router-link :to="{ name: 'Home' }" class="yuemu-logo-link">
         <img src="../assets/nuv.png" alt="Logo" class="yuemu-logo-image" />
       </router-link>
     </div>
 
     <div class="yuemu-header-center yuemu-pc-only">
       <nav class="yuemu-pill-nav-container">
-        <router-link to="/" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/' || route.path === '/home' }">
+        <router-link :to="{ name: 'Home' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === '/' || cleanPath === '/home' }">
           <span>{{ $t('nav.home') }}</span>
         </router-link>
-        <router-link to="/forum" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/forum' }">
+        <router-link :to="{ name: 'Forum' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === '/forum' }">
           <span>{{ $t('nav.forum') }}</span>
         </router-link>
-        <router-link to="/pc-chat" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/pc-chat' }">
+        <router-link :to="{ name: 'PCChat' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === '/pc-chat' }">
           <span>{{ $t('nav.chat') }}</span>
           <span v-if="loginUserStore.loginUser.id && unreadCounts.totalUnread > 0" class="yuemu-badge-dot"></span>
         </router-link>
-        <router-link to="/discovery" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/discovery' }">
+        <router-link :to="{ name: 'Discovery' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath === '/discovery' }">
           <span>{{ $t('nav.discovery') }}</span>
         </router-link>
-        <router-link v-if="loginUserStore.loginUser?.userRole === 'admin'" to="/admin/manage" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path.startsWith('/admin/') }">
+        <router-link v-if="loginUserStore.loginUser?.userRole === 'admin'" :to="{ name: 'AdminManage' }" class="yuemu-nav-item" :class="{ 'yuemu-active': cleanPath.startsWith('/admin/') }">
           <span>{{ $t('nav.admin') }}</span>
         </router-link>
       </nav>
@@ -31,15 +31,15 @@
     <div class="yuemu-header-right">
       <!-- 图标组容器：精简内聚 -->
       <div class="yuemu-icon-bar yuemu-pc-only">
-        <div class="yuemu-icon-btn" :class="{ 'yuemu-active': route.path === '/search' }" @click="handleSearchClick" :title="$t('nav.search')">
+        <div class="yuemu-icon-btn" :class="{ 'yuemu-active': cleanPath === '/search' }" @click="handleSearchClick" :title="$t('nav.search')">
           <i class="fa-solid fa-magnifying-glass"></i>
         </div>
 
-        <router-link to="/chat/ai" v-if="loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-ai-icon-btn" :class="{ 'yuemu-active': route.path === '/chat/ai' }" :title="$t('nav.aiAssistant')">
+        <router-link :to="{ name: 'AIChat' }" v-if="loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-ai-icon-btn" :class="{ 'yuemu-active': cleanPath === '/chat/ai' }" :title="$t('nav.aiAssistant')">
           <img :src="aiIcon" class="yuemu-ai-icon-img" alt="AI" />
         </router-link>
 
-        <router-link to="/message-center" v-if="loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-notification-btn" :class="{ 'yuemu-active': route.path === '/message-center' }" :title="$t('nav.messages')">
+        <router-link :to="{ name: 'MessageCenter' }" v-if="loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-notification-btn" :class="{ 'yuemu-active': cleanPath === '/message-center' }" :title="$t('nav.messages')">
           <i class="fa-regular fa-bell"></i>
           <div v-if="messageCenterUnreadCount > 0" class="yuemu-capsule-badge">
             {{ messageCenterUnreadCount > 99 ? '99+' : messageCenterUnreadCount }}
@@ -64,10 +64,10 @@
               <span class="yuemu-user-role">{{ loginUserStore.loginUser.userRole === 'admin' ? $t('user.adminRole') : $t('user.userRole') }}</span>
             </div>
             <div class="yuemu-dropdown-divider"></div>
-            <router-link to="/my" class="yuemu-dropdown-item" @click="showUserMenu = false">
+            <router-link :to="{ name: 'MyPage' }" class="yuemu-dropdown-item" @click="showUserMenu = false">
               <i class="fa-regular fa-user"></i> {{ $t('user.profile') }}
             </router-link>
-            <router-link to="/user/setting" class="yuemu-dropdown-item" @click="showUserMenu = false">
+            <router-link :to="{ name: 'UserSetting' }" class="yuemu-dropdown-item" @click="showUserMenu = false">
               <i class="fa-solid fa-gear"></i> {{ $t('user.setting') }}
             </router-link>
             <div class="yuemu-dropdown-item" @click="toggleTheme">
@@ -131,7 +131,7 @@
           </Transition>
         </div>
 
-        <router-link to="/user/login" class="yuemu-login-btn">{{ $t('user.loginOrRegister') }}</router-link>
+        <router-link :to="{ name: 'UserLogin' }" class="yuemu-login-btn">{{ $t('user.loginOrRegister') }}</router-link>
       </div>
 
       <div class="yuemu-icon-btn yuemu-mobile-only" @click="showMobileMenu = true">
@@ -152,32 +152,32 @@
             </div>
 
             <div class="yuemu-drawer-nav-list">
-              <router-link to="/" class="yuemu-d-nav-item" :class="{ 'yuemu-active': route.path === '/' || route.path === '/home' }" @click="showMobileMenu = false">
+              <router-link :to="{ name: 'Home' }" class="yuemu-d-nav-item" :class="{ 'yuemu-active': cleanPath === '/' || cleanPath === '/home' }" @click="showMobileMenu = false">
                 <i class="fa-solid fa-house"></i> {{ $t('nav.home') }}
               </router-link>
-              <router-link to="/forum" class="yuemu-d-nav-item" :class="{ 'yuemu-active': route.path === '/forum' }" @click="showMobileMenu = false">
+              <router-link :to="{ name: 'Forum' }" class="yuemu-d-nav-item" :class="{ 'yuemu-active': cleanPath === '/forum' }" @click="showMobileMenu = false">
                 <i class="fa-solid fa-compass"></i> {{ $t('nav.forum') }}
               </router-link>
-              <router-link to="/chat-redirect" class="yuemu-d-nav-item" :class="{ 'yuemu-active': route.path === '/pc-chat' }" @click="showMobileMenu = false">
+              <router-link :to="{ name: 'ChatRedirect' }" class="yuemu-d-nav-item" :class="{ 'yuemu-active': cleanPath === '/pc-chat' }" @click="showMobileMenu = false">
                 <i class="fa-solid fa-comments"></i> {{ $t('nav.chat') }}
                 <span v-if="loginUserStore.loginUser.id && unreadCounts.totalUnread > 0" class="yuemu-d-badge">{{ unreadCounts.totalUnread }}</span>
               </router-link>
-              <router-link v-if="loginUserStore.loginUser.id" to="/discovery" class="yuemu-d-nav-item" :class="{ 'yuemu-active': route.path === '/discovery' }" @click="showMobileMenu = false">
+              <router-link v-if="loginUserStore.loginUser.id" :to="{ name: 'Discovery' }" class="yuemu-d-nav-item" :class="{ 'yuemu-active': cleanPath === '/discovery' }" @click="showMobileMenu = false">
                 <i class="fa-solid fa-fire"></i> {{ $t('nav.discovery') }}
               </router-link>
 
-              <router-link v-if="loginUserStore.loginUser.id" to="/chat/ai" class="yuemu-d-nav-item yuemu-d-ai-nav-item" :class="{ 'yuemu-active': route.path === '/chat/ai' }" @click="showMobileMenu = false">
+              <router-link v-if="loginUserStore.loginUser.id" :to="{ name: 'AIChat' }" class="yuemu-d-nav-item yuemu-d-ai-nav-item" :class="{ 'yuemu-active': cleanPath === '/chat/ai' }" @click="showMobileMenu = false">
                 <img :src="aiIcon" class="yuemu-d-ai-icon-img" alt="AI" /> {{ $t('nav.aiAssistant') }}
               </router-link>
 
-              <router-link v-if="loginUserStore.loginUser?.userRole === 'admin'" to="/admin/manage" class="yuemu-d-nav-item" :class="{ 'yuemu-active': route.path.startsWith('/admin/') }" @click="showMobileMenu = false">
+              <router-link v-if="loginUserStore.loginUser?.userRole === 'admin'" :to="{ name: 'AdminManage' }" class="yuemu-d-nav-item" :class="{ 'yuemu-active': cleanPath.startsWith('/admin/') }" @click="showMobileMenu = false">
                 <i class="fa-solid fa-shield-halved"></i> {{ $t('nav.admin') }}
               </router-link>
             </div>
 
             <div class="yuemu-drawer-footer">
               <template v-if="loginUserStore.loginUser.id">
-                <div class="yuemu-d-user-profile" @click="router.push('/my'); showMobileMenu = false">
+                <div class="yuemu-d-user-profile" @click="router.push({ name: 'MyPage' }); showMobileMenu = false">
                   <img :src="loginUserStore.loginUser?.userAvatar || getDefaultAvatar(loginUserStore.loginUser?.userName)" alt="User" />
                   <div class="yuemu-d-user-info">
                     <span class="yuemu-d-name">{{ loginUserStore.loginUser.userName || $t('user.unnamed') }}</span>
@@ -201,7 +201,7 @@
                   <i class="fa-solid fa-plus"></i> {{ $t('components.globalHeader.publishNew') }}
                 </button>
               </template>
-              <router-link v-else to="/user/login" class="yuemu-d-login-btn" @click="showMobileMenu = false">{{ $t('user.loginOrRegister') }}</router-link>
+              <router-link v-else :to="{ name: 'UserLogin' }" class="yuemu-d-login-btn" @click="showMobileMenu = false">{{ $t('user.loginOrRegister') }}</router-link>
             </div>
           </div>
         </div>
@@ -242,6 +242,7 @@ import UploadActionSheet from '@/components/UploadActionSheet.vue'
 import aiIcon from '@/assets/icons/ai.svg'
 
 import { SUPPORTED_LANGUAGES, type LanguageOption } from '@/locales'
+import { stripLocalePrefix } from '@/router/localeRouter'
 
 const props = defineProps<{
   unreadCounts: { totalUnread: number; privateUnread: number; friendUnread: number },
@@ -257,6 +258,7 @@ const loginUserStore = useLoginUserStore()
 const themeStore = useThemeStore()
 const route = useRoute()
 const router = useRouter()
+const cleanPath = computed(() => stripLocalePrefix(route.path))
 
 const showUserMenu = ref(false)
 const showLangSubmenu = ref(false)
@@ -279,13 +281,21 @@ const currentLangFullName = computed(() => {
 })
 
 const changeLanguage = (langCode: string) => {
-  locale.value = langCode
-  localStorage.setItem('locale', langCode)
-  document.documentElement.lang = langCode.startsWith('zh') ? 'zh-CN' : 'en-US'
+  // 关闭所有下拉菜单
   showLangDropdown.value = false
   showUserMenu.value = false
   showLangSubmenu.value = false
   showGuestLangMenu.value = false
+
+  // 如果语言没变，不导航
+  if (locale.value === langCode) return
+
+  // URL 语言切换：同页面导航到新的 locale 前缀
+  const urlLocale = langCode === 'en-US' ? 'en' : 'zh'
+  const cleanPath = stripLocalePrefix(route.path)
+  const newPath = `/${urlLocale}${cleanPath === '/' ? '' : cleanPath}`
+  // 保留 query 和 hash
+  router.push({ path: newPath, query: route.query, hash: route.hash })
 }
 
 const toggleNextLanguage = () => {
@@ -326,13 +336,13 @@ const toggleTheme = () => {
 
 const handleSearchClick = () => {
   emit('navigate', '/search')
-  router.push('/search')
+  router.push({ name: 'Search' })
 }
 
 const handleAddClick = () => {
   if (!loginUserStore.loginUser?.id) {
     message.warning(t('components.globalHeader.pleaseLogin'))
-    router.push('/user/login')
+    router.push({ name: 'UserLogin' })
     return
   }
   showActionSheet.value = true
@@ -345,7 +355,7 @@ const confirmLogout = async () => {
       logoutConfirmVisible.value = false
       loginUserStore.setLoginUser({ userName: t('components.globalHeader.notLoggedIn') })
       emit('logout')
-      router.push('/user/login')
+      router.push({ name: 'UserLogin' })
     }
   } catch (error) {
     message.error(t('components.globalHeader.logoutFailed'))

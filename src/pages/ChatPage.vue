@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-chat-page">
     <div class="yuemu-chat-container">
 
@@ -156,7 +156,7 @@ const toggleUserModal = () => { showUserModal.value = !showUserModal.value }
 const handleUserClick = (user: any) => {
   if (!user.id) return
   showUserModal.value = false 
-  router.push(`/user/${user.id}`)
+  router.push({ name: 'UserDetail', params: { id: user.id } })
 }
 
 const getRoleLabel = (role: string) => {
@@ -187,7 +187,8 @@ const handleChatMessage = (msg: any) => {
 const handleAvatarClick = () => {
   if (isGroupChat.value) return
   router.push({
-    path: `/user/${targetUser.value.id}`,
+    name: 'UserDetail',
+    params: { id: targetUser.value.id },
     query: { userName: targetUser.value.userName, userAvatar: targetUser.value.userAvatar, userAccount: targetUser.value.userAccount, createTime: targetUser.value.createTime }
   })
 }

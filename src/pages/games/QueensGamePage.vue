@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-retro-queens-universe" :class="{ 'is-mobile': isMobile, 'is-shaking': isShaking }" @touchmove.prevent>
     <div class="arcade-handheld">
 
@@ -391,7 +391,7 @@ const changeHistoryPage = (delta: number) => {
 
 const handleUserClick = (item: any) => {
   if (!item || !item.userId) return
-  router.push(`/user/${item.userId}`)
+  router.push({ name: 'UserDetail', params: { id: item.userId } })
 }
 
 const saveScore = async (finalScore: number) => {
@@ -560,7 +560,7 @@ async function autoSolve() {
 }
 
 const toggleSound = () => isSoundEnabled.value = !isSoundEnabled.value
-const goBack = () => router.push('/games')
+const goBack = () => router.push({ name: 'Games' })
 const checkMobile = () => isMobile.value = window.innerWidth <= 768
 
 onMounted(() => {

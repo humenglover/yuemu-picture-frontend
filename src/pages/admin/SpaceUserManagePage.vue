@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="yuemu-spaceUserManagePage" class="yuemu-page-container">
 
     <template v-if="device === DEVICE_TYPE_ENUM.PC">
@@ -348,7 +348,7 @@ const toggleRecommended = async (record: API.SpaceUserVO) => {
   }
 }
 
-const goToUserPage = (userId?: number) => { if (userId) router.push(`/user/${userId}`) }
+const goToUserPage = (userId?: number) => { if (userId) router.push({ name: 'UserDetail', params: { id: userId } }) }
 
 // 移动端角色弹窗
 const roleModalVisible = ref(false)

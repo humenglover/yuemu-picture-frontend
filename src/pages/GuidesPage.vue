@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="GuidesPage">
     <div class="guides-container">
 
@@ -155,7 +155,7 @@ const filteredArticles = computed(() => {
 })
 
 const goDetail = (id: string) => {
-  router.push(`/guides/${id}`)
+  router.push({ name: 'GuideDetail', params: { id: id } })
 }
 
 const scrollToContent = () => {

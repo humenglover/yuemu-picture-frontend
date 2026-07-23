@@ -3,6 +3,7 @@ import type { RouteLocationNormalized, RouteLocationNormalizedLoaded } from 'vue
 import { shouldSaveScrollPosition } from '@/constants/route'
 import { getDeviceType } from '@/utils/device'
 import i18n from '@/locales'
+import { resolvePreferredLocale, stripLocalePrefix, localeFromPath, urlLocaleToI18n, urlLocaleToOgLocale, LOCALE_PATTERN } from '@/router/localeRouter'
 
 import HomePage from '@/pages/HomePage.vue'
 
@@ -31,8 +32,21 @@ const resolvePageTitle = (to: RouteLocationNormalized): string => {
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // ── 根路径 → 根据偏好跳转到对应语言 ──
     {
-      path: '/redirect',
+      path: '/',
+      redirect: () => {
+        const locale = resolvePreferredLocale()
+        return `/${locale}/`
+      }
+    },
+
+    // ── 带语言前缀的路由（所有页面都挂在这里） ──
+    {
+      path: `/:locale${LOCALE_PATTERN}?`,
+      children: [
+    {
+      path: 'redirect',
       name: 'Redirect',
       component: () => import('@/pages/RedirectPage.vue'),
       meta: {
@@ -41,7 +55,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/ai_resource',
+      path: 'ai_resource',
       name: 'AiResource',
       component: () => import('@/pages/AiResourcePage.vue'),
       meta: {
@@ -51,7 +65,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/',
+      path: '',
       name: 'Home',
       component: HomePage,
       meta: {
@@ -60,7 +74,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/home',
+      path: 'home',
       name: 'MyHome',
       component: HomePage,
       meta: {
@@ -69,7 +83,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/about',
+      path: 'about',
       name: 'About',
       component: () => import('@/pages/AboutPage.vue'),
       meta: {
@@ -78,7 +92,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/guides',
+      path: 'guides',
       name: 'Guides',
       component: () => import('@/pages/GuidesPage.vue'),
       meta: {
@@ -87,7 +101,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/guides/:id',
+      path: 'guides/:id',
       name: 'GuideDetail',
       component: () => import('@/pages/GuideDetailPage.vue'),
       meta: {
@@ -96,7 +110,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/contact',
+      path: 'contact',
       name: 'Contact',
       component: () => import('@/pages/ContactPage.vue'),
       meta: {
@@ -105,7 +119,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/privacy',
+      path: 'privacy',
       name: 'Privacy',
       component: () => import('@/views/PrivacyPolicyView.vue'),
       meta: {
@@ -114,7 +128,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/knowledgeFileManage',
+      path: 'admin/knowledgeFileManage',
       name: 'AdminKnowledgeFileManage',
       component: () => import('@/pages/admin/KnowledgeFileManagePage.vue'),
       meta: {
@@ -125,7 +139,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/user/login',
+      path: 'user/login',
       name: 'UserLogin',
       component: () => import('@/pages/user/UserLoginPage.vue'),
       meta: {
@@ -134,7 +148,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/user/register',
+      path: 'user/register',
       name: 'UserRegister',
       component: () => import('@/pages/user/UserRegisterPage.vue'),
       meta: {
@@ -143,7 +157,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/user/setting',
+      path: 'user/setting',
       name: 'UserSetting',
       component: () => import('@/views/SettingView.vue'),
       meta: {
@@ -152,7 +166,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/invite',
+      path: 'invite',
       name: 'InvitePage',
       component: () => import('@/pages/InvitePage.vue'),
       meta: {
@@ -162,7 +176,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/add_picture',
+      path: 'add_picture',
       name: 'AddPicture',
       component: () => import('@/pages/AddPicturePage.vue'),
       meta: {
@@ -171,7 +185,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/userManage',
+      path: 'admin/userManage',
       name: 'AdminUserManage',
       component: () => import('@/pages/admin/UserManagePage.vue'),
       meta: {
@@ -180,7 +194,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/pictureManage',
+      path: 'admin/pictureManage',
       name: 'AdminPictureManage',
       component: () => import('@/pages/admin/PictureManagePage.vue'),
       meta: {
@@ -189,7 +203,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/spaceManage',
+      path: 'admin/spaceManage',
       name: 'AdminSpaceManage',
       component: () => import('@/pages/admin/SpaceManagePage.vue'),
       meta: {
@@ -198,7 +212,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/add_space',
+      path: 'add_space',
       name: 'AddSpace',
       component: () => import('@/pages/AddSpacePage.vue'),
       meta: {
@@ -207,7 +221,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/my_space',
+      path: 'my_space',
       name: 'MySpace',
       component: () => import('@/pages/MySpacePage.vue'),
       meta: {
@@ -216,7 +230,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/space/:id',
+      path: 'space/:id',
       name: 'SpaceDetail',
       component: () => import('@/pages/SpaceDetailPage.vue'),
       props: true,
@@ -226,7 +240,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/spaceUserManage/:id',
+      path: 'spaceUserManage/:id',
       name: 'SpaceUserManage',
       component: () => import('@/pages/admin/SpaceUserManagePage.vue'),
       props: true,
@@ -236,7 +250,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/my_ports',
+      path: 'my_ports',
       name: 'MyPosts',
       component: () => import('@/pages/MyPostsPage.vue'),
       props: true,
@@ -246,7 +260,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/systemNotifyManage',
+      path: 'admin/systemNotifyManage',
       name: 'AdminSystemNotifyManage',
       component: () => import('@/pages/admin/SystemNotifyManagePage.vue'),
       meta: {
@@ -257,7 +271,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/user/report-center',
+      path: 'user/report-center',
       name: 'UserReportCenter',
       component: () => import('@/pages/user/UserReportCenter.vue'),
       meta: {
@@ -267,7 +281,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/my_teams',
+      path: 'my_teams',
       name: 'MyTeams',
       component: () => import('@/pages/MyTeamsPage.vue'),
       meta: {
@@ -277,7 +291,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/my',
+      path: 'my',
       name: 'MyPage',
       component: () => import('@/pages/MyPage.vue'),
       meta: {
@@ -289,7 +303,7 @@ const router = createRouter({
       })
     },
     {
-      path: '/space_analyze',
+      path: 'space_analyze',
       name: 'SpaceAnalyze',
       component: () => import('@/pages/SpaceAnalyzePage.vue'),
       meta: {
@@ -298,7 +312,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/search_picture',
+      path: 'search_picture',
       name: 'SearchPicture',
       component: () => import('@/pages/SearchPicturePage.vue'),
       meta: {
@@ -307,7 +321,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/guess_you_like',
+      path: 'guess_you_like',
       name: 'GuessYouLike',
       component: () => import('@/pages/GuessYouLikePage.vue'),
       meta: {
@@ -316,7 +330,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/tagManage',
+      path: 'admin/tagManage',
       name: 'AdminTagManage',
       component: () => import('@/pages/admin/TagManagePage.vue'),
       meta: {
@@ -325,7 +339,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/categoryManage',
+      path: 'admin/categoryManage',
       name: 'AdminCategoryManage',
       component: () => import('@/pages/admin/CategoryManagePage.vue'),
       meta: {
@@ -334,7 +348,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/picture/:id',
+      path: 'picture/:id',
       name: 'PictureDetail',
       component: () => import('@/pages/PictureDetailPage.vue'),
       props: true,
@@ -344,7 +358,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/mobile/picture/:id',
+      path: 'mobile/picture/:id',
       name: 'MobilePictureDetail',
       component: () => import('@/pages/MobilePictureDetailPage.vue'),
       props: true,
@@ -354,7 +368,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/picture-redirect/:id',
+      path: 'picture-redirect/:id',
       name: 'PictureRedirect',
       component: () => import('@/pages/PictureRedirectPage.vue'),
       props: true,
@@ -363,7 +377,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/item/analytics/:type/:id',
+      path: 'item/analytics/:type/:id',
       name: 'ItemAnalytics',
       component: () => import('@/pages/ItemAnalyticsPage.vue'),
       meta: {
@@ -373,7 +387,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/picture/copyright/register',
+      path: 'picture/copyright/register',
       name: 'CopyrightRegister',
       component: () => import('@/pages/CopyrightRegisterPage.vue'),
       meta: {
@@ -383,7 +397,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/picture/copyright/trace',
+      path: 'picture/copyright/trace',
       name: 'CopyrightTrace',
       component: () => import('@/pages/CopyrightTracePage.vue'),
       meta: {
@@ -392,7 +406,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/add_picture/batch',
+      path: 'add_picture/batch',
       name: 'AddPictureBatch',
       component: () => import('@/pages/AddPictureBatchPage.vue'),
       meta: {
@@ -401,7 +415,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/reportManage',
+      path: 'admin/reportManage',
       name: 'AdminReportManage',
       component: () => import('@/pages/admin/ReportManagePage.vue'),
       meta: {
@@ -412,7 +426,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/follow-list',
+      path: 'follow-list',
       name: 'FollowList',
       component: () => import('@/pages/FollowListPage.vue'),
       meta: {
@@ -421,7 +435,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/user/:id',
+      path: 'user/:id',
       name: 'UserDetail',
       component: () => import('@/pages/UserDetailPage.vue'),
       props: true,
@@ -431,7 +445,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/friend-links',
+      path: 'friend-links',
       name: 'FriendLinks',
       component: () => import('@/pages/FriendLinks.vue'),
       meta: {
@@ -440,7 +454,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/search',
+      path: 'search',
       name: 'Search',
       component: () => import('@/pages/SearchPage.vue'),
       meta: {
@@ -448,7 +462,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/space_chat/:id',
+      path: 'space_chat/:id',
       name: 'SpaceChat',
       component: () => import('@/pages/SpaceChatPage.vue'),
       meta: {
@@ -456,7 +470,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/chat/:userId?',
+      path: 'chat/:userId?',
       name: 'PrivateChat',
       component: () => import('@/pages/ChatPage.vue'),
       props: true,
@@ -467,7 +481,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/forum',
+      path: 'forum',
       name: 'Forum',
       component: () => import('@/pages/ForumPage.vue'),
       meta: {
@@ -476,7 +490,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/chat-list',
+      path: 'chat-list',
       name: 'ChatList',
       component: () => import('@/pages/ChatListPage.vue'),
       meta: {
@@ -486,7 +500,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/post/:id',
+      path: 'post/:id',
       name: 'PostDetail',
       component: () => import('@/pages/PostDetailPage.vue'),
       meta: {
@@ -496,7 +510,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/post/edit/:id?',
+      path: 'post/edit/:id?',
       name: 'PostEdit',
       component: () => import('@/pages/PostEditPage.vue'),
       meta: {
@@ -506,7 +520,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/postManage',
+      path: 'admin/postManage',
       name: 'AdminPostManage',
       component: () => import('@/pages/admin/PostManagePage.vue'),
       meta: {
@@ -516,7 +530,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/activityManage',
+      path: 'admin/activityManage',
       name: 'AdminActivityManage',
       component: () => import('@/pages/admin/ActivityManagePage.vue'),
       meta: {
@@ -526,7 +540,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/space/:spaceId/activityManage',
+      path: 'space/:spaceId/activityManage',
       name: 'SpaceActivityManage',
       component: () => import('@/pages/SpaceActivityManagePage.vue'),
       props: true,
@@ -537,7 +551,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/activity/edit/:id?',
+      path: 'activity/edit/:id?',
       name: 'ActivityEdit',
       component: () => import('@/pages/ActivityEditPage.vue'),
       meta: {
@@ -548,7 +562,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/activity/detail/:id',
+      path: 'activity/detail/:id',
       name: 'ActivityDetail',
       component: () => import('@/pages/ActivityDetailPage.vue'),
       meta: {
@@ -557,7 +571,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/activity/submission/manage',
+      path: 'activity/submission/manage',
       name: 'ActivitySubmissionManage',
       component: () => import('@/pages/ActivitySubmissionManagePage.vue'),
       meta: {
@@ -568,7 +582,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/message-center',
+      path: 'message-center',
       name: 'MessageCenter',
       component: () => import('@/pages/MessageCenterPage.vue'),
       meta: {
@@ -578,7 +592,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/message/history',
+      path: 'message/history',
       name: 'InteractionHistory',
       component: () => import('@/pages/InteractionHistoryPage.vue'),
       meta: {
@@ -588,7 +602,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/user/reset-password',
+      path: 'user/reset-password',
       name: 'UserResetPassword',
       component: () => import('@/pages/user/UserResetPasswordPage.vue'),
       meta: {
@@ -597,7 +611,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/chat/ai',
+      path: 'chat/ai',
       name: 'AIChat',
       component: () => import('@/pages/AIChatPage.vue'),
       meta: {
@@ -607,7 +621,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/manage',
+      path: 'admin/manage',
       name: 'AdminManage',
       component: () => import('@/pages/AdminManagePage.vue'),
       meta: {
@@ -618,7 +632,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/reminder',
+      path: 'reminder',
       name: 'Reminder',
       component: () => import('@/pages/ReminderPage.vue'),
       meta: {
@@ -629,7 +643,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/likeManage',
+      path: 'admin/likeManage',
       name: 'AdminLikeManage',
       component: () => import('@/pages/admin/LikeManagePage.vue'),
       meta: {
@@ -640,7 +654,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/shareManage',
+      path: 'admin/shareManage',
       name: 'AdminShareManage',
       component: () => import('@/pages/admin/ShareManagePage.vue'),
       meta: {
@@ -649,7 +663,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/appManage',
+      path: 'admin/appManage',
       name: 'AdminAppManage',
       component: () => import('@/pages/admin/AppManagePage.vue'),
       meta: {
@@ -660,7 +674,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/friendLinkManage',
+      path: 'admin/friendLinkManage',
       name: 'AdminFriendLinkManage',
       component: () => import('@/pages/admin/FriendLinkManagePage.vue'),
       meta: {
@@ -669,7 +683,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/audioManage',
+      path: 'admin/audioManage',
       name: 'AdminAudioManage',
       component: () => import('@/pages/admin/AudioManagePage.vue'),
       meta: {
@@ -680,7 +694,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/chatManage',
+      path: 'admin/chatManage',
       name: 'AdminChatManage',
       component: () => import('@/pages/admin/ChatManagePage.vue'),
       meta: {
@@ -691,7 +705,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/loveBoardManage',
+      path: 'admin/loveBoardManage',
       name: 'AdminLoveBoardManage',
       component: () => import('@/pages/admin/LoveBoardManagePage.vue'),
       meta: {
@@ -702,7 +716,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/messageManage',
+      path: 'admin/messageManage',
       name: 'AdminMessageManage',
       component: () => import('@/pages/admin/MessageManagePage.vue'),
       meta: {
@@ -713,7 +727,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/redisMonitor',
+      path: 'admin/redisMonitor',
       name: 'AdminRedisMonitor',
       component: () => import('@/pages/admin/RedisCacheMonitorPage.vue'),
       meta: {
@@ -724,7 +738,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/aiChatManage',
+      path: 'admin/aiChatManage',
       name: 'AdminAIChatManage',
       component: () => import('@/pages/admin/AiChatManagePage.vue'),
       meta: {
@@ -735,7 +749,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/sessionManage',
+      path: 'admin/sessionManage',
       name: 'AdminSessionManage',
       component: () => import('@/pages/admin/SessionManagePage.vue'),
       meta: {
@@ -746,7 +760,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/commentManage',
+      path: 'admin/commentManage',
       name: 'AdminCommentManage',
       component: () => import('@/pages/admin/CommentManagePage.vue'),
       meta: {
@@ -757,7 +771,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/games',
+      path: 'games',
       children: [
         {
           path: 'snake',
@@ -872,7 +886,7 @@ const router = createRouter({
       ]
     },
     {
-      path: '/games',
+      path: 'games',
       name: 'Games',
       component: () => import('@/pages/GamesPage.vue'),
       meta: {
@@ -882,7 +896,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/tools',
+      path: 'tools',
       name: 'Tools',
       component: () => import('@/pages/ToolsPage.vue'),
       meta: {
@@ -891,73 +905,73 @@ const router = createRouter({
       }
     },
     {
-      path: '/tools/calculator',
+      path: 'tools/calculator',
       name: 'Calculator',
       component: () => import('@/pages/tools/CalculatorPage.vue'),
       meta: { title: '百宝箱 - 全能计算器', requiresAuth: true }
     },
     {
-      path: '/tools/timer',
+      path: 'tools/timer',
       name: 'Timer',
       component: () => import('@/pages/tools/TimerPage.vue'),
       meta: { title: '百宝箱 - 倒计时与秒表', requiresAuth: true }
     },
     {
-      path: '/tools/food-wheel',
+      path: 'tools/food-wheel',
       name: 'FoodWheel',
       component: () => import('@/pages/tools/FoodWheelPage.vue'),
       meta: { title: '百宝箱 - 命运大转盘：今天吃啥', requiresAuth: true }
     },
     {
-      path: '/tools/sticky-wall',
+      path: 'tools/sticky-wall',
       name: 'StickyWall',
       component: () => import('@/pages/tools/StickyWallPage.vue'),
       meta: { title: '百宝箱 - 记忆便签墙', requiresAuth: true }
     },
     {
-      path: '/tools/pomodoro',
+      path: 'tools/pomodoro',
       name: 'Pomodoro',
       component: () => import('@/pages/tools/PomodoroPage.vue'),
       meta: { title: '百宝箱 - 沉浸番茄钟', requiresAuth: true }
     },
     {
-      path: '/tools/random',
+      path: 'tools/random',
       name: 'Random',
       component: () => import('@/pages/tools/RandomPage.vue'),
       meta: { title: '百宝箱 - 量子随机数生成', requiresAuth: true }
     },
     {
-      path: '/tools/base-converter',
+      path: 'tools/base-converter',
       name: 'BaseConverter',
       component: () => import('@/pages/tools/BaseConverterPage.vue'),
       meta: { title: '百宝箱 - 程序员的进制转换', requiresAuth: true }
     },
     {
-      path: '/tools/unit-converter',
+      path: 'tools/unit-converter',
       name: 'UnitConverter',
       component: () => import('@/pages/tools/UnitConverter.vue'),
       meta: { title: '百宝箱 - 万能单位换算', requiresAuth: true }
     },
     {
-      path: '/tools/text-lab',
+      path: 'tools/text-lab',
       name: 'TextLab',
       component: () => import('@/pages/tools/TextLab.vue'),
       meta: { title: '百宝箱 - 赛博文本处理器', requiresAuth: true }
     },
     {
-      path: '/tools/vault-key',
+      path: 'tools/vault-key',
       name: 'VaultKey',
       component: () => import('@/pages/tools/VaultKey.vue'),
       meta: { title: '百宝箱 - 坚盾密码生成器', requiresAuth: true }
     },
     {
-      path: '/tools/grid-ruler',
+      path: 'tools/grid-ruler',
       name: 'GridRuler',
       component: () => import('@/pages/tools/GridRuler.vue'),
       meta: { title: '百宝箱 - 像素级屏幕游标卡尺', requiresAuth: true }
     },
     {
-      path: '/pc-chat',
+      path: 'pc-chat',
       name: 'PCChat',
       component: () => import('@/pages/PCChatPage.vue'),
       meta: {
@@ -968,7 +982,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/chat-redirect',
+      path: 'chat-redirect',
       name: 'ChatRedirect',
       component: () => import('@/pages/ChatRedirectPage.vue'),
       meta: {
@@ -977,7 +991,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/tools/color-picker',
+      path: 'tools/color-picker',
       name: 'ColorPicker',
       component: () => import('@/pages/tools/ColorPickerPage.vue'),
       meta: {
@@ -986,7 +1000,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/barrage',
+      path: 'barrage',
       name: 'Barrage',
       component: () => import('@/pages/BarragePage.vue'),
       meta: {
@@ -995,7 +1009,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/browse-history',
+      path: 'browse-history',
       name: 'BrowseHistory',
       component: () => import('@/pages/BrowseHistoryPage.vue'),
       meta: {
@@ -1005,7 +1019,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/login-records',
+      path: 'login-records',
       name: 'LoginRecords',
       component: () => import('@/pages/LoginRecordManagePage.vue'),
       meta: {
@@ -1015,7 +1029,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/loveboard',
+      path: 'loveboard',
       name: 'LoveBoard',
       component: () => import('@/views/LoveBoardView.vue'),
       meta: {
@@ -1025,7 +1039,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/loveboard/:id',
+      path: 'loveboard/:id',
       name: 'LoveBoardShare',
       component: () => import('@/views/LoveBoardView.vue'),
       meta: {
@@ -1035,7 +1049,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/loveboard/list',
+      path: 'loveboard/list',
       name: 'LoveBoardList',
       component: () => import('@/views/LoveBoardListView.vue'),
       meta: {
@@ -1045,7 +1059,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/time-album/:id',
+      path: 'time-album/:id',
       name: 'TimeAlbumDetail',
       component: () => import('@/views/TimeAlbumDetailView.vue'),
       meta: {
@@ -1055,7 +1069,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/music-album/:id',
+      path: 'music-album/:id',
       name: 'MusicAlbumDetail',
       component: () => import('@/views/MusicAlbumDetailView.vue'),
       meta: {
@@ -1063,7 +1077,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/contact',
+      path: 'contact',
       name: 'Contact',
       component: () => import('@/pages/ContactPage.vue'),
       meta: {
@@ -1072,7 +1086,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/discovery',
+      path: 'discovery',
       name: 'Discovery',
       component: () => import('@/pages/DiscoveryPage.vue'),
       meta: {
@@ -1081,7 +1095,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/creator/analytics',
+      path: 'creator/analytics',
       name: 'CreatorAnalytics',
       component: () => import('@/pages/CreatorAnalyticsPage.vue'),
       meta: {
@@ -1091,7 +1105,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/privacy-center',
+      path: 'privacy-center',
       name: 'PrivacyCenter',
       component: () => import('@/views/PrivacyCenterView.vue'),
       meta: {
@@ -1100,7 +1114,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/privacy',
+      path: 'privacy',
       name: 'PrivacyPolicy',
       component: () => import('@/views/PrivacyPolicyView.vue'),
       meta: {
@@ -1109,7 +1123,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/ranking',
+      path: 'ranking',
       name: 'Ranking',
       component: () => import('@/pages/RankingPage.vue'),
       meta: {
@@ -1118,12 +1132,23 @@ const router = createRouter({
       }
     },
     {
-      path: '/:pathMatch(.*)*',
+      path: ':pathMatch(.*)*',
       name: 'NotFound',
       component: () => import('@/views/NotFoundView.vue'),
       meta: {
         keepAlive: false,
         title: '404 - 页面未找到'
+      }
+    }
+      ] // end children of /:locale(zh|en)
+    },
+
+    // ── 不带语言前缀的路径 → 自动补全前缀重定向 ──
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: (to: any) => {
+        const locale = resolvePreferredLocale()
+        return `/${locale}${to.path}`
       }
     }
   ],
@@ -1134,8 +1159,10 @@ const router = createRouter({
     if (to.hash) {
       return { el: to.hash, behavior: 'smooth' }
     }
-    if (shouldSaveScrollPosition(to.path)) {
-      const savedScrollPosition = sessionStorage.getItem(`scroll_${to.path}`)
+    // 使用去掉 locale 前缀的路径作为 scroll key，保证跨语言滚动位置一致
+    const cleanPath = stripLocalePrefix(to.path)
+    if (shouldSaveScrollPosition(cleanPath)) {
+      const savedScrollPosition = sessionStorage.getItem(`scroll_${cleanPath}`)
       if (savedScrollPosition) {
         const position = parseInt(savedScrollPosition)
         if (!isNaN(position)) {
@@ -1155,41 +1182,113 @@ router.beforeEach((to, from, next) => {
     return
   }
 
-  // 异步保存滚动位置，避免阻塞路由切换
-  if (shouldSaveScrollPosition(from.path)) {
+  // 异步保存滚动位置（使用去掉 locale 前缀的路径作为 key）
+  const cleanFromPath = stripLocalePrefix(from.path)
+  if (shouldSaveScrollPosition(cleanFromPath)) {
     Promise.resolve().then(() => {
       const scrollPosition = window.pageYOffset || document.documentElement.scrollTop
-      sessionStorage.setItem(`scroll_${from.path}`, scrollPosition.toString())
+      sessionStorage.setItem(`scroll_${cleanFromPath}`, scrollPosition.toString())
     })
   }
+
+  // ── 从 URL 提取 locale 并同步到 i18n ──
+  const urlLocale = (to.params.locale as string) || localeFromPath(to.path)
+  if (urlLocale) {
+    const i18nLocale = urlLocaleToI18n(urlLocale)
+    if (i18n.global.locale.value !== i18nLocale) {
+      i18n.global.locale.value = i18nLocale
+      localStorage.setItem('locale', i18nLocale)
+      document.documentElement.lang = i18nLocale.startsWith('zh') ? 'zh-CN' : 'en-US'
+    }
+  } else if (to.path !== '/' && to.matched.length > 0) {
+    // 缺少 locale 前缀 → 补全后重定向
+    const preferredLocale = resolvePreferredLocale()
+    const newPath = `/${preferredLocale}${to.path === '/' ? '' : to.path}`
+    next({ path: newPath, query: to.query, hash: to.hash, replace: true })
+    return
+  }
+
   prevRoute = from
   next()
 })
 
 let lastTitle = DEFAULT_ZH_TITLE
 
+/** 更新或创建 <meta> 标签 */
+const setMeta = (attr: string, value: string, content: string) => {
+  const selector = attr === 'property' ? `meta[property="${value}"]` : `meta[name="${value}"]`
+  let el = document.querySelector(selector) as HTMLMetaElement
+  if (!el) {
+    el = document.createElement('meta')
+    el.setAttribute(attr, value)
+    document.head.appendChild(el)
+  }
+  el.setAttribute('content', content)
+}
+
+/** 动态更新 hreflang 和 canonical 链接 */
+const updateSEOLinks = (to: RouteLocationNormalized) => {
+  const baseUrl = 'https://www.yuemutuku.com'
+  const urlLocale = (to.params.locale as string) || localeFromPath(to.path) || 'zh'
+  const pathWithoutLocale = stripLocalePrefix(to.path) || '/'
+
+  const ensureLink = (selector: string, rel: string, hreflang?: string): HTMLLinkElement => {
+    let link = document.querySelector(selector) as HTMLLinkElement
+    if (!link) {
+      link = document.createElement('link')
+      link.rel = rel
+      if (hreflang) link.setAttribute('hreflang', hreflang)
+      document.head.appendChild(link)
+    }
+    return link
+  }
+
+  const canonical = ensureLink('link[rel="canonical"]', 'canonical')
+  canonical.href = `${baseUrl}/${urlLocale}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`
+
+  const altZh = ensureLink('link[hreflang="zh-CN"]', 'alternate', 'zh-CN')
+  altZh.href = `${baseUrl}/zh${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`
+
+  const altEn = ensureLink('link[hreflang="en-US"]', 'alternate', 'en-US')
+  altEn.href = `${baseUrl}/en${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`
+
+  const altDefault = ensureLink('link[hreflang="x-default"]', 'alternate', 'x-default')
+  altDefault.href = `${baseUrl}/zh${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`
+}
+
 router.afterEach((to) => {
   const newTitle = resolvePageTitle(to)
+  const baseUrl = 'https://www.yuemutuku.com'
+  const urlLocale = (to.params.locale as string) || localeFromPath(to.path) || 'zh'
+  const pathWithoutLocale = stripLocalePrefix(to.path) || '/'
+  const canonicalUrl = `${baseUrl}/${urlLocale}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`
 
-  // 只有当标题真正改变时才更新DOM，减少不必要的DOM操作
+  // 从 i18n 读取 SEO 文案（按当前语言）
+  const t = (key: string) => i18n.global.t(key)
+
+  // ── 标题 + 描述 ──
   if (newTitle !== lastTitle) {
     document.title = newTitle
     lastTitle = newTitle
-    
-    // 动态更新 meta description 以解决 SEO "相同 meta 描述" 的警告
-    // 结合页面标题生成独一无二的长尾描述 (100-150字符之间最佳)
-    const baseDesc = '在这里您可以发现海量优质图片素材，分享生活点滴，与志同道合的创作者交流互动。加入悦木图库，开启您的创意之旅，探索无限美好可能。'
-    const newDescription = `${newTitle} | ${baseDesc}`
-    
-    const descMeta = document.querySelector('meta[name="description"]')
-    if (descMeta) descMeta.setAttribute('content', newDescription)
-      
-    const ogDescMeta = document.querySelector('meta[property="og:description"]')
-    if (ogDescMeta) ogDescMeta.setAttribute('content', newDescription)
-      
-    const twDescMeta = document.querySelector('meta[name="twitter:description"]')
-    if (twDescMeta) twDescMeta.setAttribute('content', newDescription)
+    const seoDesc = t('common.seo.description')
+    const newDescription = seoDesc && seoDesc !== 'common.seo.description'
+      ? `${newTitle} | ${seoDesc}`
+      : newTitle
+    setMeta('name', 'description', newDescription)
+    setMeta('property', 'og:description', newDescription)
+    setMeta('name', 'twitter:description', newDescription)
   }
+
+  // ── 每次导航都更新的标签（数据来自 locales/common.ts seo 段） ──
+  setMeta('property', 'og:title', newTitle)
+  setMeta('name', 'twitter:title', newTitle)
+  setMeta('property', 'og:url', canonicalUrl)
+  setMeta('name', 'keywords', t('common.seo.keywords'))
+  setMeta('property', 'og:site_name', t('common.seo.siteName'))
+  setMeta('property', 'og:locale', urlLocaleToOgLocale(urlLocale))
+
+  // ── hreflang / canonical ──
+  updateSEOLinks(to)
 })
 
 export { prevRoute }

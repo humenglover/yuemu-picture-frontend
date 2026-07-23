@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="yuemu-pictureEditPage" class="yuemu-modern-publish-page">
     <header class="yuemu-publish-header">
       <div class="yuemu-header-left">
@@ -1044,17 +1044,17 @@ const handleSubmit = async () => {
               okText: t('pages.addPicturePage.btnOk'),
               onOk: () => {
                 localStorage.setItem('hasShownApprovalNotice', 'true')
-                router.push(`/picture-redirect/${picture.value.id}`)
+                router.push({ name: 'PictureRedirect', params: { id: picture.value.id } })
               },
-              onCancel: () => router.push(`/picture-redirect/${picture.value.id}`)
+              onCancel: () => router.push({ name: 'PictureRedirect', params: { id: picture.value.id } })
             })
           } else {
             showToastMsg(t('pages.addPicturePage.confirmTitlePublishSuccess'), 'success')
-            router.push(`/picture-redirect/${picture.value.id}`)
+            router.push({ name: 'PictureRedirect', params: { id: picture.value.id } })
           }
         } else {
           showToastMsg(t('pages.addPicturePage.toastSavedToSpace'), 'success')
-          router.push(`/space/${spaceId.value}`)
+          router.push({ name: 'SpaceDetail', params: { id: spaceId.value } })
         }
       }
     }
@@ -1083,7 +1083,7 @@ const saveAsDraft = async () => {
       const draftRes = await updatePictureDraftStatusUsingPost({ pictureId: picture.value.id, isDraft: 1 })
       if (draftRes.data.code === 0) {
         showToastMsg(t('pages.addPicturePage.toastSavedToDrafts'), 'success')
-        router.push('/')
+        router.push({ name: 'Home' })
       }
     }
   } catch (error) {

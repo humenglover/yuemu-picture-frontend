@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-article-ranking-waterfall">
     <div v-if="loading && (!dataList || dataList.length === 0)" class="yuemu-masonry-grid">
       <div v-for="colIndex in columnCount" :key="'skeleton-col-' + colIndex" class="yuemu-masonry-column">
@@ -179,8 +179,8 @@ const formatNumber = (num: number | string | undefined | null) => {
   if (n >= 1000) return (n / 1000).toFixed(1) + "k";
   return n.toString();
 };
-const goToPostDetail = (id: string) => router.push(`/post/${id}`);
-const goToUserPage = (userId: string) => router.push(`/user/${userId}`);
+const goToPostDetail = (id: string) => router.push({ name: 'PostDetail', params: { id: id } });
+const goToUserPage = (userId: string) => router.push({ name: 'UserDetail', params: { id: userId } });
 </script>
 <style scoped lang="scss">.yuemu-article-ranking-waterfall {
   width: 100%;

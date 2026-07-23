@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-immersive-ranking-list" ref="containerRef">
     <div v-if="loading && (!dataList || dataList.length === 0)" class="yuemu-justified-feed yuemu-skeleton-wrap">
       <div v-for="(row, rowIndex) in skeletonRows" :key="`skeleton-row-${rowIndex}`" class="yuemu-justified-row" :style="{ height: row.height + 'px' }">
@@ -143,8 +143,8 @@ const skeletonRows = computed(() => {
 
 const updateWidth = () => { if (containerRef.value) { containerWidth.value = Math.floor(containerRef.value.clientWidth) }; windowWidth.value = window.innerWidth }
 const formatNumber = (num: number | string | undefined | null) => { if (num === undefined || num === null || num === '') return '0'; const n = typeof num === "string" ? parseInt(num, 10) : num; if (isNaN(n)) return '0'; return n >= 10000 ? (n / 10000).toFixed(1) + "w" : n.toString() }
-const doClickPicture = (picture: any) => { if (!isMobile.value) { selectedPictureId.value = picture.id; selectedPictureData.value = picture; detailModalVisible.value = true } else { router.push({ path: `/picture-redirect/${picture.id}`, state: { pictureData: JSON.parse(JSON.stringify(picture)) } }) } }
-const goToUserPage = (userId: string | number | undefined) => { if (userId) router.push(`/user/${userId}`) }
+const doClickPicture = (picture: any) => { if (!isMobile.value) { selectedPictureId.value = picture.id; selectedPictureData.value = picture; detailModalVisible.value = true } else { router.push({ name: 'PictureRedirect', params: { id: picture.id }, state: { pictureData: JSON.parse(JSON.stringify(picture)) } }) } }
+const goToUserPage = (userId: string | number | undefined) => { if (userId) router.push({ name: 'UserDetail', params: { id: userId } }) }
 const handleDetailModalClose = (needReload = false) => { detailModalVisible.value = false; selectedPictureId.value = null; selectedPictureData.value = null; if (needReload && props.onReload) { props.onReload() } }
 const handlePopState = () => { if (detailModalVisible.value) { detailModalVisible.value = false; selectedPictureId.value = null; selectedPictureData.value = null } }
 

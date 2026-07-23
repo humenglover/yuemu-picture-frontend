@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Teleport to="body">
     <Transition name="yuemu-fade-scale">
       <div v-if="visible" class="yuemu-modal-overlay" @click.self="close">
@@ -119,7 +119,7 @@ const formatExpire = (dateStr: string) => {
 
 const goToInvite = () => {
   close()
-  router.push('/invite')
+  router.push({ name: 'InvitePage' })
 }
 </script>
 

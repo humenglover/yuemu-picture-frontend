@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="yuemu-spaceManagePage">
     <template v-if="device === DEVICE_TYPE_ENUM.PC">
       <div class="yuemu-container">
@@ -6,13 +6,13 @@
           <div class="yuemu-header-top-row">
             <h2 class="yuemu-page-title-text"> {{ t('pages.admin.spaceManagePage.title') }} </h2>
             <div class="yuemu-action-group">
-              <a-button @click="router.push('/space_analyze?queryPublic=1')" class="yuemu-btn-ghost yuemu-orange">
+              <a-button @click="router.push({ name: 'SpaceAnalyze', query: { queryPublic: '1' } })" class="yuemu-btn-ghost yuemu-orange">
                 <i class="fas fa-chart-bar"></i> {{ t('pages.admin.spaceManagePage.analyzePublic') }}
               </a-button>
-              <a-button @click="router.push('/space_analyze?queryAll=1')" class="yuemu-btn-ghost yuemu-purple">
+              <a-button @click="router.push({ name: 'SpaceAnalyze', query: { queryAll: '1' } })" class="yuemu-btn-ghost yuemu-purple">
                 <i class="fas fa-chart-line"></i> {{ t('pages.admin.spaceManagePage.analyzeAll') }}
               </a-button>
-              <a-button type="primary" @click="router.push('/add_space')" class="yuemu-btn-primary">
+              <a-button type="primary" @click="router.push({ name: 'AddSpace' })" class="yuemu-btn-primary">
                 <i class="fas fa-plus"></i> {{ t('pages.admin.spaceManagePage.createSpace') }}
               </a-button>
             </div>
@@ -82,8 +82,8 @@
                 </template>
                 <template v-else-if="column.key === 'action'">
                   <div class="yuemu-table-actions">
-                    <a-button type="text" class="yuemu-link-blue" @click="router.push(`/space_analyze?spaceId=${record.id}`)"> {{ t('pages.admin.spaceManagePage.analyze') }} </a-button>
-                    <a-button type="text" class="yuemu-link-green" @click="router.push(`/add_space?id=${record.id}`)"> {{ t('pages.admin.spaceManagePage.edit') }} </a-button>
+                    <a-button type="text" class="yuemu-link-blue" @click="router.push({ name: 'SpaceAnalyze', query: { spaceId: record.id } })"> {{ t('pages.admin.spaceManagePage.analyze') }} </a-button>
+                    <a-button type="text" class="yuemu-link-green" @click="router.push({ name: 'AddSpace', query: { id: record.id } })"> {{ t('pages.admin.spaceManagePage.edit') }} </a-button>
                     <a-button
                       type="text"
                       :class="record.isRecommended === 1 ? 'yuemu-link-orange' : 'yuemu-link-gray'"
@@ -119,7 +119,7 @@
         <div class="yuemu-sticky-header">
           <div class="yuemu-header-top">
             <h1 class="yuemu-mobile-title"> {{ t('pages.admin.spaceManagePage.title') }} </h1>
-            <van-button type="primary" size="small" class="yuemu-mobile-btn-icon" @click="router.push('/add_space')" round>
+            <van-button type="primary" size="small" class="yuemu-mobile-btn-icon" @click="router.push({ name: 'AddSpace' })" round>
               <i class="fas fa-plus"></i>
             </van-button>
           </div>
@@ -127,10 +127,10 @@
             <van-search v-model="searchParams.spaceName" :placeholder="t('pages.admin.spaceManagePage.searchSpaceName')" class="yuemu-search-input" shape="round" @search="onSearch" />
           </div>
           <div class="yuemu-mobile-global-actions">
-            <div class="yuemu-pill-btn yuemu-orange" @click="router.push('/space_analyze?queryPublic=1')">
+            <div class="yuemu-pill-btn yuemu-orange" @click="router.push({ name: 'SpaceAnalyze', query: { queryPublic: '1' } })">
                 <i class="fas fa-chart-bar"></i> {{ t('pages.admin.spaceManagePage.analyzePublicShort') }}
             </div>
-            <div class="yuemu-pill-btn yuemu-purple" @click="router.push('/space_analyze?queryAll=1')">
+            <div class="yuemu-pill-btn yuemu-purple" @click="router.push({ name: 'SpaceAnalyze', query: { queryAll: '1' } })">
                 <i class="fas fa-chart-line"></i> {{ t('pages.admin.spaceManagePage.analyzeAllShort') }}
             </div>
             <div class="yuemu-sort-trigger" @click="toggleSortOrder">
@@ -178,8 +178,8 @@
               </div>
 
               <div class="yuemu-card-actions">
-                <button class="yuemu-action-pill yuemu-blue" @click="router.push(`/space_analyze?spaceId=${space.id}`)"> {{ t('pages.admin.spaceManagePage.analyze') }} </button>
-                <button class="yuemu-action-pill yuemu-green" @click="router.push(`/add_space?id=${space.id}`)"> {{ t('pages.admin.spaceManagePage.edit') }} </button>
+                <button class="yuemu-action-pill yuemu-blue" @click="router.push({ name: 'SpaceAnalyze', query: { spaceId: space.id } })"> {{ t('pages.admin.spaceManagePage.analyze') }} </button>
+                <button class="yuemu-action-pill yuemu-green" @click="router.push({ name: 'AddSpace', query: { id: space.id } })"> {{ t('pages.admin.spaceManagePage.edit') }} </button>
                 <button
                   class="yuemu-action-pill"
                   :class="space.isRecommended === 1 ? 'yuemu-orange' : 'yuemu-gray'"

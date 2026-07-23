@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="yuemu-retro-mines-universe" :class="{ 'is-mobile': isMobile, 'is-shaking': isShaking }" @touchmove.prevent>
     <div class="arcade-handheld">
 
@@ -425,7 +425,7 @@ const changeHistoryPage = (delta: number) => {
 
 const handleUserClick = (item: any) => {
   if (!item || !item.userId) return
-  router.push(`/user/${item.userId}`)
+  router.push({ name: 'UserDetail', params: { id: item.userId } })
 }
 
 const saveScore = async (finalTime: number) => {
@@ -640,7 +640,7 @@ const changeDifficulty = (level: any) => {
 const startTimer = () => { timerInterval = setInterval(() => gameState.time++, 1000) }
 const formatTime = (s: number) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`
 const toggleSound = () => { gameState.isMuted = !gameState.isMuted }
-const goBack = () => router.push('/games')
+const goBack = () => router.push({ name: 'Games' })
 
 // 音效系统
 const sfx = {
