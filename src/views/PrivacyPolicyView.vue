@@ -55,6 +55,12 @@
           <ul>
             <li v-for="(item, index) in getArray('pages.privacyPage.policy.s3.items')" :key="index">{{ item }}</li>
           </ul>
+          <h3>{{ $t('pages.privacyPage.policy.s3.adsenseTitle') }}</h3>
+          <p>
+            {{ $t('pages.privacyPage.policy.s3.adsenseDesc') }}
+            <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color, #2563eb); text-decoration: underline;">https://adssettings.google.com</a>
+          </p>
+          <p>{{ $t('pages.privacyPage.policy.s3.thirdPartyOptOut') }}</p>
           <p class="policy-note">{{ $t('pages.privacyPage.policy.s3.note') }}</p>
         </div>
         <hr />

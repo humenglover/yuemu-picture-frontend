@@ -465,7 +465,7 @@ const toggleSider = () => {
   background: transparent;
   transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible !important;
   min-height: 100vh;
 }
 

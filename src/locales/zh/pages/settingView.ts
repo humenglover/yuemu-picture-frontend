@@ -114,7 +114,10 @@ export default {
       title: '关于我们',
       app: '悦木图库',
       docs: '官方文档',
-      author: '鹿梦'
+      author: '鹿梦',
+      creatorGuide: '创作者指南',
+      privacyPolicy: '隐私政策',
+      aboutUs: '关于我们'
     },
     download: {
       title: '下载 App',

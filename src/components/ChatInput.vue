@@ -11,7 +11,7 @@
         :class="{ 'yuemu-active': showEmojiPicker }"
         @click="toggleEmojiPicker"
       >
-        😊
+        <SmileOutlined />
       </button>
 
       <div class="yuemu-media-buttons">
@@ -112,7 +112,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from 'vue'
 import { message } from 'ant-design-vue'
-import { PictureOutlined, AudioOutlined, VideoCameraOutlined } from '@ant-design/icons-vue'
+import { PictureOutlined, AudioOutlined, VideoCameraOutlined, SmileOutlined } from '@ant-design/icons-vue'
 import EmojiPicker from './EmojiPicker.vue'
 import { uploadPostImageUsingPost } from '@/api/pictureController'
 import Recorder from 'recorderx'

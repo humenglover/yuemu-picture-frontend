@@ -38,10 +38,19 @@ export default {
       note: '我们绝不出售您的个人信息。'
     },
     s3: {
-      title: '3. Cookies',
-      desc: '我们使用 cookies 及类似技术来：',
-      items: ['保持您的登录状态', '记住您的偏好', '提升网站性能', '测量匿名的使用统计'],
-      note: '您可以在浏览器中禁用 cookies，但这可能会导致部分功能无法正常使用。'
+      title: '3. Cookies 与广告服务 (Google AdSense)',
+      desc: '我们使用 cookies 及类似技术来提供服务和提升体验：',
+      items: [
+        '保持您的登录状态与个性化偏好',
+        '提升网站性能并分析匿名的访问流量',
+        'Google 作为第三方供应商，会使用 Cookie 在我们的网站上投放广告',
+        'Google 使用广告 Cookie（包括 DoubleClick Cookie）使其及其合作伙伴能够根据用户对本网站或互联网上其他网站的访问记录向用户投放广告'
+      ],
+      adsenseTitle: '个性化广告退订与选择退出 (Opt-out)',
+      adsenseDesc: '您可以随时选择退出 Google 个性化广告投放。如需管理或选择退出，请访问 Google 官方广告设置页面：',
+      adsenseLink: 'https://adssettings.google.com',
+      thirdPartyOptOut: '此外，您也可以访问 www.aboutads.info 了解并选择退出第三方广告供应商使用 Cookie 投放的个性化广告。',
+      note: '您可以在浏览器设置中禁用 cookies，但这可能会导致部分功能无法正常使用。'
     },
     s4: {
       title: '4. AI 功能',

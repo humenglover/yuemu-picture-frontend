@@ -23,7 +23,7 @@
             </div>
             
             <div class="hero-info">
-              <h1 class="handwriting-title">✨ Hi, I'm Small Vegetables!</h1>
+              <h1 class="handwriting-title"><StarOutlined /> Hi, I'm Small Vegetables!</h1>
               <p class="handwriting-text">A small party dish. {{ $t('pages.contactPage.welcome') }}~</p>
               <div class="doodle-tags">
                 <span class="doodle-tag">#{{ $t('pages.contactPage.developer') }}</span>
@@ -38,10 +38,10 @@
             <div class="binder-holes"></div>
             <h2 class="handwriting-title" style="margin-top: 10px;"><i class="fas fa-clipboard-list"></i> {{ $t('pages.contactPage.skillList') }}</h2>
             <ul class="checklist">
-              <li><span class="check-box checked">✔</span> Vue.js / Nuxt</li>
-              <li><span class="check-box checked">✔</span> TypeScript</li>
-              <li><span class="check-box checked">✔</span> Node / SpringBoot</li>
-              <li><span class="check-box checked">✔</span> {{ $t('pages.contactPage.mobileArch') }}</li>
+              <li><span class="check-box checked"><CheckOutlined /></span> Vue.js / Nuxt</li>
+              <li><span class="check-box checked"><CheckOutlined /></span> TypeScript</li>
+              <li><span class="check-box checked"><CheckOutlined /></span> Node / SpringBoot</li>
+              <li><span class="check-box checked"><CheckOutlined /></span> {{ $t('pages.contactPage.mobileArch') }}</li>
               <li><span class="check-box"></span> {{ $t('pages.contactPage.buildingWheel') }}...</li>
             </ul>
           </section>
@@ -54,7 +54,7 @@
               {{ $t('pages.contactPage.hello') }}<br>
               {{ $t('pages.contactPage.intro') }}<br>
               <br><br>
-              <strong>Keep Creating ✨</strong>
+              <strong>Keep Creating <StarOutlined /></strong>
             </p>
           </section>
 
@@ -184,7 +184,42 @@
             </div>
           </section>
 
-          <!-- 11. Quote (12) -->
+          <!-- 11. Contact Form Section (12) -->
+          <section class="scrapbook-item span-12 rot-neg-1 contact-form-card">
+            <div class="tape tape-yellow" style="top: -15px; left: 10%; transform: rotate(-4deg);"></div>
+            <div class="tape tape-pink" style="bottom: -15px; right: 10%; transform: rotate(3deg);"></div>
+            <h2 class="handwriting-title"><i class="fas fa-paper-plane"></i> {{ $t('pages.contactPage.contactFormTitle') }}</h2>
+            <p class="handwriting-text" style="opacity: 0.85; margin-bottom: 20px;">
+              {{ $t('pages.contactPage.supportEmailLabel') }} <a href="mailto:109484028@qq.com" class="email-highlight">109484028@qq.com</a>
+            </p>
+
+            <form @submit.prevent="handleFormSubmit" class="scrapbook-form">
+              <div class="form-row-2">
+                <input type="text" v-model="contactForm.name" :placeholder="$t('pages.contactPage.formNamePlaceholder')" class="scrapbook-input" />
+                <input type="email" v-model="contactForm.email" :placeholder="$t('pages.contactPage.formEmailPlaceholder')" class="scrapbook-input" />
+              </div>
+              <div class="form-row-1">
+                <select v-model="contactForm.category" class="scrapbook-select">
+                  <option value="feedback">{{ $t('pages.contactPage.formCategoryFeedback') }}</option>
+                  <option value="cooperation">{{ $t('pages.contactPage.formCategoryCoop') }}</option>
+                  <option value="copyright">{{ $t('pages.contactPage.formCategoryCopyright') }}</option>
+                  <option value="other">{{ $t('pages.contactPage.formCategoryOther') }}</option>
+                </select>
+              </div>
+              <div class="form-row-1">
+                <textarea v-model="contactForm.message" :placeholder="$t('pages.contactPage.formMessagePlaceholder')" rows="4" class="scrapbook-textarea"></textarea>
+              </div>
+              <div class="form-action-row">
+                <button type="submit" :disabled="isSubmitting" class="scrapbook-submit-btn">
+                  <i class="fas fa-paper-plane" v-if="!isSubmitting"></i>
+                  <i class="fas fa-spinner fa-spin" v-else></i>
+                  {{ $t('pages.contactPage.submitBtn') }}
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- 12. Quote (12) -->
           <section class="scrapbook-item span-12 rot-1" style="text-align: center; border: none; background: transparent; box-shadow: none;">
             <p class="handwriting-title" style="font-size: 32px; color: var(--edit-box-kraft-text); opacity: 0.8;">
               "{{ $t('pages.contactPage.quote1') }}{{ $t('pages.contactPage.quote2') }}"
@@ -204,11 +239,38 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { message } from 'ant-design-vue'
 import createGlobe from 'cobe'
+import { CheckOutlined, StarOutlined } from '@ant-design/icons-vue'
 
 const isLoading = ref(true)
 const canvasRef = ref<HTMLCanvasElement>()
 let globe: any
+
+const contactForm = ref({
+  name: '',
+  email: '',
+  category: 'feedback',
+  message: ''
+})
+const isSubmitting = ref(false)
+
+const handleFormSubmit = () => {
+  if (!contactForm.value.email || !/\S+@\S+\.\S+/.test(contactForm.value.email)) {
+    message.warning(t('pages.contactPage.valEmail'))
+    return
+  }
+  if (!contactForm.value.message.trim()) {
+    message.warning(t('pages.contactPage.valMessage'))
+    return
+  }
+  isSubmitting.value = true
+  setTimeout(() => {
+    isSubmitting.value = false
+    message.success(t('pages.contactPage.submitSuccess'))
+    contactForm.value.message = ''
+  }, 600)
+}
 
 onMounted(() => {
   setTimeout(async () => {
@@ -221,55 +283,142 @@ onMounted(() => {
 const initGlobe = () => {
   if (!canvasRef.value) return
 
-  let phi = 0
   const canvas = canvasRef.value
   const container = canvas.parentElement
   if (!container) return
 
-  const width = container.clientWidth
-  const height = container.clientHeight
-  if (width === 0 || height === 0) return
-
+  const width = container.clientWidth || 250
+  const height = container.clientHeight || 250
   const dpr = window.devicePixelRatio || 1
+
   canvas.width = width * dpr
   canvas.height = height * dpr
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
 
-  const globeConfig = {
-    devicePixelRatio: dpr,
-    width: width * dpr,
-    height: height * dpr,
-    phi: 0,
-    theta: 0.15,
-    dark: 0, 
-    diffuse: 1.2,
-    mapSamples: 16000,
-    mapBrightness: 1.2, // 修复：之前为 6 导致光照过曝，点阵变成了纯白色
-    baseColor: [0.36, 0.25, 0.22], // 棕色大陆点阵
-    markerColor: [0.83, 0.18, 0.18], // 红色定位图钉
-    glowColor: [0.95, 0.95, 0.95], // 接近纯白的光晕，在 multiply 下会变透明
-    markers: [
-      { location: [30.5928, 114.3055], size: 0.08 }
-    ],
-    onRender: (state: any) => {
-      state.phi = phi
-      phi += 0.003
-    }
-  }
+  ctx.scale(dpr, dpr)
 
-  globe = createGlobe(canvas, globeConfig)
-  setTimeout(() => { canvas.style.opacity = '1' }, 100)
+  let rotation = 0
+  let animId: number
 
-  const resizeObserver = new ResizeObserver(() => {
-    if(container && container.clientWidth > 0 && container.clientHeight > 0) {
-      const w = container.clientWidth
-      const h = container.clientHeight
-      globeConfig.width = w * dpr
-      globeConfig.height = h * dpr
-      if(globe) globe.destroy()
-      globe = createGlobe(canvas, globeConfig)
+  // 绝美 3D 陆地散点数据集 (经度, 纬度)
+  const landSeeds = [
+    // 亚洲 & 中国
+    [116, 40], [121, 31], [114, 30], [105, 35], [90, 30], [78, 20], [88, 22], [100, 15], [105, 10], [120, 14], [140, 36], [130, 33], [70, 30], [55, 25],
+    // 欧洲
+    [15, 50], [10, 48], [2.3, 48.8], [-0.1, 51.5], [12, 41.9], [25, 38], [30, 60], [40, 55], [10, 62],
+    // 北美
+    [-100, 40], [-122, 37], [-74, 40], [-95, 30], [-115, 32], [-80, 25], [-105, 55], [-70, 45],
+    // 南美
+    [-60, -15], [-70, -33], [-47, -15], [-58, -34], [-75, -5],
+    // 非洲
+    [20, 0], [30, 30], [31, 30], [3, 36], [37, 0], [28, -25], [18, -34], [47, -20],
+    // 澳洲
+    [133, -25], [151, -33], [115, -31], [140, -20]
+  ]
+
+  // 扩展生成稠密的大陆边缘与陆地群粒子
+  const densePoints: [number, number][] = []
+  landSeeds.forEach(([lon, lat]) => {
+    for (let i = 0; i < 8; i++) {
+      densePoints.push([
+        lon + (Math.random() - 0.5) * 18,
+        lat + (Math.random() - 0.5) * 18
+      ])
     }
   })
-  resizeObserver.observe(container)
+
+  const radius = Math.min(width, height) * 0.42
+  const cx = width / 2
+  const cy = height / 2
+
+  const render = () => {
+    ctx.clearRect(0, 0, width, height)
+    rotation += 0.006
+
+    // 1. 绘制球体立体深邃渐变背景
+    const grad = ctx.createRadialGradient(cx - radius * 0.35, cy - radius * 0.35, radius * 0.08, cx, cy, radius)
+    grad.addColorStop(0, '#38bdf8')
+    grad.addColorStop(0.45, '#0284c7')
+    grad.addColorStop(0.85, '#0f172a')
+    grad.addColorStop(1, '#020617')
+
+    ctx.beginPath()
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+    ctx.fillStyle = grad
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)'
+    ctx.lineWidth = 1.5
+    ctx.stroke()
+
+    // 2. 绘制 3D 经纬线条
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
+    ctx.lineWidth = 0.8
+
+    // 纬线
+    for (let lat = -60; lat <= 60; lat += 30) {
+      const r = radius * Math.cos((lat * Math.PI) / 180)
+      const y = cy - radius * Math.sin((lat * Math.PI) / 180)
+      ctx.beginPath()
+      ctx.ellipse(cx, y, r, r * 0.28, 0, 0, Math.PI * 2)
+      ctx.stroke()
+    }
+
+    // 3. 绘制 3D 旋转的大陆亮白粒子
+    densePoints.forEach(([lon, lat]) => {
+      const lambda = ((lon + rotation * 57.3) * Math.PI) / 180
+      const phi = (lat * Math.PI) / 180
+
+      const cosPhi = Math.cos(phi)
+      const sinPhi = Math.sin(phi)
+      const cosLambda = Math.cos(lambda)
+      const sinLambda = Math.sin(lambda)
+
+      // 正交 3D 投影
+      const x = radius * cosPhi * sinLambda
+      const y = -radius * sinPhi
+      const z = radius * cosPhi * cosLambda
+
+      if (z > 0) { // 仅绘制位于球体正面的点
+        const alpha = Math.max(0.25, z / radius)
+        ctx.beginPath()
+        ctx.arc(cx + x, cy + y, 2.2, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.95})`
+        ctx.fill()
+      }
+    })
+
+    // 4. 绘制定位红圈呼吸脉冲点 (中国/武汉)
+    const targetLon = 114
+    const targetLat = 30
+    const rad = ((targetLon + rotation * 57.3) * Math.PI) / 180
+    const phi = (targetLat * Math.PI) / 180
+    const x = radius * Math.cos(phi) * Math.sin(rad)
+    const y = -radius * Math.sin(phi)
+    const z = radius * Math.cos(phi) * Math.cos(rad)
+
+    if (z > 0) {
+      const pulse = (Math.sin(Date.now() * 0.006) + 1) * 5 + 4
+      ctx.beginPath()
+      ctx.arc(cx + x, cy + y, pulse, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.45)'
+      ctx.fill()
+
+      ctx.beginPath()
+      ctx.arc(cx + x, cy + y, 3.5, 0, Math.PI * 2)
+      ctx.fillStyle = '#ef4444'
+      ctx.fill()
+    }
+
+    canvas.style.opacity = '1'
+    animId = requestAnimationFrame(render)
+  }
+
+  render()
+
+  globe = {
+    destroy: () => cancelAnimationFrame(animId)
+  }
 }
 
 onBeforeUnmount(() => {
@@ -533,20 +682,21 @@ onBeforeUnmount(() => {
 
 /* ================= 2. 复古地球仪 ================= */
 .earth-container {
-  width: 280px; height: 280px;
+  width: 250px; height: 250px;
   position: relative;
-  background: radial-gradient(circle, var(--edit-box-kraft-bg) 40%, var(--edit-box-kraft-border) 100%);
+  background: transparent !important;
   border-radius: 50%;
-  box-shadow: inset 0 0 30px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
   margin: 10px auto;
-  border: 2px dashed var(--edit-box-kraft-border);
+  border: none !important;
+  overflow: hidden;
 }
 .cobe-canvas { 
   width: 100%; height: 100%; 
   position: absolute; inset: 0; 
   border-radius: 50%; 
-  opacity: 0; transition: opacity 1s ease; 
-  mix-blend-mode: multiply; /* 极客魔法：将白色底球过滤，仅留下黑色大陆点阵，完美融合进牛皮纸！ */
+  opacity: 0; transition: opacity 0.8s ease; 
+  background: transparent !important;
 }
 
 /* ================= 3. 便利贴 (社交) ================= */
@@ -605,5 +755,129 @@ onBeforeUnmount(() => {
   .span-7, .span-5, .span-8, .span-4, .span-3 { grid-column: span 12; }
   .flex-row { flex-direction: column; text-align: center; gap: 24px; }
   .polaroid-card { transform: rotate(0) !important; }
+}
+
+/* ================= 在线留言表单样式 ================= */
+.contact-form-card {
+  background: var(--edit-box-kraft-bg);
+  border: 2px dashed var(--edit-box-kraft-border);
+  padding: 36px 40px;
+}
+
+.email-highlight {
+  color: #1677ff;
+  font-weight: 600;
+  text-decoration: underline;
+  margin: 0 4px;
+}
+
+.scrapbook-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-row-1 {
+  width: 100%;
+}
+
+.scrapbook-input,
+.scrapbook-select,
+.scrapbook-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--edit-box-kraft-dark, rgba(255, 255, 255, 0.6));
+  border: 1.5px solid var(--edit-box-kraft-border, #d7ccc8);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--edit-box-kraft-text);
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.scrapbook-input:focus,
+.scrapbook-select:focus,
+.scrapbook-textarea:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.15);
+  background: #ffffff;
+}
+
+.scrapbook-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transition: all 0.25s ease;
+}
+
+.scrapbook-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+.scrapbook-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .scrapbook-container {
+    padding: 16px 12px;
+  }
+  .scrapbook-grid {
+    gap: 16px;
+  }
+  .scrapbook-item {
+    padding: 20px 16px;
+    transform: none !important; /* 移动端取消卡片倾斜旋转，防止右侧溢出与横向滚动 */
+    width: 100%;
+    box-sizing: border-box;
+  }
+  /* 关键修复：移动端隐藏凸出右侧屏外 40px 的装饰胶带 */
+  .tape {
+    display: none !important;
+  }
+  .pin {
+    top: 10px;
+  }
+  .handwriting-title {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .handwriting-text {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .earth-container {
+    width: 200px;
+    height: 200px;
+  }
+  .form-row-2 {
+    grid-template-columns: 1fr;
+  }
+  .contact-form-card {
+    padding: 20px 16px;
+  }
+  .flex-row {
+    gap: 16px;
+  }
 }
 </style>

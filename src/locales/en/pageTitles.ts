@@ -141,6 +141,11 @@ const enPageTitles: Record<string, string> = {
 
   // ── 404 ──
   NotFound: '404 - Page Not Found',
+
+  // ── Guides & About ──
+  About: 'About Us - yuemutuku',
+  Guides: 'Design & Creator Guides - yuemutuku',
+  GuideDetail: 'Creator Guide Detail - yuemutuku',
 };
 
 /** Default page title fallback */

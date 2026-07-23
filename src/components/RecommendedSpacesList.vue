@@ -5,7 +5,7 @@
     <div class="yuemu-section" v-if="recommendedSpaces.length > 0">
       <div class="yuemu-section-header">
         <div class="header-left">
-          <span class="header-icon">🔥</span>
+          <FireOutlined class="header-icon" />
           <h3 class="header-title">{{ t('components.recommendedSpacesList.recommendedSpaces') }}</h3>
         </div>
       </div>
@@ -33,7 +33,7 @@
     <div class="yuemu-section" v-if="latestSpaces.length > 0">
       <div class="yuemu-section-header">
         <div class="header-left">
-          <span class="header-icon" style="color: #3b82f6;">🕒</span>
+          <ClockCircleOutlined class="header-icon" style="color: #3b82f6;" />
           <h3 class="header-title">{{ t('components.recommendedSpacesList.latestCreated') }}</h3>
         </div>
       </div>
@@ -78,6 +78,7 @@ const { t } = useI18n();
 
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { FireOutlined, ClockCircleOutlined } from '@ant-design/icons-vue'
 import { listRecommendedSpacesUsingGet, listSpaceVoByPageUsingPost } from '@/api/spaceController';
 import { getTextCover } from '@/utils/textCoverGenerator';
 

@@ -212,7 +212,7 @@
               {{ t('components.pictureChatRoom.onlineUsers') }} ({{ onlineUsers.length }})
             </h3>
             <button class="yuemu-modal-close" @click="toggleUserModal" type="button">
-              ✕
+              <CloseOutlined />
             </button>
           </div>
           <div class="yuemu-modal-body">
@@ -290,6 +290,7 @@ import { ref, onMounted, onUnmounted, computed, nextTick, onBeforeUnmount, h, on
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
+import { CloseOutlined } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
 import ChatWebSocket from '@/utils/chatWebSocket'
 import { getDefaultAvatar } from '@/utils/userUtils'

@@ -46,7 +46,7 @@
         <div class="panel-inner">
           <div class="panel-header">
             <h3>{{ t('pages.tools.foodWheelPage.royalMenu') }} <small>{{ foodList.length }}</small></h3>
-            <button class="close-btn" @click="showPanel = false">✕</button>
+            <button class="close-btn" @click="showPanel = false"><CloseOutlined /></button>
           </div>
 
           <div class="add-section">
@@ -104,6 +104,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { message } from 'ant-design-vue';
+import { CloseOutlined } from '@ant-design/icons-vue'
 
 // 基础数据
 const isDark = ref(document.documentElement.classList.contains('dark-theme'));

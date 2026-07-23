@@ -9,11 +9,11 @@ const zhPageTitles: Record<string, string> = {
   MyHome: '首页 - 发现美好瞬间',
 
   // ── 用户 ──
-  UserLogin: '登录 - 欢迎回到悦木',
+  UserLogin: '登录 - 欢迎回到悦木，安全登录您的账号，开启精彩的内容创作与分享体验之旅',
   UserRegister: '注册 - 开启创作者之旅',
   UserSetting: '账号设置 - 打造专属铭牌',
   UserDetail: 'TA的空间 - 遇见有趣的灵魂',
-  UserResetPassword: '安全中心 - 重置密码',
+  UserResetPassword: '安全中心 - 找回并重置密码，悦木图库致力于为您提供安全可靠的账号找回服务',
   UserReportCenter: '小黑屋 - 举报与申诉中心',
 
   // ── 个人中心 ──
@@ -48,7 +48,7 @@ const zhPageTitles: Record<string, string> = {
   ChatList: '消息信箱 - 联系人列表',
   PCChat: '同频共振 - 全屏互动',
   AIChat: '召唤 AI - 你的赛博助手',
-  ChatRedirect: '连接接入中...',
+  ChatRedirect: '连接接入中 - 正在为您跳转至专属聊天频道，请稍候片刻，即将开启您的跨频交流体验',
 
   // ── 论坛 & 帖子 ──
   Forum: '叽叽喳喳 - 悦木社区',
@@ -84,10 +84,10 @@ const zhPageTitles: Record<string, string> = {
   ItemAnalytics: '作品分析 - 数据透视',
 
   // ── 游戏 ──
-  Games: '摸鱼专区 - 欢乐小游戏',
+  Games: '摸鱼专区 - 欢乐小游戏，工作学习之余的放松神器，海量经典在线网页游戏等你来探索挑战',
 
   // ── 工具 ──
-  Tools: '次元百宝箱 - 实用工具',
+  Tools: '次元百宝箱 - 实用工具，集合了包括全能计算器、进制转换、颜色取色器在内的一系列常用工具',
   Calculator: '百宝箱 - 全能计算器',
   Timer: '百宝箱 - 倒计时与秒表',
   FoodWheel: '百宝箱 - 命运大转盘：今天吃啥',
@@ -141,6 +141,11 @@ const zhPageTitles: Record<string, string> = {
 
   // ── 404 ──
   NotFound: '404 - 页面未找到',
+
+  // ── 创作者指南与关于我们 ──
+  About: '关于我们 - 悦木图库',
+  Guides: '设计与创作者指南 - 悦木图库',
+  GuideDetail: '创作者指南详情 - 悦木图库',
 };
 
 /** 默认页面标题（当路由无 name 或无匹配翻译时使用） */

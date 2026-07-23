@@ -8,6 +8,7 @@
       >
         <BasicLayout />
         <GameResolutionWarning />
+        <CookieConsentBanner />
       </van-config-provider>
     </a-config-provider>
 
@@ -15,7 +16,7 @@
     <Transition name="exit-dialog">
       <div v-if="showExitDialog" class="exit-overlay" @click.self="onCancel">
         <div class="exit-dialog">
-          <div class="exit-dialog__icon">🌿</div>
+          <LogoutOutlined class="exit-dialog__icon" />
           <div class="exit-dialog__title">{{ $t('pages.app.exitDialog.title') }}</div>
           <div class="exit-dialog__desc">{{ $t('pages.app.exitDialog.desc') }}</div>
           <div class="exit-dialog__actions">
@@ -31,6 +32,7 @@
 <script setup lang="ts">
 import BasicLayout from '@/layouts/BasicLayout.vue'
 import GameResolutionWarning from '@/components/GameResolutionWarning.vue'
+import CookieConsentBanner from '@/components/CookieConsentBanner.vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN';
 import enUS from 'ant-design-vue/es/locale/en_US';
 import dayjs from 'dayjs';
@@ -43,6 +45,7 @@ import { respondExitConfirm } from '@/utils/back';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { theme } from 'ant-design-vue';
 import { getDeviceType } from '@/utils/device';
+import { LogoutOutlined } from '@ant-design/icons-vue'
 // import FontLoader from '@/components/FontLoader.vue'
 
 // ── 全局广告开关提供给所有子组件 ────────────────────

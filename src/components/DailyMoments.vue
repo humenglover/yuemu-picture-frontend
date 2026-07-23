@@ -26,7 +26,7 @@
 
           <div class="yuemu-moment-footer">
             <div class="yuemu-time-info">
-              <span class="yuemu-time-icon">🕰️</span>
+              <ClockCircleOutlined class="yuemu-time-icon" />
               {{ formatTime(moment.createTime) }}
             </div>
 
@@ -47,7 +47,7 @@
     </div>
 
     <div v-else class="yuemu-romantic-empty-state">
-      <div class="yuemu-empty-icon-wrap"><span class="yuemu-floating-leaf">🍃</span></div>
+      <div class="yuemu-empty-icon-wrap"><EnvironmentOutlined class="yuemu-floating-leaf" /></div>
       <p class="yuemu-empty-text">{{ t('components.dailyMoments.emptyState') }}</p>
     </div>
 
@@ -129,6 +129,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { ClockCircleOutlined, EnvironmentOutlined } from '@ant-design/icons-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { message } from 'ant-design-vue'
 import {

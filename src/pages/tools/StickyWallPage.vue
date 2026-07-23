@@ -5,7 +5,7 @@
     <header class="top-nav">
       <div class="glass-dock">
         <button class="retro-btn create" @click="addNote">
-          <span class="icon">✍️</span> 
+          <EditOutlined class="icon" />
         </button>
         <button class="retro-btn clear" @click="clearAll">
           <span class="icon"><i class="fas fa-broom"></i></span> 
@@ -69,6 +69,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 import { ref, onMounted } from 'vue';
 import { message, Modal } from 'ant-design-vue';
+import { EditOutlined } from '@ant-design/icons-vue'
 
 // 这里的 isDark 建议通过 inject 或 props 获取你全局的状态
 const isDark = ref(false);

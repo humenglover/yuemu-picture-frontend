@@ -38,10 +38,19 @@ export default {
       note: 'We never sell your personal information.'
     },
     s3: {
-      title: '3. Cookies',
-      desc: 'We use cookies and similar technologies to:',
-      items: ['Keep you signed in', 'Remember your preferences', 'Improve website performance', 'Measure anonymous usage statistics'],
-      note: 'You may disable cookies in your browser, although some features may not function properly.'
+      title: '3. Cookies & Advertising (Google AdSense)',
+      desc: 'We use cookies and similar technologies to provide services and enhance user experience:',
+      items: [
+        'Keep you signed in and store your preferences',
+        'Improve website performance and analyze anonymous usage statistics',
+        'Third party vendors, including Google, use cookies to serve ads based on a user\'s prior visits to your website or other websites.',
+        'Google\'s use of advertising cookies (including the DoubleClick cookie) enables it and its partners to serve ads to users based on their visit to your sites and/or other sites on the Internet.'
+      ],
+      adsenseTitle: 'Personalized Advertising Opt-Out',
+      adsenseDesc: 'Users may opt out of personalized advertising by visiting Google Ad Settings:',
+      adsenseLink: 'https://adssettings.google.com',
+      thirdPartyOptOut: 'Alternatively, users can opt out of a third-party vendor\'s use of cookies for personalized advertising by visiting www.aboutads.info.',
+      note: 'You may disable cookies in your browser settings, although some features may not function properly.'
     },
     s4: {
       title: '4. AI Features',

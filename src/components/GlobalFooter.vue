@@ -1,35 +1,29 @@
 <template>
   <div id="yuemu-globalFooter">
-    <!-- PC端：横向布局、无界毛玻璃质感、高度压缩 -->
-    <div v-if="device === DEVICE_TYPE_ENUM.PC" class="yuemu-pc-footer">
-      <div class="yuemu-pc-footer-inner">
+    <!-- PC端：单行极简居中 i18n 水平底栏 (Single-Row Centered Bar) -->
+    <footer v-if="device === DEVICE_TYPE_ENUM.PC" class="single-row-pc-footer">
+      <div class="footer-single-bar">
+        <span class="copyright-item">© {{ currentYear }} {{ t('components.globalFooter.brandName') }}</span>
+        <span class="divider-dot">•</span>
 
-        <!-- 左侧：版权信息 -->
-        <div class="yuemu-footer-left">
-          <span class="yuemu-brand">{{ t('components.globalFooter.brandName') }}</span>
-          <span class="yuemu-copyright">© {{ currentYear }} All rights reserved.</span>
-        </div>
+        <router-link to="/guides" class="footer-nav-link">{{ t('components.globalFooter.guides') }}</router-link>
+        <span class="divider-dot">•</span>
 
-        <!-- 中间：精简版免责声明 -->
-        <div class="yuemu-footer-center">
-          <span class="yuemu-disclaimer-text">
-            {{ t('components.globalFooter.disclaimer') }}
-            <a class="yuemu-mail-link" href="mailto:109484028@qq.com">109484028@qq.com</a>
-          </span>
-          <span class="yuemu-footer-divider">|</span>
-          <router-link to="/privacy" class="yuemu-privacy-link">{{ t('pages.privacyPage.privacyPolicy') }}</router-link>
-        </div>
+        <router-link to="/privacy" class="footer-nav-link">{{ t('components.globalFooter.privacy') }}</router-link>
+        <span class="divider-dot">•</span>
 
-        <!-- 右侧：备案信息 -->
-        <div class="yuemu-footer-right">
-          <a class="yuemu-beian-link" href="https://beian.miit.gov.cn/" target="_blank">
-            <i class="fas fa-shield-alt yuemu-shield-icon"></i>
-            {{ getBeianNumber() }}
-          </a>
-        </div>
+        <router-link to="/about" class="footer-nav-link">{{ t('components.globalFooter.about') }}</router-link>
+        <span class="divider-dot">•</span>
 
+        <router-link to="/contact" class="footer-nav-link">{{ t('components.globalFooter.contact') }}</router-link>
+        <span class="divider-dot">•</span>
+
+        <a class="beian-nav-link" href="https://beian.miit.gov.cn/" target="_blank">
+          <i class="fas fa-shield-halved shield-icon"></i>
+          {{ getBeianNumber() }}
+        </a>
       </div>
-    </div>
+    </footer>
 
     <!-- 移动端：全宽底部导航栏 -->
     <div v-else class="yuemu-mobile-bottom-bar" :class="{ 'is-hidden': isHidden }">
@@ -269,51 +263,69 @@ const getBeianNumber = () => {
   line-height: 1;
 }
 
-/* ================== PC 端：极简纤薄无边框设计 ================== */
-.yuemu-pc-footer {
+/* ==================== 单行极简居中 i18n 水平底栏 CSS ==================== */
+.single-row-pc-footer {
   width: 100%;
-  background: var(--header-background, rgba(255, 255, 255, 0.65));
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  /* 重点修改：将原来的 24px 大幅压缩到 12px，让单行文字更加精致细长 */
-  padding: 12px 0;
-  transition: background-color 0.4s ease;
-  position: relative;
-  bottom: 0;
-  box-shadow: 0 -4px 30px var(--header-shadow, rgba(0, 0, 0, 0.05));
-}
-
-@media (prefers-color-scheme: dark) { .yuemu-pc-footer { background: rgba(25, 25, 25, 0.65);
-  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.15); } }
-
-.yuemu-pc-footer-inner {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 24px;
+  background: var(--header-background, rgba(255, 255, 255, 0.75));
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
+  padding: 16px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-secondary, #86868b);
   font-size: 13px;
-  color: var(--text-secondary, #64748b);
+  line-height: 1;
 }
 
-@media (prefers-color-scheme: dark) { .yuemu-pc-footer-inner { color: #94a3b8; } }
-
-.yuemu-footer-left {
+.footer-single-bar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
-.yuemu-brand {
-  font-weight: 600;
-  color: var(--text-primary, #334155);
-  font-size: 14px;
-  letter-spacing: 0.5px;
+.copyright-item {
+  color: var(--text-secondary, #86868b);
+  font-weight: 400;
 }
 
-@media (prefers-color-scheme: dark) { .yuemu-brand { color: #e2e8f0; } }
+.divider-dot {
+  color: var(--border-color, rgba(0, 0, 0, 0.15));
+  font-size: 11px;
+}
+
+.footer-nav-link {
+  color: var(--text-secondary, #86868b);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.footer-nav-link:hover {
+  color: var(--text-primary, #1d1d1f);
+}
+
+.beian-nav-link {
+  color: var(--text-secondary, #86868b);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+.beian-nav-link:hover {
+  color: var(--text-primary, #1d1d1f);
+}
+
+.shield-icon {
+  font-size: 11px;
+}
 
 .yuemu-footer-center {
   flex: 1;

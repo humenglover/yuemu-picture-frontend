@@ -41,5 +41,19 @@ export default {
   startOpensource: 'Opened a new chapter in open source',
   quote1: 'Setting goals is the heart of learning;',
   quote2: 'Learning is the practice of setting goals.',
-  wangyangming: 'Wang Yangming'
+  wangyangming: 'Wang Yangming',
+  contactFormTitle: 'Contact Us & Send a Message',
+  supportEmailLabel: 'Official Support & Contact Email: ',
+  formNamePlaceholder: 'Your Name or Alias (Optional)',
+  formEmailPlaceholder: 'Your Email Address (Required for reply)',
+  formCategoryLabel: 'Query Category',
+  formCategoryFeedback: '💡 Feedback & Suggestions',
+  formCategoryCoop: '🤝 Business & Cooperation',
+  formCategoryCopyright: '🛡️ Copyright & Takedown Request',
+  formCategoryOther: '💬 Other Inquiry & Help',
+  formMessagePlaceholder: 'Please describe your thoughts, query, or suggestion in detail...',
+  submitBtn: 'Submit Message',
+  submitSuccess: 'Message submitted successfully! Thank you for contacting us, we will reply soon.',
+  valEmail: 'Please enter a valid email address',
+  valMessage: 'Message content cannot be empty'
 };

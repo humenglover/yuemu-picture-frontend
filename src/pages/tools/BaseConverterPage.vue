@@ -94,7 +94,7 @@
         <div class="retro-modal-content" @click.stop>
           <div class="modal-header">
             <h3>REFERENCE TABLE . SYS-DATA</h3>
-            <button class="close-btn" @click="showReferenceTable = false">✖</button>
+            <button class="close-btn" @click="showReferenceTable = false"><CloseOutlined /></button>
           </div>
           <div class="modal-body">
             <div class="retro-table-wrapper">
@@ -128,7 +128,7 @@
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 import { ref, computed } from 'vue'
-import { CopyOutlined, TableOutlined } from '@ant-design/icons-vue'
+import { CopyOutlined, TableOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 
 const inputBase = ref(10)

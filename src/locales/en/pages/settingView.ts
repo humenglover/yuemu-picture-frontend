@@ -114,7 +114,10 @@ export default {
       title: 'About Us',
       app: 'yuemutuku',
       docs: 'Official Docs',
-      author: 'Lumeng'
+      author: 'Lumeng',
+      creatorGuide: 'Creator Guide',
+      privacyPolicy: 'Privacy Policy',
+      aboutUs: 'About Us'
     },
     download: {
       title: 'Download App',

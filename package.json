@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "build:staging": "vite build --mode staging",
     "build:prod": "vite build --mode production",
-    "build:seo": "npm run build && node scripts/prerender.mjs",
+    "build:seo": "npm run build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs --static-only",
     "prerender": "node scripts/prerender.mjs",
     "preview": "vite preview",
     "preview:info": "vite preview --host --port 4173",
@@ -17,7 +17,8 @@
     "lint": "eslint ../yuemu-version/012 --fix",
     "format": "prettier --write ../yuemu-version/012/src",
     "api:generate": "node scripts/generate-api.mjs",
-    "sitemap:generate": "node scripts/generate-sitemap.mjs"
+    "sitemap:generate": "node scripts/generate-sitemap.mjs",
+    "sitemap:static": "node scripts/generate-sitemap.mjs --static-only"
   },
   "dependencies": {
     "@bytemd/plugin-gfm": "^1.22.0",

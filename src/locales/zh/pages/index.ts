@@ -60,6 +60,8 @@ import barragePage from './barragePage';
 import aiResourcePage from './aiResourcePage';
 import privacyPage from './privacyPage';
 import notFoundPage from './notFoundPage';
+import guidesPage from './guidesPage';
+import aboutPage from './aboutPage';
 
 export default {
   app,
@@ -123,5 +125,7 @@ export default {
   barragePage,
   aiResourcePage,
   privacyPage,
-  notFoundPage
+  notFoundPage,
+  guidesPage,
+  aboutPage
 };

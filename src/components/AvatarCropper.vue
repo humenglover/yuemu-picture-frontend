@@ -4,7 +4,7 @@
 
       <div class="yuemu-modal-header">
         <h3>{{ t('components.avatarCropper.title') }}</h3>
-        <button class="yuemu-close-btn" @click="closeModal">✕</button>
+        <button class="yuemu-close-btn" @click="closeModal"><CloseOutlined /></button>
       </div>
 
       <div class="yuemu-modal-body">
@@ -67,6 +67,7 @@ import { ref, reactive, onMounted } from 'vue'
 import 'vue-cropper/dist/index.css'
 import { VueCropper } from 'vue-cropper'
 import { getDeviceType } from '@/utils/device'
+import { CloseOutlined } from '@ant-design/icons-vue'
 import { DEVICE_TYPE_ENUM } from '@/constants/device'
 import { useI18n } from 'vue-i18n'
 

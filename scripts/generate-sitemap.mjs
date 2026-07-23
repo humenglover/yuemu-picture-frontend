@@ -16,6 +16,7 @@
 import { writeFileSync, readFileSync, existsSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { discoverArticles } from './guide-articles.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PROJECT_ROOT = resolve(__dirname, '..')
@@ -265,13 +266,73 @@ function makeImageEntries(pictures) {
   })
 }
 
+// ==================== 静态 Sitemap 生成（指南文章自动注入） ====================
+
+/** 从文章数据生成 sitemap entry */
+function makeGuideEntry(article) {
+  const loc = `${CONFIG.siteUrl}/guides/${article.id}`
+  const lastmod = article.date || new Date().toISOString().split('T')[0]
+  return `  <url><loc>${escapeXml(loc)}</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>${lastmod}</lastmod></url>`
+}
+
+/** 重新生成静态 sitemap.xml 中的指南文章部分 */
+function regenerateStaticSitemap() {
+  console.log('\n📚 重新生成静态 Sitemap（指南文章）...')
+
+  const staticPath = CONFIG.staticSitemap
+  if (!existsSync(staticPath)) {
+    console.error(`  ⚠ 静态 sitemap 不存在: ${staticPath}`)
+    return
+  }
+
+  const articles = discoverArticles()
+  const entries = articles.map(makeGuideEntry)
+
+  let content = readFileSync(staticPath, 'utf-8')
+
+  // 替换 __GUIDE_ARTICLES_START__ 和 __GUIDE_ARTICLES_END__ 之间的内容
+  const startMarker = '<!-- __GUIDE_ARTICLES_START__ -->'
+  const endMarker = '<!-- __GUIDE_ARTICLES_END__ -->'
+  const startIdx = content.indexOf(startMarker)
+  const endIdx = content.indexOf(endMarker)
+
+  if (startIdx === -1 || endIdx === -1) {
+    console.error('  ⚠ 未在 sitemap.xml 中找到 __GUIDE_ARTICLES_START__ / __GUIDE_ARTICLES_END__ 标记')
+    console.error('    请在 sitemap.xml 中添加这两个标记，脚本将自动替换中间的内容。')
+    return
+  }
+
+  const before = content.substring(0, startIdx + startMarker.length)
+  const after = content.substring(endIdx)
+  const newContent = before + '\n' + entries.join('\n') + '\n  ' + after
+
+  writeFileSync(staticPath, newContent, 'utf-8')
+  console.log(`✅ 静态 Sitemap 已更新: ${staticPath}`)
+  console.log(`   已注入 ${entries.length} 篇指南文章`)
+  articles.forEach(a => console.log(`     /guides/${a.id} — ${a.date}`))
+}
+
 // ==================== 主流程 ====================
 
 async function main() {
-  console.log('🚀 开始生成动态 Sitemap...\n')
+  const staticOnly = process.argv.includes('--static-only')
+
+  console.log('🚀 开始生成 Sitemap...\n')
   console.log(`   后端 API: ${CONFIG.apiBase}`)
   console.log(`   网站域名: ${CONFIG.siteUrl}`)
+
+  // 1. 始终更新静态 sitemap 中的指南文章部分
+  regenerateStaticSitemap()
+
+  // 2. --static-only 模式下跳过动态内容拉取
+  if (staticOnly) {
+    console.log('\n📌 --static-only 模式，跳过动态内容拉取')
+    console.log('🎉 静态 Sitemap 更新完毕!')
+    return
+  }
+
   console.log(`   每类型上限: ${CONFIG.maxPerType} 条`)
+  console.log('\n📡 拉取动态内容...')
 
   // 并行拉取所有类型的数据
   const [

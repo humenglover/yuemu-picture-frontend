@@ -252,7 +252,7 @@
 
             <div class="dialog-footer">
               <button class="submit-btn" @click="submitApply">
-                <span class="emoji">✨</span> {{ $t('pages.friendLinksPage.submitApply') }}
+                <SendOutlined class="emoji" /> {{ $t('pages.friendLinksPage.submitApply') }}
               </button>
             </div>
           </div>
@@ -270,7 +270,7 @@ const { t } = useI18n();
 import { ref, onMounted, onUnmounted, reactive } from 'vue'
 import { message, Upload } from 'ant-design-vue'
 import type { FormInstance, UploadChangeParam, UploadProps } from 'ant-design-vue'
-import { SearchOutlined, PlusOutlined, EyeOutlined, CalendarOutlined, LoadingOutlined } from '@ant-design/icons-vue'
+import { SearchOutlined, PlusOutlined, EyeOutlined, CalendarOutlined, LoadingOutlined, SendOutlined } from '@ant-design/icons-vue'
 import type { FriendLink } from '@/api/friendLinkController'
 import { formatTime } from '@/utils/dateUtils'
 import {

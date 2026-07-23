@@ -69,6 +69,51 @@ const router = createRouter({
       },
     },
     {
+      path: '/about',
+      name: 'About',
+      component: () => import('@/pages/AboutPage.vue'),
+      meta: {
+        keepAlive: true,
+        title: '关于我们 - 悦木图库'
+      }
+    },
+    {
+      path: '/guides',
+      name: 'Guides',
+      component: () => import('@/pages/GuidesPage.vue'),
+      meta: {
+        keepAlive: true,
+        title: '设计与创作者指南 - 悦木图库'
+      }
+    },
+    {
+      path: '/guides/:id',
+      name: 'GuideDetail',
+      component: () => import('@/pages/GuideDetailPage.vue'),
+      meta: {
+        keepAlive: false,
+        title: '创作者指南详情 - 悦木图库'
+      }
+    },
+    {
+      path: '/contact',
+      name: 'Contact',
+      component: () => import('@/pages/ContactPage.vue'),
+      meta: {
+        keepAlive: true,
+        title: '联系与关于创作者 - 悦木图库'
+      }
+    },
+    {
+      path: '/privacy',
+      name: 'Privacy',
+      component: () => import('@/views/PrivacyPolicyView.vue'),
+      meta: {
+        keepAlive: true,
+        title: '隐私政策 - 悦木图库'
+      }
+    },
+    {
       path: '/admin/knowledgeFileManage',
       name: 'AdminKnowledgeFileManage',
       component: () => import('@/pages/admin/KnowledgeFileManagePage.vue'),
@@ -1130,6 +1175,20 @@ router.afterEach((to) => {
   if (newTitle !== lastTitle) {
     document.title = newTitle
     lastTitle = newTitle
+    
+    // 动态更新 meta description 以解决 SEO "相同 meta 描述" 的警告
+    // 结合页面标题生成独一无二的长尾描述 (100-150字符之间最佳)
+    const baseDesc = '在这里您可以发现海量优质图片素材，分享生活点滴，与志同道合的创作者交流互动。加入悦木图库，开启您的创意之旅，探索无限美好可能。'
+    const newDescription = `${newTitle} | ${baseDesc}`
+    
+    const descMeta = document.querySelector('meta[name="description"]')
+    if (descMeta) descMeta.setAttribute('content', newDescription)
+      
+    const ogDescMeta = document.querySelector('meta[property="og:description"]')
+    if (ogDescMeta) ogDescMeta.setAttribute('content', newDescription)
+      
+    const twDescMeta = document.querySelector('meta[name="twitter:description"]')
+    if (twDescMeta) twDescMeta.setAttribute('content', newDescription)
   }
 })
 

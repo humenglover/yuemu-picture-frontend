@@ -126,7 +126,7 @@
             </button>
             <button class="sys-btn start-btn" @click="returnToMenu">
               <div class="pill">
-                <span class="pill-icon">☰</span>
+                <MenuOutlined class="pill-icon" />
               </div>
               <span class="sys-label">{{ t('pages.games.drawLinePage.menu') }}</span>
             </button>
@@ -326,6 +326,7 @@ const { t } = useI18n();
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
+import { MenuOutlined } from '@ant-design/icons-vue'
 import {
   saveGameRecordUsingPost,
   getMyHistoryRecordsUsingPost,

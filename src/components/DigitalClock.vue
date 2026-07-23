@@ -9,9 +9,9 @@
     </div>
     <div class="yuemu-date">{{ dateString }}</div>
     <div class="yuemu-decoration-icons">
-      <span class="yuemu-floating-icon">☁️</span>
-      <span class="yuemu-floating-icon">🌤️</span>
-      <span class="yuemu-floating-icon">☀️</span>
+      <CloudOutlined class="yuemu-floating-icon" />
+      <SunOutlined class="yuemu-floating-icon" />
+      <SunOutlined class="yuemu-floating-icon" />
     </div>
   </div>
 </template>
@@ -23,6 +23,7 @@ defineOptions({
 
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { CloudOutlined, SunOutlined } from '@ant-design/icons-vue'
 
 const { t } = useI18n()
 

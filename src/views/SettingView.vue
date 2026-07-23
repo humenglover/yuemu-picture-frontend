@@ -134,13 +134,7 @@
       <div class="setting-group">
         <div class="group-title">{{ $t('pages.settingView.groups.privacy') }}</div>
         <div class="group-card">
-          <div class="setting-cell" @click="$router.push('/privacy-center')">
-            <div class="cell-icon bg-purple"><i class="fas fa-file-shield"></i></div>
-            <div class="cell-content">
-              <div class="cell-title">{{ $t('pages.privacyPage.privacyCenter') }}</div>
-            </div>
-            <div class="cell-right"><i class="fas fa-chevron-right"></i></div>
-          </div>
+
 
           <div class="setting-cell" @click="handlePrivacySettingClick">
             <div class="cell-icon bg-teal"><i class="fas fa-shield-alt"></i></div>
@@ -420,6 +414,15 @@
           </a>
           <p class="info-item"><i class="fas fa-envelope"></i><span>109484028@qq.com</span></p>
           <p class="info-item"><i class="fas fa-shield-alt"></i><a href="https://beian.miit.gov.cn/" target="_blank">{{ getBeianNumber() }}</a></p>
+          <div class="about-links-nav">
+            <span class="nav-dot">•</span>
+            <a class="nav-link-btn" @click="aboutUsOpen = false; $router.push('/guides')">{{ $t('pages.settingView.modals.about.creatorGuide') }}</a>
+            <span class="nav-dot">•</span>
+            <a class="nav-link-btn" @click="aboutUsOpen = false; $router.push('/privacy')">{{ $t('pages.settingView.modals.about.privacyPolicy') }}</a>
+            <span class="nav-dot">•</span>
+            <a class="nav-link-btn" @click="aboutUsOpen = false; $router.push('/about')">{{ $t('pages.settingView.modals.about.aboutUs') }}</a>
+            <span class="nav-dot">•</span>
+          </div>
           <p class="copyright">© {{ currentYear }} {{ $t('pages.settingView.modals.about.author') }}. All rights reserved.</p>
         </div>
       </div>
@@ -1185,7 +1188,39 @@ onBeforeUnmount(() => {
 
 .info-item { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; color: var(--text-secondary); font-size: 14px; }
 .info-item a { color: var(--link-color); text-decoration: none; }
-.copyright { margin-top: 32px; font-size: 12px; color: var(--text-tertiary); }
+
+.about-links-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0 16px;
+}
+
+.nav-dot {
+  color: var(--text-tertiary, #94a3b8);
+  font-size: 12px;
+}
+
+.nav-link-btn {
+  font-size: 14px;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.nav-link-btn:hover {
+  color: var(--link-color, #2563eb);
+}
+
+.nav-link-btn.active {
+  color: var(--text-primary, #1e293b);
+  font-weight: 600;
+}
+
+.copyright { margin-top: 16px; font-size: 12px; color: var(--text-tertiary); }
 
 .qr-container { display: inline-block; padding: 16px; background: #fff; border-radius: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); margin-bottom: 20px; border: 1px solid var(--border-color); }
 .download-qr-code { width: 200px; height: 200px; display: block; border-radius: 12px; }

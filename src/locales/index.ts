@@ -2,14 +2,26 @@ import { createI18n } from 'vue-i18n'
 import zhCN from './zh'
 import enUS from './en'
 
+export interface LanguageOption {
+  code: string
+  name: string
+  shortName: string
+  label: string
+  icon?: string
+}
+
+export const SUPPORTED_LANGUAGES: LanguageOption[] = [
+  { code: 'zh-CN', name: '简体中文', shortName: 'ZH', label: 'ZH (简体中文)', icon: '🇨🇳' },
+  { code: 'en-US', name: 'English', shortName: 'EN', label: 'EN (English)', icon: '🇺🇸' },
+]
+
 /**
  * 获取默认语言
  * 优先级：localStorage 用户选择 > 浏览器语言 > 兜底 zh-CN
- * 只支持 zh-CN 和 en-US 两种语言，浏览器语言匹配前缀即可（zh* → zh-CN，其余 → en-US）
  */
 const getDefaultLanguage = (): string => {
   const saved = localStorage.getItem('locale')
-  if (saved && ['zh-CN', 'en-US'].includes(saved)) {
+  if (saved && SUPPORTED_LANGUAGES.some(l => l.code === saved)) {
     return saved
   }
   const browserLang = navigator.language || (navigator as any).userLanguage || ''

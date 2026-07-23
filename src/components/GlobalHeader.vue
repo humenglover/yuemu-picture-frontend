@@ -19,7 +19,7 @@
           <span>{{ $t('nav.chat') }}</span>
           <span v-if="loginUserStore.loginUser.id && unreadCounts.totalUnread > 0" class="yuemu-badge-dot"></span>
         </router-link>
-        <router-link to="/discovery" v-if="loginUserStore.loginUser.id" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/discovery' }">
+        <router-link to="/discovery" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path === '/discovery' }">
           <span>{{ $t('nav.discovery') }}</span>
         </router-link>
         <router-link v-if="loginUserStore.loginUser?.userRole === 'admin'" to="/admin/manage" class="yuemu-nav-item" :class="{ 'yuemu-active': route.path.startsWith('/admin/') }">
@@ -29,24 +29,23 @@
     </div>
 
     <div class="yuemu-header-right">
-      <div v-if="!loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-pc-only" @click="toggleLanguage" :title="$t('components.globalHeader.switchLang')">
-        <i class="fa-solid fa-language"></i>
-      </div>
-
-      <div class="yuemu-icon-btn" :class="{ 'yuemu-active': route.path === '/search' }" @click="handleSearchClick" :title="$t('nav.search')">
-        <i class="fa-solid fa-magnifying-glass"></i>
-      </div>
-
-      <router-link to="/chat/ai" v-if="loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-ai-icon-btn" :class="{ 'yuemu-active': route.path === '/chat/ai' }" :title="$t('nav.aiAssistant')">
-        <img :src="aiIcon" class="yuemu-ai-icon-img" alt="AI" />
-      </router-link>
-
-      <router-link to="/message-center" v-if="loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-notification-btn" :class="{ 'yuemu-active': route.path === '/message-center' }" :title="$t('nav.messages')">
-        <i class="fa-regular fa-bell"></i>
-        <div v-if="messageCenterUnreadCount > 0" class="yuemu-capsule-badge">
-          {{ messageCenterUnreadCount > 99 ? '99+' : messageCenterUnreadCount }}
+      <!-- 图标组容器：精简内聚 -->
+      <div class="yuemu-icon-bar yuemu-pc-only">
+        <div class="yuemu-icon-btn" :class="{ 'yuemu-active': route.path === '/search' }" @click="handleSearchClick" :title="$t('nav.search')">
+          <i class="fa-solid fa-magnifying-glass"></i>
         </div>
-      </router-link>
+
+        <router-link to="/chat/ai" v-if="loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-ai-icon-btn" :class="{ 'yuemu-active': route.path === '/chat/ai' }" :title="$t('nav.aiAssistant')">
+          <img :src="aiIcon" class="yuemu-ai-icon-img" alt="AI" />
+        </router-link>
+
+        <router-link to="/message-center" v-if="loginUserStore.loginUser.id" class="yuemu-icon-btn yuemu-notification-btn" :class="{ 'yuemu-active': route.path === '/message-center' }" :title="$t('nav.messages')">
+          <i class="fa-regular fa-bell"></i>
+          <div v-if="messageCenterUnreadCount > 0" class="yuemu-capsule-badge">
+            {{ messageCenterUnreadCount > 99 ? '99+' : messageCenterUnreadCount }}
+          </div>
+        </router-link>
+      </div>
 
       <button v-if="loginUserStore.loginUser.id" class="yuemu-publish-btn yuemu-pc-only" @click="handleAddClick">
         <i class="fa-solid fa-plus"></i>
@@ -75,10 +74,26 @@
               <i :class="themeStore.isDarkTheme ? 'fa-solid fa-sun' : 'fa-solid fa-moon'"></i>
               {{ themeStore.isDarkTheme ? $t('user.lightMode') : $t('user.darkMode') }}
             </div>
-            <div class="yuemu-dropdown-item" @click="toggleLanguage">
-              <i class="fa-solid fa-language"></i>
-              {{ $t('components.globalHeader.switchLang') }}
+            <div class="yuemu-dropdown-item yuemu-dropdown-expandable" @click="showLangSubmenu = !showLangSubmenu">
+              <i class="fa-solid fa-globe"></i>
+              <span class="yuemu-expand-label">{{ $t('components.globalHeader.switchLang') }}</span>
+              <i class="fa-solid fa-chevron-right yuemu-sub-arrow" :class="{ 'is-rotated': showLangSubmenu }"></i>
             </div>
+
+            <Transition name="yuemu-sub-dropdown">
+              <div v-if="showLangSubmenu" class="yuemu-sub-menu-box">
+                <div
+                  v-for="item in SUPPORTED_LANGUAGES"
+                  :key="item.code"
+                  class="yuemu-sub-menu-item"
+                  :class="{ 'is-selected': locale === item.code }"
+                  @click="changeLanguage(item.code)"
+                >
+                  <span>{{ item.name }}</span>
+                  <i v-if="locale === item.code" class="fa-solid fa-check yuemu-check-icon"></i>
+                </div>
+              </div>
+            </Transition>
             <div class="yuemu-dropdown-divider"></div>
             <div class="yuemu-dropdown-item yuemu-text-danger" @click="logoutConfirmVisible = true; showUserMenu = false">
               <i class="fa-solid fa-arrow-right-from-bracket"></i> {{ $t('user.logout') }}
@@ -87,7 +102,37 @@
         </Transition>
       </div>
 
-      <router-link v-else to="/user/login" class="yuemu-login-btn yuemu-pc-only">{{ $t('user.loginOrRegister') }}</router-link>
+      <div v-else class="yuemu-guest-action-group yuemu-pc-only">
+        <div class="yuemu-guest-lang-wrapper">
+          <button
+            class="yuemu-guest-lang-btn"
+            :class="{ 'is-open': showGuestLangMenu }"
+            @click.stop="showGuestLangMenu = !showGuestLangMenu"
+            :title="$t('components.globalHeader.switchLang')"
+          >
+            <i class="fa-solid fa-globe"></i>
+            <span>{{ currentLangName }}</span>
+            <i class="fa-solid fa-chevron-down guest-lang-arrow" :class="{ 'is-rotated': showGuestLangMenu }"></i>
+          </button>
+
+          <Transition name="yuemu-dropdown">
+            <div v-if="showGuestLangMenu" class="yuemu-guest-lang-pop-menu" @click.stop>
+              <div
+                v-for="item in SUPPORTED_LANGUAGES"
+                :key="item.code"
+                class="yuemu-guest-lang-item"
+                :class="{ 'is-selected': locale === item.code }"
+                @click="changeLanguage(item.code)"
+              >
+                <span>{{ item.name }}</span>
+                <i v-if="locale === item.code" class="fa-solid fa-check check-icon"></i>
+              </div>
+            </div>
+          </Transition>
+        </div>
+
+        <router-link to="/user/login" class="yuemu-login-btn">{{ $t('user.loginOrRegister') }}</router-link>
+      </div>
 
       <div class="yuemu-icon-btn yuemu-mobile-only" @click="showMobileMenu = true">
         <i class="fa-solid fa-bars"></i>
@@ -186,7 +231,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, onUnmounted, shallowRef } from 'vue'
+import { ref, watch, onMounted, onUnmounted, shallowRef, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { useThemeStore } from '@/stores/useThemeStore'
@@ -195,6 +240,8 @@ import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import UploadActionSheet from '@/components/UploadActionSheet.vue'
 import aiIcon from '@/assets/icons/ai.svg'
+
+import { SUPPORTED_LANGUAGES, type LanguageOption } from '@/locales'
 
 const props = defineProps<{
   unreadCounts: { totalUnread: number; privateUnread: number; friendUnread: number },
@@ -212,16 +259,43 @@ const route = useRoute()
 const router = useRouter()
 
 const showUserMenu = ref(false)
+const showLangSubmenu = ref(false)
+const showGuestLangMenu = ref(false)
+const showLangDropdown = ref(false)
 const logoutConfirmVisible = ref(false)
 const showActionSheet = ref(false)
 const showMobileMenu = ref(false)
 
 const { locale, t } = useI18n()
 
+const currentLangName = computed(() => {
+  const found = SUPPORTED_LANGUAGES.find(l => l.code === locale.value)
+  return found ? (found.shortName || (found.code === 'zh-CN' ? 'ZH' : 'EN')) : 'ZH'
+})
+
+const currentLangFullName = computed(() => {
+  const found = SUPPORTED_LANGUAGES.find(l => l.code === locale.value)
+  return found ? found.name : '简体中文'
+})
+
+const changeLanguage = (langCode: string) => {
+  locale.value = langCode
+  localStorage.setItem('locale', langCode)
+  document.documentElement.lang = langCode.startsWith('zh') ? 'zh-CN' : 'en-US'
+  showLangDropdown.value = false
+  showUserMenu.value = false
+  showLangSubmenu.value = false
+  showGuestLangMenu.value = false
+}
+
+const toggleNextLanguage = () => {
+  const currentIndex = SUPPORTED_LANGUAGES.findIndex(l => l.code === locale.value)
+  const nextIndex = (currentIndex + 1) % SUPPORTED_LANGUAGES.length
+  changeLanguage(SUPPORTED_LANGUAGES[nextIndex].code)
+}
+
 const toggleLanguage = () => {
-  const newLang = locale.value === 'zh-CN' ? 'en-US' : 'zh-CN'
-  locale.value = newLang
-  localStorage.setItem('locale', newLang)
+  toggleNextLanguage()
 }
 
 const currentUnreadCounts = shallowRef(props.unreadCounts)
@@ -282,6 +356,13 @@ const closeMenus = (e: MouseEvent) => {
   const target = e.target as HTMLElement
   if (!target.closest('.yuemu-user-dropdown-trigger')) {
     showUserMenu.value = false
+    showLangSubmenu.value = false
+  }
+  if (!target.closest('.yuemu-guest-lang-wrapper')) {
+    showGuestLangMenu.value = false
+  }
+  if (!target.closest('.yuemu-lang-dropdown-wrapper')) {
+    showLangDropdown.value = false
   }
 }
 
@@ -324,35 +405,44 @@ onUnmounted(() => document.removeEventListener('click', closeMenus))
 .yuemu-badge-dot { position: absolute; top: 6px; right: 10px; width: 6px; height: 6px; background-color: #ef4444; border-radius: 50%; }
 
 /* ==================== 右侧操作区 ==================== */
-.yuemu-header-right { display: flex; align-items: center; gap: 16px; }
+.yuemu-header-right { display: flex; align-items: center; gap: 14px; }
+
+/* 图标组内聚栏 */
+.yuemu-icon-bar {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--hover-background, rgba(0, 0, 0, 0.03));
+  padding: 4px 8px; border-radius: 99px;
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.04));
+}
 
 /* 基础 Icon 按钮 */
 .yuemu-icon-btn {
   display: flex; justify-content: center; align-items: center;
-  width: 38px; height: 38px; border-radius: 50%; border: none; background: transparent;
-  color: var(--text-primary, #333); font-size: 18px; cursor: pointer;
-  transition: all 0.2s; text-decoration: none;
+  width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent;
+  color: var(--text-primary, #475569); font-size: 16px; cursor: pointer;
+  transition: all 0.2s ease; text-decoration: none;
 }
-.yuemu-icon-btn:hover { background: var(--hover-background, rgba(0,0,0,0.05)); }
-.yuemu-icon-btn.yuemu-active { background: var(--link-color, #2563eb); color: #ffffff; }
+.yuemu-icon-btn:hover { background: var(--card-background, #ffffff); color: var(--link-color, #2563eb); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); }
+.yuemu-icon-btn.yuemu-active { background: var(--link-color, #2563eb); color: #ffffff; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); }
 
 /* AI 按钮高级质感 */
 .yuemu-ai-icon-btn {
-  background: rgba(168, 85, 247, 0.04) !important;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  background: rgba(168, 85, 247, 0.06) !important;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.yuemu-ai-icon-img { width: 28px; height: 28px; object-fit: contain; transition: transform 0.3s ease; }
+.yuemu-ai-icon-img { width: 24px; height: 24px; object-fit: contain; transition: transform 0.25s ease; }
 .yuemu-ai-icon-btn:hover {
-  background: rgba(168, 85, 247, 0.12) !important;
-  border-color: transparent !important;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+  background: rgba(168, 85, 247, 0.15) !important;
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.25) !important;
   transform: translateY(-1px);
 }
-.yuemu-ai-icon-btn:hover .yuemu-ai-icon-img { transform: scale(1.1); }
+.yuemu-ai-icon-btn:hover .yuemu-ai-icon-img { transform: scale(1.08); }
 .yuemu-ai-icon-btn.yuemu-active {
-  background: rgba(168, 85, 247, 0.15) !important;
-  border: none !important;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35) !important;
+  background: rgba(168, 85, 247, 0.16) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(168, 85, 247, 0.5), 0 2px 10px rgba(168, 85, 247, 0.2) !important;
+}
+.yuemu-ai-icon-btn.yuemu-active .yuemu-ai-icon-img {
+  transform: scale(1.1);
 }
 
 .yuemu-notification-btn { position: relative; }
@@ -376,7 +466,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus))
 .yuemu-avatar-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(0,0,0,0.05); }
 
 .yuemu-modern-dropdown-menu {
-  position: absolute; top: calc(100% + 12px); right: 0; width: 180px;
+  position: absolute; top: calc(100% + 12px); right: 0; width: 190px;
   background: var(--card-background, #fff); border: 1px solid var(--border-color, rgba(0,0,0,0.05));
   border-radius: 16px; padding: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.08);
   transform-origin: top right; z-index: 2000;
@@ -392,6 +482,127 @@ onUnmounted(() => document.removeEventListener('click', closeMenus))
 }
 .yuemu-dropdown-item i { font-size: 15px; width: 16px; text-align: center; color: var(--text-secondary, #888); }
 .yuemu-dropdown-item:hover { background: var(--hover-background, #f9f9f9); }
+
+.yuemu-dropdown-expandable { justify-content: space-between; }
+.yuemu-expand-label { flex: 1; margin-left: 0; }
+.yuemu-sub-arrow { font-size: 11px; color: var(--text-secondary, #a1a1aa); transition: transform 0.2s ease; }
+.yuemu-sub-arrow.is-rotated { transform: rotate(90deg); }
+
+.yuemu-sub-menu-box {
+  margin: 4px 0 4px 12px;
+  padding: 4px;
+  background: var(--hover-background, #f8fafc);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+:deep(.dark-theme) .yuemu-sub-menu-box { background: rgba(255, 255, 255, 0.05); }
+
+.yuemu-sub-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-primary, #334155);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.yuemu-sub-menu-item:hover {
+  background: var(--card-background, #ffffff);
+  color: var(--link-color, #2563eb);
+}
+.yuemu-sub-menu-item.is-selected {
+  font-weight: 600;
+  color: var(--link-color, #2563eb);
+  background: rgba(37, 99, 235, 0.08);
+}
+.yuemu-check-icon {
+  font-size: 12px;
+  color: var(--link-color, #2563eb);
+}
+
+/* 未登录状态右侧操作组 */
+.yuemu-guest-action-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.yuemu-guest-lang-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.yuemu-guest-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  background: var(--hover-background, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
+  color: var(--text-primary, #334155);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.yuemu-guest-lang-btn:hover,
+.yuemu-guest-lang-btn.is-open {
+  background: var(--card-background, #ffffff);
+  color: var(--link-color, #2563eb);
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.guest-lang-arrow {
+  font-size: 10px;
+  color: var(--text-secondary, #94a3b8);
+  transition: transform 0.2s ease;
+}
+.guest-lang-arrow.is-rotated { transform: rotate(180deg); }
+
+.yuemu-guest-lang-pop-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 150px;
+  background: var(--card-background, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.yuemu-guest-lang-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-primary, #334155);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.yuemu-guest-lang-item:hover {
+  background: var(--hover-background, #f1f5f9);
+  color: var(--link-color, #2563eb);
+}
+.yuemu-guest-lang-item.is-selected {
+  font-weight: 600;
+  color: var(--link-color, #2563eb);
+  background: rgba(37, 99, 235, 0.08);
+}
 
 .yuemu-login-btn {
   display: flex; align-items: center; height: 36px; padding: 0 20px;
@@ -532,4 +743,6 @@ onUnmounted(() => document.removeEventListener('click', closeMenus))
     transform: none !important;
   }
 }
+
+
 </style>

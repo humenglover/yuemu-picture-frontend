@@ -41,5 +41,19 @@ export default {
   startOpensource: '开启开源新篇章',
   quote1: '故立志者，为学之心也；',
   quote2: '为学者，立志之事也。',
-  wangyangming: '王阳明'
+  wangyangming: '王阳明',
+  contactFormTitle: '在线留言与意见反馈',
+  supportEmailLabel: '官方支持与联系邮箱：',
+  formNamePlaceholder: '您的姓名或称呼（选填）',
+  formEmailPlaceholder: '您的电子邮箱（必填，用于回复）',
+  formCategoryLabel: '留言类型',
+  formCategoryFeedback: '💡 意见与功能建议',
+  formCategoryCoop: '🤝 商务合作与交流',
+  formCategoryCopyright: '🛡️ 版权与侵权申诉',
+  formCategoryOther: '💬 其他咨询与帮助',
+  formMessagePlaceholder: '请详细描述您的问题、建议或合作意向...',
+  submitBtn: '提交留言发送',
+  submitSuccess: '留言提交成功！感谢您的反馈与支持，我们将尽快回复您。',
+  valEmail: '请输入有效的电子邮箱地址',
+  valMessage: '留言内容不能为空'
 };

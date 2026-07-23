@@ -17,6 +17,7 @@ import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createServer } from 'node:http'
 import { readFileSync, existsSync, statSync } from 'node:fs'
+import { discoverArticles } from './guide-articles.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PROJECT_ROOT = resolve(__dirname, '..')
@@ -30,26 +31,35 @@ if (!existsSync(DIST_INDEX)) {
 }
 console.log(`  Dist: ${DIST}`)
 
+// ── Auto-discover guide articles ──
+const guideArticles = discoverArticles()
+const guideRoutes = guideArticles.map(a => `/guides/${a.id}`)
+console.log(`  🧭 Auto-discovered ${guideRoutes.length} guide routes\n`)
+
 // ── Config ──
+const STATIC_ROUTES = [
+  '/',
+  '/home',
+  '/about',
+  '/guides',
+  '/discovery',
+  '/forum',
+  '/ranking',
+  '/search',
+  '/friend-links',
+  '/contact',
+  '/privacy',
+  '/privacy-center',
+  '/games',
+  '/tools',
+  '/ai_resource',
+  '/loveboard',
+  '/loveboard/list',
+]
+
 const ROUTES = process.argv.includes('--routes')
   ? process.argv[process.argv.indexOf('--routes') + 1].split(',')
-  : [
-      '/',
-      '/home',
-      '/discovery',
-      '/forum',
-      '/ranking',
-      '/search',
-      '/friend-links',
-      '/contact',
-      '/privacy',
-      '/privacy-center',
-      '/games',
-      '/tools',
-      '/ai_resource',
-      '/loveboard',
-      '/loveboard/list',
-    ]
+  : [...STATIC_ROUTES, ...guideRoutes]
 
 // ── Browser path ──
 const BROWSER_PATHS = [
