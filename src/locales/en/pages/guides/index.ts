@@ -1,5 +1,6 @@
 import a9 from './a9';
 import a10 from './a10';
+import a11 from './a11';
 import a3 from './a3';
 import a7 from './a7';
 import a2 from './a2';
@@ -12,6 +13,7 @@ import a1 from './a1';
 export const articles = [
   a9,
   a10,
+  a11,
   a3,
   a7,
   a2,

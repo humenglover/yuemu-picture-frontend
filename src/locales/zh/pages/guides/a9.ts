@@ -139,6 +139,8 @@ Chrome 130+、Safari 18+、Firefox 130+，四大新特性已实现跨浏览器�
 }
 \`\`\`
 
+:::demo scroll-driven :::
+
 采用渐进增强策略，优先保障无障碍设备与低性能环境的展示质量。
 
 ## 二、视图过渡 API（View Transitions API）
@@ -206,6 +208,8 @@ function updatePage(newContent) {
 
 卡片缩略图向详情页大图无缝延伸，无需依赖任何第三方动画库。
 
+:::demo view-transitions :::
+
 ### 实践最佳要点
 
 | 实践维度 | 标准规范指导 |
@@ -263,6 +267,8 @@ function updatePage(newContent) {
 | **表单集成** | 无原生表单提交交互约束 | 支持 \`<form method="dialog">\` 原生返回值机制 |
 | **推荐适用场景** | 下拉菜单、Tooltip、浮动面板 | 模态确认对话框、登录弹窗、表单提交窗口 |
 
+:::demo popover :::
+
 ## 四、锚点定位（Anchor Positioning）
 
 传统 Floating UI 库与 CSS 锚点定位对比：
@@ -306,6 +312,8 @@ function updatePage(newContent) {
 | **下方空间受限** | 自动触发回退规则，重定位至上方（\`top\`） |
 | **上下空间均受限** | 自动尝试重定位至右侧（\`right\`） |
 | **左右空间极度狭窄** | 自动尝试重定位至左侧（\`left\`）或按最适方向自适应 |
+
+:::demo anchor-positioning :::
 
 ## 五、容器查询（Container Queries）—— 组件级响应式设计
 

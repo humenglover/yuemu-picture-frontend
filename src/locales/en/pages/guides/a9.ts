@@ -123,6 +123,8 @@ Phase range definitions for fine-tuning trigger points:
 }
 \`\`\`
 
+:::demo scroll-driven :::
+
 ## Part 2: View Transitions API
 
 The View Transitions API provides native, fluid state snapshot transitions for both single-page (SPA) and multi-page (MPA) applications.
@@ -163,6 +165,8 @@ Native page-to-page transitions for standard HTML links:
 }
 \`\`\`
 
+:::demo view-transitions :::
+
 ## Part 3: Popover API — Native Top-Layer Popups
 
 Legacy Popup Pain Points vs. Popover API Solutions:
@@ -183,6 +187,8 @@ Legacy Popup Pain Points vs. Popover API Solutions:
   <button popovertarget="my-popover" popovertargetaction="hide">Close</button>
 </div>
 \`\`\`
+
+:::demo popover :::
 
 ### Mode Comparison
 
@@ -232,6 +238,8 @@ Floating UI vs. CSS Anchor Positioning:
 | **Bottom space constrained** | Automatically falls back to top (\`top\`) |
 | **Top & Bottom constrained** | Automatically tries right side (\`right\`) |
 | **Extremely constrained** | Automatically tries left side (\`left\`) or best fit |
+
+:::demo anchor-positioning :::
 
 ## Part 5: Container Queries
 

@@ -18,6 +18,8 @@ export default {
   notFoundTitle: "Guide Article Not Found",
   copyrightTitle: "Copyright & License Statement",
   copyrightDesc: "Published by yuemutuku under CC BY-NC 4.0 International. Attribution required for redistribution.",
+  copyCode: "Copy Code",
+  codeCopied: "Copied!",
   categories: {
     "all": "All Guides",
     "copyright": "Copyright & Compliance",
@@ -29,6 +31,27 @@ export default {
     "trends": "Design Trends",
     "branding": "Branding",
     "frontend": "Frontend Engineering"
+  },
+  demos: {
+    scrollTitle: "Live Interactive Demo: Scroll-driven Animations",
+    scrollTip: "Scroll inside the box below to observe scroll-timeline performance:",
+    scrollNode: "Scroll Render Node",
+    scrollDesc: "60fps compositor thread hardware acceleration, zero JS required",
+    vtTitle: "Live Interactive Demo: View Transitions Layout Toggle",
+    gridMode: "Grid View",
+    listMode: "List View",
+    vtNode: "Component Node",
+    vtDesc: "Native view snapshot smooth transition",
+    popoverTitle: "Live Interactive Demo: Popover API Top Layer Dialog",
+    popoverSub: "Click below to trigger native Popover (Top Layer isolated, ESC & light-dismiss auto-close supported):",
+    triggerPopover: "Trigger Popover (Auto Mode)",
+    popoverModalHead: "Native Popover Top Layer Panel",
+    popoverModalBody: "This panel renders in the browser Top Layer, bypassing all parent z-index & overflow limits.",
+    closeEsc: "Close Panel (Esc)",
+    anchorTitle: "Live Interactive Demo: Anchor Positioning & Collision Fallbacks",
+    anchorSub: "Switch directions below to observe live floating tooltip anchor tracking:",
+    posLabel: "Target Position:",
+    anchorTarget: "Anchor Target (#target-btn)"
   },
   articles,
 };

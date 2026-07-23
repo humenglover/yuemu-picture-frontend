@@ -59,7 +59,7 @@
                 <span class="code-lang-tag">{{ block.lang || 'CODE' }}</span>
                 <button class="copy-code-btn" @click="copyCode(block.code || '')">
                   <i class="far fa-copy mr-1"></i>
-                  <span>{{ copyStatusMap[block.code || ''] ? 'Copied!' : 'Copy' }}</span>
+                  <span>{{ copyStatusMap[block.code || ''] ? $t('pages.guidesPage.codeCopied') : $t('pages.guidesPage.copyCode') }}</span>
                 </button>
               </div>
               <pre class="article-pre-code"><code>{{ block.code }}</code></pre>
@@ -86,16 +86,16 @@
               <!-- Demo 1: Scroll-driven animations -->
               <div v-if="block.demoId === 'scroll-driven'" class="demo-box scroll-driven-demo">
                 <div class="demo-header">
-                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> 实时交互效果演示：Scroll-driven Animations</span>
+                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> {{ $t('pages.guidesPage.demos.scrollTitle') }}</span>
                 </div>
                 <div class="demo-scroll-container">
                   <div class="demo-scroll-content">
-                    <p class="demo-tip"><i class="fas fa-hand-pointer text-blue-500 mr-1.5"></i> 试着在下框中向下滑动，观察滚动时间线驱动的流畅交互：</p>
+                    <p class="demo-tip"><i class="fas fa-hand-pointer text-blue-500 mr-1.5"></i> {{ $t('pages.guidesPage.demos.scrollTip') }}</p>
                     <div v-for="n in 5" :key="n" class="demo-scroll-card">
                       <div class="demo-card-icon"><i class="fas fa-cubes text-blue-500"></i></div>
                       <div class="demo-card-text">
-                        <strong>滚动渲染节点 #{{ n }}</strong>
-                        <p>60fps 合成器线程硬件加速，零 JS 算力依赖</p>
+                        <strong>{{ $t('pages.guidesPage.demos.scrollNode') }} #{{ n }}</strong>
+                        <p>{{ $t('pages.guidesPage.demos.scrollDesc') }}</p>
                       </div>
                     </div>
                   </div>
@@ -105,23 +105,23 @@
               <!-- Demo 2: View transitions -->
               <div v-else-if="block.demoId === 'view-transitions'" class="demo-box view-transition-demo">
                 <div class="demo-header">
-                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> 实时交互效果演示：View Transitions 视图切换</span>
+                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> {{ $t('pages.guidesPage.demos.vtTitle') }}</span>
                 </div>
                 <div class="demo-body">
                   <div class="demo-actions">
                     <button class="demo-btn" :class="{ active: demoLayout === 'grid' }" @click="toggleDemoLayout('grid')">
-                      <i class="fas fa-th-large mr-1.5"></i> 网格模式 (Grid)
+                      <i class="fas fa-th-large mr-1.5"></i> {{ $t('pages.guidesPage.demos.gridMode') }}
                     </button>
                     <button class="demo-btn" :class="{ active: demoLayout === 'list' }" @click="toggleDemoLayout('list')">
-                      <i class="fas fa-list mr-1.5"></i> 列表模式 (List)
+                      <i class="fas fa-list mr-1.5"></i> {{ $t('pages.guidesPage.demos.listMode') }}
                     </button>
                   </div>
                   <div class="demo-cards-grid" :class="demoLayout">
                     <div v-for="n in 3" :key="n" class="demo-vt-card">
                       <div class="demo-vt-img"><i class="fas fa-image"></i></div>
                       <div class="demo-vt-info">
-                        <h5>组件节点 #{{ n }}</h5>
-                        <p>原生视图快照平滑过渡</p>
+                        <h5>{{ $t('pages.guidesPage.demos.vtNode') }} #{{ n }}</h5>
+                        <p>{{ $t('pages.guidesPage.demos.vtDesc') }}</p>
                       </div>
                     </div>
                   </div>
@@ -131,13 +131,13 @@
               <!-- Demo 3: Popover API -->
               <div v-else-if="block.demoId === 'popover'" class="demo-box popover-demo">
                 <div class="demo-header">
-                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> 实时交互效果演示：Popover API 原生顶层弹窗</span>
+                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> {{ $t('pages.guidesPage.demos.popoverTitle') }}</span>
                 </div>
                 <div class="demo-body text-center">
-                  <p class="demo-sub-text">点击下方按钮触发原生 Popover 弹出层（位于 Top Layer 隔离层，支持 ESC 与外部点击自动闭合）：</p>
+                  <p class="demo-sub-text">{{ $t('pages.guidesPage.demos.popoverSub') }}</p>
                   <div class="demo-actions justify-center">
                     <button class="demo-btn primary-gradient" @click="showDemoPopover = !showDemoPopover">
-                      <i class="fas fa-window-restore mr-1.5"></i> 触发 Popover (Auto 模式)
+                      <i class="fas fa-window-restore mr-1.5"></i> {{ $t('pages.guidesPage.demos.triggerPopover') }}
                     </button>
                   </div>
 
@@ -145,11 +145,11 @@
                   <div v-if="showDemoPopover" class="demo-popover-backdrop" @click="showDemoPopover = false">
                     <div class="demo-popover-content" @click.stop>
                       <div class="popover-head">
-                        <h4><i class="fas fa-shield-alt text-blue-500 mr-2"></i> 原生 Popover 弹出面板</h4>
+                        <h4><i class="fas fa-shield-alt text-blue-500 mr-2"></i> {{ $t('pages.guidesPage.demos.popoverModalHead') }}</h4>
                         <button class="close-icon" @click="showDemoPopover = false"><i class="fas fa-times"></i></button>
                       </div>
-                      <p class="popover-body-p">此面板直接运行于浏览器 Top Layer，无视父节点 z-index 与 overflow: hidden 约束。</p>
-                      <button class="demo-btn outline mt-3" @click="showDemoPopover = false">关闭窗口 (Esc)</button>
+                      <p class="popover-body-p">{{ $t('pages.guidesPage.demos.popoverModalBody') }}</p>
+                      <button class="demo-btn outline mt-3" @click="showDemoPopover = false">{{ $t('pages.guidesPage.demos.closeEsc') }}</button>
                     </div>
                   </div>
                 </div>
@@ -158,18 +158,18 @@
               <!-- Demo 4: Anchor Positioning -->
               <div v-else-if="block.demoId === 'anchor-positioning'" class="demo-box anchor-demo">
                 <div class="demo-header">
-                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> 实时交互效果演示：Anchor Positioning 锚点定位与碰撞回退</span>
+                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> {{ $t('pages.guidesPage.demos.anchorTitle') }}</span>
                 </div>
                 <div class="demo-body text-center">
-                  <p class="demo-sub-text">切换下方定位方向，观察浮层相对于锚点目标的位置追踪：</p>
+                  <p class="demo-sub-text">{{ $t('pages.guidesPage.demos.anchorSub') }}</p>
                   <div class="demo-actions justify-center mb-4">
                     <button v-for="pos in ['bottom', 'top', 'right']" :key="pos" class="demo-btn" :class="{ active: demoAnchorPos === pos }" @click="demoAnchorPos = pos">
-                      定位方向: {{ pos }}
+                      {{ $t('pages.guidesPage.demos.posLabel') }} {{ pos }}
                     </button>
                   </div>
                   <div class="demo-anchor-stage">
                     <div class="demo-anchor-target">
-                      <i class="fas fa-bullseye text-blue-500 mr-1.5"></i> 锚点目标 (#target-btn)
+                      <i class="fas fa-bullseye text-blue-500 mr-1.5"></i> {{ $t('pages.guidesPage.demos.anchorTarget') }}
                       <div class="demo-anchor-tooltip" :class="`pos-${demoAnchorPos}`">
                         <i class="fas fa-info-circle text-blue-400 mr-1"></i> Tooltip (position-anchor: --target-btn; position-area: {{ demoAnchorPos }})
                       </div>
@@ -946,6 +946,304 @@ const goArticle = (id: string) => {
 
 .article-table tr:last-child td {
   border-bottom: none;
+}
+
+/* ==================== 实时交互效果演示组件样式 ==================== */
+.article-interactive-demo-card {
+  margin: 36px 0;
+}
+
+.demo-box {
+  background: var(--card-background, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+}
+
+.demo-header {
+  padding: 12px 20px;
+  background: var(--hover-background, #f8fafc);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.demo-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.demo-body {
+  padding: 24px;
+}
+
+.demo-sub-text {
+  font-size: 14px;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 16px;
+}
+
+.demo-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.demo-actions.justify-center {
+  justify-content: center;
+}
+
+.demo-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--card-background, #ffffff);
+  color: var(--text-primary, #334155);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.demo-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.demo-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.demo-btn.primary-gradient {
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+}
+
+.demo-btn.primary-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+}
+
+.demo-btn.outline {
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.demo-btn.outline:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Demo 1: Scroll Container */
+.demo-scroll-container {
+  height: 220px;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--hover-background, #f8fafc);
+  position: relative;
+}
+
+.demo-scroll-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.demo-tip {
+  font-size: 13px;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 8px;
+}
+
+.demo-scroll-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--card-background, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  font-size: 13.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.demo-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Demo 2: View Transitions Grid */
+.demo-cards-grid {
+  display: grid;
+  gap: 14px;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.demo-cards-grid.grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.demo-cards-grid.list {
+  grid-template-columns: 1fr;
+}
+
+.demo-vt-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: var(--hover-background, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+}
+
+.demo-vt-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.demo-vt-info h5 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  margin-bottom: 2px;
+}
+
+.demo-vt-info p {
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+}
+
+/* Demo 3: Popover Backdrop */
+.demo-popover-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: popoverFadeIn 0.25s ease;
+}
+
+@keyframes popoverFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.demo-popover-content {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  text-align: left;
+  border: 1px solid #e2e8f0;
+}
+
+.popover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.popover-head h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.close-icon {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.popover-body-p {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+/* Demo 4: Anchor Positioning Stage */
+.demo-anchor-stage {
+  height: 180px;
+  background: var(--hover-background, #f8fafc);
+  border-radius: 16px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.demo-anchor-target {
+  position: relative;
+  padding: 12px 24px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.demo-anchor-tooltip {
+  position: absolute;
+  white-space: nowrap;
+  padding: 6px 14px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.demo-anchor-tooltip.pos-bottom {
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.demo-anchor-tooltip.pos-top {
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.demo-anchor-tooltip.pos-right {
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 /* 动图与图片卡片容器 */

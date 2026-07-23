@@ -18,6 +18,8 @@ export default {
   notFoundTitle: "未找到指定的指南文章",
   copyrightTitle: "版权与知识共享声明",
   copyrightDesc: "本文由悦木图库（yuemutuku）原创发布，遵守知识共享 署名-非商业性使用 4.0 国际许可协议。转载请注明出处与作者链接。",
+  copyCode: "复制代码",
+  codeCopied: "已复制",
   categories: {
     "all": "全部指南",
     "copyright": "版权合规",
@@ -29,6 +31,27 @@ export default {
     "trends": "设计趋势",
     "branding": "品牌设计",
     "frontend": "前端工程"
+  },
+  demos: {
+    scrollTitle: "实时交互效果演示：Scroll-driven Animations",
+    scrollTip: "试着在下框中向下滑动，观察滚动时间线驱动的流畅交互：",
+    scrollNode: "滚动渲染节点",
+    scrollDesc: "60fps 合成器线程硬件加速，零 JS 算力依赖",
+    vtTitle: "实时交互效果演示：View Transitions 视图切换",
+    gridMode: "网格模式 (Grid)",
+    listMode: "列表模式 (List)",
+    vtNode: "组件节点",
+    vtDesc: "原生视图快照平滑过渡",
+    popoverTitle: "实时交互效果演示：Popover API 原生顶层弹窗",
+    popoverSub: "点击下方按钮触发原生 Popover 弹出层（位于 Top Layer 隔离层，支持 ESC 与外部点击自动闭合）：",
+    triggerPopover: "触发 Popover (Auto 模式)",
+    popoverModalHead: "原生 Popover 弹出面板",
+    popoverModalBody: "此面板直接运行于浏览器 Top Layer，无视父节点 z-index 与 overflow: hidden 约束。",
+    closeEsc: "关闭窗口 (Esc)",
+    anchorTitle: "实时交互效果演示：Anchor Positioning 锚点定位与碰撞回退",
+    anchorSub: "切换下方定位方向，观察浮层相对于锚点目标的位置追踪：",
+    posLabel: "定位方向:",
+    anchorTarget: "锚点目标 (#target-btn)"
   },
   articles,
 };
