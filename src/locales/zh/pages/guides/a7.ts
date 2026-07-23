@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a7',
   categoryKey: 'trends',
   tag: '设计趋势',
@@ -6,7 +6,7 @@ export default {
   title: '2026 UI 设计趋势：谁在退潮，谁在崛起',
   desc: '盘点液态玻璃、新粗野主义、超级色彩主义与微动效的实战演进。',
   readTimeVal: '16 分钟',
-  date: '2026-06-20',
+  date: '2026-05-10',
   content: `每年都有一堆"设计趋势"被吹得天花乱坠，但你翻翻两年前那些"必追趋势"——现在还有人提吗？全凉了。
 
 回看自己两年前跟风做的那些设计，那个羞耻感：

@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a10',
   categoryKey: 'design',
   tag: 'Visual Design',
@@ -6,7 +6,7 @@ export default {
   title: 'Building a Design System from Scratch: Design Tokens to Component Engineering',
   desc: 'From three-tier token architecture and Figma Variables to CI/CD auto-sync — a production-ready design system blueprint.',
   readTimeVal: '18 min',
-  date: '2026-07-22',
+  date: '2026-07-05',
   content: `If you've worked on more than three projects as a frontend developer, you know this pain: every project has different colors, different spacing, different border radii. The same button looks different on every page. The designer changed three times. The design file has four slightly different blues — #2563eb, #1d4ed8, #3b82f6, #2083f2 — and nobody knows which one is "the brand blue."
 
 ![Design system chaos](/gifs/a10_chaos.gif)

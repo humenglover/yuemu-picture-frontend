@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a12',
   categoryKey: 'design',
   tag: 'Visual Design',

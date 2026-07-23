@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a3',
   categoryKey: 'ai',
   tag: 'AI Exploration',
@@ -6,7 +6,7 @@ export default {
   title: 'AIGC Visual Creation Workflow',
   desc: 'Midjourney & ControlNet in production — from prompt engineering to commercial delivery.',
   readTimeVal: '18 min',
-  date: '2026-07-15',
+  date: '2026-02-15',
   content: `Back in 2023 when AI art first blew up, the entire internet was screaming "designers are doomed." Fast forward to 2026 — turns out designers aren't extinct. The ones who refused to learn AI, though? Yeah, they got steamrolled. It's giving "the future waits for no one" energy.
 
 I still remember my first Midjourney prompt: "beautiful girl portrait." Hit enter. The result? Twisted limbs, three extra fingers, one eye higher than the other. The shock was real:

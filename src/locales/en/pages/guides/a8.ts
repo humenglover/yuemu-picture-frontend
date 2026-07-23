@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a8',
   categoryKey: 'branding',
   tag: 'Branding',
@@ -6,7 +6,7 @@ export default {
   title: 'Building a Visual Brand Identity System',
   desc: 'From logo to complete brand system — color architecture, motion identity, and breaking through AI sameness.',
   readTimeVal: '15 min',
-  date: '2026-06-28',
+  date: '2026-05-30',
   content: `I've met so many founders who spent a few thousand bucks on a logo and then thought "brand: done." Honestly? That mindset is more dangerous than having no logo at all. It gives you false confidence — you think you've crossed the finish line, but you haven't even found the starting gate.
 
 Here's a test. Take a screenshot of your product. Cover the logo. Can you still tell it's yours? If covering the logo makes your product indistinguishable from competitors —

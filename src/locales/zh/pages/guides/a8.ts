@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a8',
   categoryKey: 'branding',
   tag: '品牌设计',
@@ -6,7 +6,7 @@ export default {
   title: '品牌视觉识别系统构建指南',
   desc: '从 Logo 到完整品牌体系——色彩架构、动效识别与 AI 同质化破局。',
   readTimeVal: '15 分钟',
-  date: '2026-06-28',
+  date: '2026-05-30',
   content: `我见过太多创始人——花三万块设计了个 Logo，然后觉得"品牌搞完了"。说真的，这种想法比不设计 Logo 还危险。因为它给了你一个虚假的安全感——你以为你做完了，实际上你连门都没进。
 
 来，做个测试。把你的产品截图，把 Logo 遮住。你能认出来这是你的产品吗？如果遮住 Logo 之后你的产品跟竞品长得一模一样——

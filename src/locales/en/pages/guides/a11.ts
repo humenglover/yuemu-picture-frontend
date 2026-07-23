@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a11',
   categoryKey: 'ai',
   tag: 'AI Exploration',
@@ -6,7 +6,7 @@ export default {
   title: '2026 AI Design Tools Guide: From Vibe Design to Production Code',
   desc: 'Deep dive into Google Stitch, Figma Make, Cursor + MCP, v0, and more — the complete AI-powered design-to-code workflow.',
   readTimeVal: '19 min',
-  date: '2026-07-22',
+  date: '2026-07-15',
   content: `Late 2025, everyone was asking "Will AI replace designers?" By mid-2026, the answer is clear: **AI won't replace designers, but designers who use AI are replacing those who don't.**
 
 What's even more striking — the 2026 tools don't just "generate a pretty picture." They generate deployable code. The design-to-code gap is closing fast.

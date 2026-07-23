@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a11',
   categoryKey: 'ai',
   tag: 'AI 探索',
@@ -6,7 +6,7 @@ export default {
   title: '2026 AI 设计工具完全实战指南：从 Vibe Design 到生产级代码',
   desc: '深度实测 Google Stitch、Figma Make、Cursor + MCP、v0 等工具链，拆解从想法到代码的 AI 驱动工作流。',
   readTimeVal: '19 分钟',
-  date: '2026-07-22',
+  date: '2026-07-15',
   content: `2025 年底大家都在问"AI 会不会取代设计师"。到了 2026 年中，答案很清楚了：**AI 不会取代设计师，但会用 AI 的设计师正在取代不会用的。**
 
 更刺激的是——2026 年涌现的工具不再是"AI 生成一张好看的图"，而是"AI 生成可直接部署的代码"。设计到代码的鸿沟正在被填平。

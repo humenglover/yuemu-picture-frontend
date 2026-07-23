@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a3',
   categoryKey: 'ai',
   tag: 'AI 探索',
@@ -6,7 +6,7 @@ export default {
   title: 'AIGC 视觉创作实战工作流',
   desc: 'Midjourney 与 ControlNet 控图实战，从 Prompt 工程到商业落地。',
   readTimeVal: '18 分钟',
-  date: '2026-07-15',
+  date: '2026-02-15',
   content: `2023 年 AI 制图刚火的时候，全网都在喊"设计师要失业了"。到了 2026 年你再回头看——失业的设计师没几个，倒是不会用 AI 的真的被卷死了。一股"时代抛弃你的时候连招呼都不打"的既视感。
 
 我还记得自己第一次在 Midjourney 里敲了个 "beautiful girl portrait"，回车——出来的图四肢扭曲、手指多了三根、眼睛一高一低。那个震撼：

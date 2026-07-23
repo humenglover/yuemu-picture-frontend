@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a9',
   categoryKey: 'frontend',
   tag: 'Frontend Engineering',
@@ -6,7 +6,7 @@ export default {
   title: '2026 CSS New Features Guide: Scroll Animations, View Transitions & Native Popovers',
   desc: 'Master Scroll-driven Animations, View Transitions API, Popover API, and Anchor Positioning — four browser-native superpowers.',
   readTimeVal: '20 min',
-  date: '2026-07-22',
+  date: '2026-06-20',
   content: `In 2026, modern CSS has natively adopted critical capabilities that previously required heavy JavaScript engines and third-party utility libraries.
 
 Scroll-driven animations, smooth view transitions, native top-layer popovers, and anchor positioning are now fully supported across all major browser engines. This shift marks a fundamental milestone from script-driven DOM manipulation toward declarative browser rendering.

@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a4',
   categoryKey: 'performance',
   tag: '性能优化',
@@ -6,7 +6,7 @@ export default {
   title: 'Web 媒体性能优化指南',
   desc: '从 WebP/AVIF 转换到响应式图片与 LCP 极速加载策略。',
   readTimeVal: '14 分钟',
-  date: '2026-07-10',
+  date: '2026-03-05',
   content: `先给你看一组我亲身经历的血泪数据。去年接了个图库项目，首屏 LCP——**8.4 秒**。8.4 秒什么概念？Google 的研究数据摆在那：加载超过 3 秒，53% 的移动用户直接关页面走人。你的页面加载了 8.4 秒，等于超过一半的用户根本没看到你的内容长什么样就已经走了。一股"辛辛苦苦做半年，一秒回到解放前"的感觉。
 
 看到 Lighthouse 跑出来 8.4 秒的那一刻，屏幕前所有人的反应：

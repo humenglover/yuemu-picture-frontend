@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a4',
   categoryKey: 'performance',
   tag: 'Performance',
@@ -6,7 +6,7 @@ export default {
   title: 'Web Media Performance Guide',
   desc: 'WebP/AVIF, responsive images, and LCP optimization — real strategies that actually work.',
   readTimeVal: '14 min',
-  date: '2026-07-10',
+  date: '2026-03-05',
   content: `Let me hit you with some real numbers. Last year I inherited a stock photo gallery project. The LCP on first load? **8.4 seconds.** For context: Google's research shows that beyond 3 seconds, 53% of mobile users bounce. At 8.4 seconds, more than half your visitors never even saw what the page looked like. Months of work, gone in the time it takes to microwave leftovers.
 
 The moment that Lighthouse report spat out 8.4s, everyone at their screen looked exactly like this:

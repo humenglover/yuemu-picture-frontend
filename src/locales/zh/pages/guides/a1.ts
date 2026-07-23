@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a1',
   categoryKey: 'copyright',
   tag: '版权与合规',
@@ -6,7 +6,7 @@ export default {
   title: '图像版权与 CC 协议使用指南',
   desc: '深入剖析 CC 协议类别、商业授权边界及侵权规避指南。',
   readTimeVal: '12 分钟',
-  date: '2026-07-20',
+  date: '2026-01-10',
   content: `先讲个真事。去年我一个做自媒体的朋友，公众号接了个软广，配图用了张 Unsplash 上"看起来免费"的照片。三个月后，一家图库平台发来律师函，索赔八万。那张照片的原作者根本没授权给 Unsplash——是第三方搬运上去的。
 
 朋友懵了。他说："我哪知道啊？"

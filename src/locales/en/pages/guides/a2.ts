@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a2',
   categoryKey: 'design',
   tag: 'Visual Design',
@@ -6,7 +6,7 @@ export default {
   title: 'Minimalist Design & Color Theory',
   desc: 'Mastering negative space, the 60-30-10 rule, and dark mode done right.',
   readTimeVal: '15 min',
-  date: '2026-07-18',
+  date: '2026-01-25',
   content: `Hot take: 90% of so-called "minimalist design" on the internet isn't minimalism — it's just stuff that's been deleted. Removing every element from a page isn't design. It's a blank document.
 
 Real minimalism is that "just right" feeling — one more thing and it's cluttered, one less and it's empty. I first understood this looking at Kenya Hara's horizon poster series for MUJI. An endless white salt flat, a razor-thin horizon line, and a barely-visible MUJI logo. The amount of visual information is laughably small, yet your eyes are absolutely locked in. That vibe of "there's nothing here but somehow everything is right" — that's the real deal.

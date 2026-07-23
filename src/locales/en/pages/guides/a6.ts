@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a6',
   categoryKey: 'accessibility',
   tag: 'Accessibility',
@@ -6,7 +6,7 @@ export default {
   title: 'Web Accessibility: A Practical Guide',
   desc: 'WCAG 2.2 compliance, keyboard focus management, screen reader adaptation — real implementation.',
   readTimeVal: '13 min',
-  date: '2026-06-30',
+  date: '2026-04-15',
   content: `Let me hit you with an uncomfortable truth. In most teams, accessibility — a11y, as the industry calls it — lives in the "we'll get to it later" column. Product managers don't prioritize it. Designers don't spec it. Developers don't build it. The result? Over 15% of the global population lives with some form of disability — visual, auditory, motor, cognitive. Your product hasn't even launched yet and it's already shut out one in six human beings.
 
 And here's the even more pragmatic angle — international markets and B2B enterprise procurement are increasingly writing **WCAG 2.2 AA compliance** into their vendor requirements. Fail a11y, and you don't even get a seat at the table. This isn't "design idealism" anymore. It's compliance. It's the market telling you: get it together or get left behind.

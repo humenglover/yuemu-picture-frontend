@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a7',
   categoryKey: 'trends',
   tag: 'Design Trends',
@@ -6,7 +6,7 @@ export default {
   title: '2026 UI Design Trends: Rising & Fading',
   desc: 'Liquid Glass, Neo-Brutalism, hyperchromatic design, and micro-interactions — a clear-eyed reality check.',
   readTimeVal: '16 min',
-  date: '2026-06-20',
+  date: '2026-05-10',
   content: `Every year, dozens of "design trends" get hyped to the moon. Now go look at the "must-follow trends" from two years ago. Anyone still talking about them? Exactly. Dead and buried.
 
 That specific cringe of looking at designs you made two years ago while chasing a trend:

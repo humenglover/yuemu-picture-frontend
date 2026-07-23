@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a1',
   categoryKey: 'copyright',
   tag: 'Copyright & Compliance',
@@ -6,7 +6,7 @@ export default {
   title: 'Image Copyright & Creative Commons Guide',
   desc: 'Everything about CC licenses, commercial boundaries, and staying out of legal trouble.',
   readTimeVal: '12 min',
-  date: '2026-07-20',
+  date: '2026-01-10',
   content: `Let me tell you a true story. Last year, a friend of mine who runs a WeChat blog used a "free-looking" photo from Unsplash in a sponsored post. Three months later: a stock photo platform sent a cease-and-desist letter demanding ¥80,000 in damages. The original photographer had never authorized Unsplash to distribute that image — some random third party uploaded it.
 
 My friend was stunned. "How was I supposed to know?"

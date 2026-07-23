@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a5',
   categoryKey: 'typography',
   tag: 'Typography',
@@ -6,7 +6,7 @@ export default {
   title: 'Font Pairing & Typesetting Guide',
   desc: 'Web font loading, modular type scales, variable fonts, and cross-platform font stacks.',
   readTimeVal: '11 min',
-  date: '2026-07-05',
+  date: '2026-03-25',
   content: `Good typography is like oxygen — you never notice it until it's gone. Then you're gasping.
 
 I've seen too many genuinely powerful products die on the altar of bad typography. Font sizes with no scale logic — just random numbers someone typed and shipped. Line heights so tight reading feels like rush hour on the subway. Cross-platform font fallbacks that collapse straight into Times New Roman. And the worst — four completely incompatible fonts mashed into the same page:

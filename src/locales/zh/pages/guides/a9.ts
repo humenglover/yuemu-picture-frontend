@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a9',
   categoryKey: 'frontend',
   tag: '前端工程',
@@ -6,7 +6,7 @@ export default {
   title: '2026 CSS 新特性指南：滚动动画、视图过渡与原生弹窗',
   desc: '深入掌握 Scroll-driven Animations、View Transitions API、Popover API 与 Anchor Positioning 四大浏览器原生能力。',
   readTimeVal: '20 分钟',
-  date: '2026-07-22',
+  date: '2026-06-20',
   content: `进入 2026 年，现代 CSS 已具备多项过去依赖 JavaScript 引擎及三方库才能实现的基础能力。
 
 滚动驱动动画、页面平滑过渡、原生弹出层、锚点相对定位——这些特性均已获得主流浏览器的原生支持。这一演进标志着 Web 渲染能力从脚本驱动向声明式渲染引擎的全面跨越。

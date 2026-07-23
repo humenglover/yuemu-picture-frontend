@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'a10',
   categoryKey: 'design',
   tag: '视觉设计',
@@ -6,7 +6,7 @@ export default {
   title: '设计系统从零搭建完全指南：Design Tokens 到组件库工程化',
   desc: '从三层 Token 架构、Figma Variables 实操到 CI/CD 自动同步，一套可落地的设计系统工程化方案。',
   readTimeVal: '18 分钟',
-  date: '2026-07-22',
+  date: '2026-07-05',
   content: `做过三个以上项目的前端应该都有这种体验：每个项目颜色不一样、间距不一样、圆角不一样，甚至同一个按钮在各个页面长得都不一样。设计师换了三轮，设计稿里光蓝色就有 #2563eb、#1d4ed8、#3b82f6、#2083f2 四种——没人分得清哪个才是"品牌蓝"。
 
 ![设计系统混乱现场](/gifs/a10_chaos.gif)
