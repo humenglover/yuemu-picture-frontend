@@ -18,179 +18,97 @@ That's what happens without a design system. Here's how to build one from zero �
 
 Design Tokens are the atomic layer: they turn visual decisions (colors, spacing, fonts, radii) into named variables. But dumping a flat list of variable names doesn't work. You need hierarchy.
 
-### The Standard Three-Tier Architecture
+### The Three-Tier Architecture
 
-\`\`\`
- ┌─────────────────────────────────────────────────────┐
- │            Design Token Three-Tier Architecture       │
- │                                                     │
- │  Layer 3: Component Tokens (component-specific)       │
- │  ┌─────────────────────────────────────────────┐    │
- │  │ button-primary-bg → color.brand.primary      │    │
- │  │ card-padding      → spacing.section.lg       │    │
- │  │ Purpose: components reference these directly  │    │
- │  └─────────────────────────────────────────────┘    │
- │                      ↑ references                     │
- │  Layer 2: Semantic Tokens                             │
- │  ┌─────────────────────────────────────────────┐    │
- │  │ color.brand.primary  → blue.500              │    │
- │  │ color.text.primary   → neutral.900           │    │
- │  │ spacing.section.lg   → 48px                  │    │
- │  │ Purpose: expresses INTENT, not raw values     │    │
- │  └─────────────────────────────────────────────┘    │
- │                      ↑ references                     │
- │  Layer 1: Primitive Tokens (Global)                   │
- │  ┌─────────────────────────────────────────────┐    │
- │  │ blue.500    → #2563eb                        │    │
- │  │ neutral.900 → #111827                        │    │
- │  │ space.12    → 48px                           │    │
- │  │ Purpose: defines atomic values, never used    │    │
- │  │           directly by components              │    │
- │  └─────────────────────────────────────────────┘    │
- └─────────────────────────────────────────────────────┘
-\`\`\`
+**Layer 1 — Primitive (Global) Tokens**
 
-**Why three layers?** Say your brand color changes from blue to green. Change only Layer 1's \`blue.500\` → \`green.500\`. Layer 2's \`color.brand.primary\` automatically follows. Every component picks up the change with zero manual edits. Without layers, you're changing colors in every single component file.
+Defines atomic values. Never used directly by components. Examples: blue.500 = #2563eb, neutral.900 = #111827, space.12 = 48px.
+
+**Layer 2 — Semantic Tokens**
+
+Expresses INTENT, not raw values. All values use aliases referencing Primitives. Examples: color.brand.primary references blue.500, color.text.primary references neutral.900, spacing.section.xl references space.12.
+
+**Layer 3 — Component Tokens**
+
+Components reference this layer directly. Examples: button.primary.bg references color.brand.primary, card.padding.x references spacing.section.lg. When rebranding, only Layer 1 changes — Layers 2 and 3 follow automatically. Zero component edits required.
+
+**Why three layers?** Say your brand color changes from blue to green. Change only Layer 1's blue.500 mapping to green.500. Layer 2's color.brand.primary automatically follows. Every component picks up the change instantly. Without layers, you're editing every single component file manually.
 
 ### Naming Conventions
 
-\`\`\`
- ✅ color.brand.primary          ← Named by SEMANTICS — survives rebrands
- ❌ color.blue.500               ← Named by VALUE — breaks on any color change
-
- ✅ spacing.section.xl           ← Expresses PURPOSE
- ❌ spacing.48px                 ← Hardcodes the value
-
- Structure: {category}.{property}.{variant}.{state}
- Example:   color  . text    . primary . hover
-\`\`\`
+- `color.brand.primary` — named by semantics, survives rebrands
+- Never use `color.blue.500` — named by value, breaks on any color change
+- `spacing.section.xl` — expresses purpose
+- Never use `spacing.48px` — hardcodes the value
+- Recommended structure: `{category}.{property}.{variant}.{state}`, e.g. `color.text.primary.hover`
 
 ## Part 2: Figma Variables — Implementing Tokens in Your Design Tool
 
 Figma Variables is the native mechanism for Design Tokens inside Figma. 2026 supports: Color, Number, String, Boolean.
 
-### Collections Setup
+### Recommended Collections Setup
 
-\`\`\`
- Figma Variables Collections (Recommended)
+**Collection 1: Primitives** — raw atomic values: blue/500 = #2563eb, neutral/50 = #f9fafb, neutral/900 = #111827, space/4 = 16px, space/8 = 32px, radius/md = 8px, font/xl = 32px.
 
- ┌──────────────────────────────────────────────────────┐
- │  Collection 1: Primitives                             │
- │  ┌──────────────────────────────────────────────────┐ │
- │  │ blue/500    #2563eb    neutral/50    #f9fafb     │ │
- │  │ blue/600    #1d4ed8    neutral/900   #111827     │ │
- │  │ space/4     16px       radius/md     8px         │ │
- │  │ space/8     32px       font/xl       32px        │ │
- │  └──────────────────────────────────────────────────┘ │
- │                                                      │
- │  Collection 2: Semantic                               │
- │  ┌──────────────────────────────────────────────────┐ │
- │  │ color/brand/primary  → blue/500    ← alias!     │ │
- │  │ color/text/primary   → neutral/900 ← alias!     │ │
- │  │ spacing/section/xl   → space/8     ← alias!     │ │
- │  │                             ALL values use alias   │ │
- │  └──────────────────────────────────────────────────┘ │
- │                                                      │
- │  Collection 3: Components (optional, for enterprise)   │
- │  ┌──────────────────────────────────────────────────┐ │
- │  │ button/primary/bg     → color/brand/primary       │ │
- │  │ card/padding/x        → spacing/section/lg        │ │
- │  └──────────────────────────────────────────────────┘ │
- └──────────────────────────────────────────────────────┘
-\`\`\`
+**Collection 2: Semantic** — all values use aliases referencing Primitives: color/brand/primary → blue/500, color/text/primary → neutral/900, spacing/section/xl → space/8. This is the critical layer — when rebranding, only Primitives change. Semantic layer stays untouched.
 
-Critical: Semantic layer values must use **aliases**, not raw color codes. Change Primitives once, Semantic follows automatically.
+**Collection 3: Components** (optional, for enterprise scale): button/primary/bg → color/brand/primary, card/padding/x → spacing/section/lg. Small teams can stop at Semantic.
 
 ### Modes for Theming
 
-\`\`\`
- Same Semantic Token, different Mode → different value
+The same Semantic Token maps to different Primitive values per Mode. For `color/bg/primary`:
 
- Token: color/bg/primary
+| Mode | Mapped Value |
+|---|---|
+| Light | #FFFFFF |
+| Dark | neutral/900 |
+| High Contrast | #000000 |
 
-  ┌────────────┬──────────────┬──────────────┐
-  │  Light Mode │  Dark Mode   │  HighContrast │
-  ├────────────┼──────────────┼──────────────┤
-  │  #FFFFFF   │  neutral/900 │  #000000      │
-  └────────────┴──────────────┴──────────────┘
-
-  Designer: switch Mode → entire page re-themes instantly
-  Developer: switch data-theme → CSS variables swap values
-\`\`\`
-
-At this point, your design file and codebase share the same variable system. This is the foundation for keeping them in sync.
+Designers switch Modes in Figma — the entire page re-themes instantly. Developers switch `data-theme` in code — CSS variables swap values. At this point, your design file and codebase share the same variable system.
 
 ## Part 3: Building the Component Library — Start With 10
 
-Don't try to build 50 components for v1. Ship these 10 first:
-
-\`\`\`
- Core 10 Components (by priority)
- ┌────────┬────────┬────────┬────────┬────────┐
- │ Button │ Input  │ Select │ Modal  │ Card   │
- ├────────┼────────┼────────┼────────┼────────┤
- │Badge   │Avatar  │Toast   │Tabs    │Table   │
- └────────┴────────┴────────┴────────┴────────┘
-\`\`\`
+Don't try to build 50 components for v1. Ship these 10 first: Button, Input, Select, Modal, Card, Badge, Avatar, Toast, Tabs, Table. Iterate from real usage.
 
 ### Component Building Principles
 
-\`\`\`
- 1. Every visual property references a Token. Never hardcode.
-    ✅ background: var(--color-brand-primary)
-    ❌ background: #2563eb
+**First, every visual property references a Token. Never hardcode.** Use `var(--color-brand-primary)`, not `#2563eb`.
 
- 2. Define all states BEFORE designing the default state
-    default → hover → active → focus → disabled → loading → error
+**Second, define all states before designing the default state.** Cover default → hover → active → focus → disabled → loading → error. All seven states, no exceptions.
 
- 3. Figma component name = code component name
-    Type=Primary, Size=Medium, State=Hover
-    → <Button variant="primary" size="md" />
+**Third, Figma component names must match code component names.** Figma: `Type=Primary, Size=Medium, State=Hover`. Code: `<Button variant="primary" size="md" />`.
 
- 4. Use Auto Layout for spacing. Never drag pixels manually.
-\`\`\`
+**Fourth, use Auto Layout for spacing.** Never drag pixels manually.
 
 ### Common Pitfalls
 
-\`\`\`
- ❌ Don't tokenize too early — a single landing page only needs CSS variables
- ❌ Don't skip the Semantic layer — going Primitive → Component directly
-    means every component breaks on rebrand
- ❌ Don't build 50 components for v1 — ship 10 core ones, iterate from usage
- ✅ The "detach test" — if designers detach components to make them work,
-    the component design is broken, not the person
-\`\`\`
+- Don't tokenize too early — a single landing page only needs CSS variables, not a full three-tier system
+- Don't skip the Semantic layer — going Primitive → Component directly means every component breaks on rebrand
+- Don't build 50 components for v1 — ship 10 core ones, iterate from usage
+- The detach test — if designers detach components to make them work, the component design is broken, not the person
 
-## Part 4: Engineering the Sync — Figma ↔ Code Automation
+## Part 4: Engineering the Sync — Figma to Code Automation
 
 The #1 killer of design systems isn't "we couldn't build it." It's "design changed and code didn't follow."
 
 ![Design-to-code sync pipeline](/gifs/a10_sync.gif)
-*▲ The design system CI/CD pipeline — Figma Variable update → Git Push → Style Dictionary build → npm publish, fully automated*
+*▲ Design system CI/CD pipeline — Figma variable update triggers Git push, Style Dictionary build, npm publish*
 
 ### Recommended Sync Architecture
 
-\`\`\`
-  Figma Variables              Git Repository               Applications
-  ┌──────────────┐        ┌──────────────────────┐        ┌──────────┐
-  │ Tokens Studio │─push─→│ tokens/               │        │ Web App  │
-  │ (Figma Plugin)│        │  primitives.json      │        │ (CSS     │
-  └──────────────┘        │  semantic.json        │        │  Vars)   │
-        │                 │        ↓               │        └──────────┘
-        │                 │ Style Dictionary       │        ┌──────────┐
-        │                 │  → CSS Variables       │──npm──→│ iOS App  │
-        │                 │  → Swift Constants     │ publish│ (Swift)  │
-        │                 │  → Kotlin Objects      │        └──────────┘
-        │                 └──────────────────────┘        ┌──────────┐
-        │                                                │ Android  │
-        └────────────── CI/CD Pipeline ─────────────────→│ (Kotlin) │
-                                                         └──────────┘
-\`\`\`
+**Step 1**: Designer modifies variables via Tokens Studio plugin in Figma, pushes to Git repository.
+
+**Step 2**: GitHub Action detects token file changes, triggers Style Dictionary build.
+
+**Step 3**: Style Dictionary reads JSON token definitions, generates multi-platform artifacts — CSS Variables (Web), Swift Constants (iOS), Kotlin Objects (Android).
+
+**Step 4**: Build artifacts auto-publish to npm / CocoaPods. Frontend and mobile teams update their dependencies. Done.
+
+Designers never touch code. Developers never manually edit CSS variables. One change, all platforms synced.
 
 ### Style Dictionary Config
 
 \`\`\`js
-// tokens.config.js
 module.exports = {
   source: ['tokens/**/*.json'],
   platforms: {
@@ -208,8 +126,9 @@ module.exports = {
 };
 \`\`\`
 
+Build output example:
+
 \`\`\`css
-/* Build output: dist/css/variables.css */
 :root {
   --color-brand-primary: #2563eb;
   --color-text-primary: #111827;
@@ -222,88 +141,26 @@ module.exports = {
 }
 \`\`\`
 
-### The CI/CD Flow
-
-\`\`\`
- Designer changes Figma Variable
-       ↓
- Tokens Studio plugin pushes → Git Repo
-       ↓
- GitHub Action triggers Style Dictionary Build
-       ↓
- CSS / Swift / Kotlin artifacts generated
-       ↓
- Auto npm publish / CocoaPods push
-       ↓
- Frontend/mobile: npm update → done
-
- Designers never touch code. Developers never manually edit CSS variables.
-\`\`\`
-
 ## Part 5: Multi-Brand & Multi-Theme Scaling
 
-When you need multiple brands (main + sub-brands) or multiple themes (Light + Dark + High Contrast):
+When maintaining multiple brands or themes, keep the Semantic Layer stable and only change Primitive mappings. For example, color/brand/primary maps to blue/500 under Brand A, and green/500 under Brand B.
 
-\`\`\`
-  Semantic Layer stays STABLE, only Primitive mappings change
-
-          Semantic Layer (unchanged)
-  ┌─────────────────────────────────────────┐
-  │  color/brand/primary                    │
-  │  color/bg/primary                       │
-  │  font/heading                           │
-  └──────────┬──────────┬───────────────────┘
-             │          │
-    ┌────────┴──┐  ┌───┴────────┐
-    │ Brand A   │  │ Brand B    │   ← Different brands swap Primitives
-    │ blue/500  │  │ green/500  │
-    │ white     │  │ cream      │
-    └───────────┘  └────────────┘
-
-  Figma approach: Extended Collections
-  - Parent Collection: shared Semantic Tokens
-  - Child Collection A: Brand A Primitives
-  - Child Collection B: Brand B Primitives
-  - Edit Parent → all Children auto-update
-  - Edit one Child → only that brand changes
-\`\`\`
+Figma approach: use Extended Collections. A Parent Collection holds shared Semantic Tokens. Child Collection A holds Brand A Primitives. Child Collection B holds Brand B Primitives. Edit the Parent — all Children auto-update. Edit one Child — only that brand changes.
 
 ## Part 6: Three Metrics That Actually Matter
 
-\`\`\`
- 1. Component Usage Rate
-    → Figma component instances / total elements
-    → Below 80% = components don't cover real needs
+**Component Usage Rate**: Figma component instances divided by total elements. Below 80% means components don't cover real needs, or designers don't know they exist.
 
- 2. Detach Rate
-    → % of designers detaching (unlinking) components
-    → Above 20% = components are badly designed for real scenarios
+**Detach Rate**: percentage of designers unlinking components. Above 20% means components are badly designed for real scenarios. Revisit the component design.
 
- 3. The 3-Minute Test
-    → Can a new designer find, place, and configure a button in 3 minutes?
-    → If not, your component library is too hard to use
-\`\`\`
+**The 3-Minute Test**: can a new designer find, place, and configure a button in 3 minutes? If not, your component library is too hard to use.
 
 ## Part 7: What a Design System Actually Is
 
 ![Design system built](/gifs/a10_build.gif)
 *▲ A design system isn't "a pretty component doc." It's turning your design decisions into reusable, syncable, traceable code assets.*
 
-\`\`\`
-  Design System = Design Decisions × Engineering
+Design System = Design Decisions × Engineering. Design Tokens map to CSS Variables. Figma Variables map to Style Dictionary. Components map to Component Library. CI/CD pipeline ties them together.
 
-  ┌──────────────────┐     ┌──────────────────┐
-  │  Design Tokens   │ ←→ │  CSS Variables    │
-  │  (Design Language)│     │  (Code Reality)   │
-  ├──────────────────┤     ├──────────────────┤
-  │  Figma Variables │ ←→ │  Style Dictionary │
-  │  (Design Tool)   │     │  (Build Tool)     │
-  ├──────────────────┤     ├──────────────────┤
-  │  Components      │ ←→ │  Component Lib    │
-  │  (Design Assets) │     │  (Code Assets)    │
-  └──────────────────┘     └──────────────────┘
-          ↕  CI/CD Auto-Sync  ↕
-\`\`\`
-
-Honest truth: **the biggest value of a design system isn't "unified colors and spacing." It's eliminating the meeting where five people debate what a button should look like.** The time you save? Spend it on things that actually matter.`
+Honest truth: **the biggest value of a design system isn't "unified colors and spacing." It's eliminating the meeting where five people debate what a button should look like.** Spend the saved time on things that actually matter.`
 };

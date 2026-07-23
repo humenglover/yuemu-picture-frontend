@@ -9,48 +9,21 @@ export default {
   date: '2026-07-22',
   content: `Late 2025, everyone was asking "Will AI replace designers?" By mid-2026, the answer is clear: **AI won't replace designers, but designers who use AI are replacing those who don't.**
 
-What's even more striking — the 2026 tools don't just "generate a pretty picture." They generate deployable code. The design-to-code gap is closing, and it's closing fast.
+What's even more striking — the 2026 tools don't just "generate a pretty picture." They generate deployable code. The design-to-code gap is closing fast.
 
 ![AI design speed](/gifs/a11_stitch.gif)
-*▲ Google Stitch: one sentence → five-screen interactive prototype → exportable code. Twenty minutes total. Two years ago this was two days of work.*
+*▲ Google Stitch: one sentence to five-screen interactive prototype. Twenty minutes total. Two years ago this was two days of work.*
 
 Here's the complete breakdown of the best AI design tools in 2026 and the workflow that actually ships.
 
 ## Part 1: The 2026 AI Design Tool Stack
 
-\`\`\`
- ┌────────────────────────────────────────────────────────────┐
- │              2026 AI Design Four-Layer Stack                  │
- │                                                            │
- │  Layer 1: Exploration & Concept                             │
- │  ┌──────────────────────────────────────────────────────┐  │
- │  │ Google Stitch (Free)    One sentence → multi-screen     │  │
- │  │                          interactive prototype          │  │
- │  │ Claude Artifacts        Conversational UI drafts        │  │
- │  └──────────────────────────────────────────────────────┘  │
- │                         ↓ Output: low-fidelity prototype     │
- │  Layer 2: Refinement & Design System                        │
- │  ┌──────────────────────────────────────────────────────┐  │
- │  │ Figma Make ($16+/mo)    Prompt → components, tied to    │  │
- │  │                          your Design Tokens             │  │
- │  │ Figma AI                Auto-layout, content fill       │  │
- │  └──────────────────────────────────────────────────────┘  │
- │                         ↓ Output: high-fidelity design       │
- │  Layer 3: Components & UI                                   │
- │  ┌──────────────────────────────────────────────────────┐  │
- │  │ v0 by Vercel ($20/mo)   Production React/Tailwind       │  │
- │  │ Uizard                  Sketch → editable wireframes     │  │
- │  └──────────────────────────────────────────────────────┘  │
- │                         ↓ Output: production components      │
- │  Layer 4: Assembly & Deployment                             │
- │  ┌──────────────────────────────────────────────────────┐  │
- │  │ Cursor + Figma MCP      AI editor reads Figma directly  │  │
- │  │ Lovable                 Full-stack MVP, one click       │  │
- │  │ Bolt.new                In-browser full-stack apps       │  │
- │  └──────────────────────────────────────────────────────┘  │
- │                         ↓ Output: deployable application     │
- └────────────────────────────────────────────────────────────┘
-\`\`\`
+| Layer | Role | Key Tools | Output |
+|---|---|---|---|
+| Layer 1 — Exploration | Rapid idea visualization | Google Stitch (free), Claude Artifacts | Low-fidelity interactive prototypes |
+| Layer 2 — Refinement | Design system binding, polish | Figma Make, Figma AI | High-fidelity design files |
+| Layer 3 — Components | Production frontend components | v0 by Vercel, Uizard | TypeScript + Tailwind components |
+| Layer 4 — Assembly | Full-stack build & deploy | Cursor + Figma MCP, Lovable, Bolt.new | Deployable application |
 
 Core insight: **no single tool covers the full pipeline.** Pros chain four layers together, using the best tool for each phase.
 
@@ -60,43 +33,22 @@ Stitch is 2026's most disruptive design tool. Google acquired Galileo AI, rebuil
 
 ### What Is Vibe Design?
 
-Traditional flow: wireframe → grid → place components → adjust spacing → color → interactions. Every step is "execution."
+Traditional flow: wireframe → grid → place components → adjust spacing → color → interactions → handoff. Every step is execution. Total time: roughly 4 hours.
 
-Vibe Design: describe the feeling and intent — **"a dark-mode SaaS dashboard, data-visualization-heavy, neon green CTA, minimal and restrained, Stripe-like aesthetic"** — and the AI generates five interconnected interactive screens.
-
-\`\`\`
- Traditional Flow                  Vibe Design Flow
- ┌────────────────────┐      ┌────────────────────┐
- │ ① Wireframe   30min│      │ ① Describe     2min│
- │ ② Grid        15min│      │ ② AI → 5 screens 3min│
- │ ③ Components  45min│      │ ③ Voice tweak   5min│
- │ ④ Spacing     30min│      │ ④ Prototype     1min│
- │ ⑤ Color       20min│      │ ⑤ Export code   1min│
- │ ⑥ Interactions 60min│     │                    │
- │ ⑦ Handoff     30min│      │ Total: ~12 minutes  │
- │                    │      │                    │
- │ Total: ~4 hours    │      │                    │
- └────────────────────┘      └────────────────────┘
-\`\`\`
+Vibe Design: describe the feeling and intent — "a dark-mode SaaS dashboard, data-visualization-heavy, neon green CTA, minimal and restrained, Stripe-like aesthetic." The AI generates five interconnected interactive screens in about 12 minutes.
 
 ### Stitch Core Capabilities
 
-\`\`\`
-  Input Methods        Output Formats        Killer Features
- ┌─────────────────┐  ┌──────────────────┐  ┌────────────────────┐
- │ Text prompts     │  │ Multi-page proto │  │ DESIGN.md           │
- │ Screenshots      │  │ HTML/CSS export   │  │ → Exports tokens    │
- │ Hand sketches    │  │ React / Vue       │  │ → Cursor reads it    │
- │ Voice commands   │  │ Tailwind / Flutter│  │ → Code = branded    │
- │ Competitor URLs  │  │ Editable Figma    │  │                      │
- │                  │  │ Clickable proto   │  │ Style Injection      │
- │ Completely FREE ✨│  │                  │  │ → Paste URL, absorb  │
- └─────────────────┘  └──────────────────┘  └────────────────────┘
-\`\`\`
+| Dimension | Details |
+|---|---|
+| Input | Text prompts, screenshots, hand sketches, voice commands, competitor URLs |
+| Output | Multi-page prototypes, HTML/CSS, React/Vue/Tailwind/Flutter, editable Figma files |
+| Key Features | DESIGN.md token export, Style Injection (paste URL to absorb style), Voice Canvas |
+| Price | Completely free (Beta), 350 standard generations/month, 50-200 experimental |
 
 ### DESIGN.md — The Bridge from Design to Code
 
-Stitch's most underrated feature. Export a \`DESIGN.md\` file from any prototype:
+Stitch's most underrated feature. Export a `DESIGN.md` file:
 
 \`\`\`markdown
 # Design System
@@ -110,179 +62,104 @@ Stitch's most underrated feature. Export a \`DESIGN.md\` file from any prototype
 - Card: 16px padding, 1px neutral-200 border, 8px radius
 \`\`\`
 
-Drop this into Cursor or Claude Code. The AI writes code that carries your brand DNA automatically. Design-to-code is no longer "designer sends a screenshot, developer guesses the rest."
+Drop this into Cursor or Claude Code. AI-generated code carries your brand DNA automatically.
 
-### Stitch Limitations (Know These)
+### Stitch Limitations
 
-\`\`\`
- ✅ Great for: proof of concept, rapid exploration, founder MVPs
- ❌ Not for:
-    · Production polish — output is mid-fidelity, needs manual refinement
-    · Design system governance — no component libraries or token enforcement
-    · Team collaboration — single-user, no real-time multiplayer
-    · Accessibility compliance — WCAG contrast needs manual review
-    · Complex animations — micro-interactions and custom motion aren't supported
-\`\`\`
+Great for proof of concept, rapid exploration, founder MVPs. Not for production polish (mid-fidelity output needs manual refinement), design system governance (no component libraries or token enforcement), team collaboration (single-user), accessibility compliance (WCAG needs manual review), or complex animations.
 
 ## Part 3: Figma Make — Design to Production Code
 
-If Stitch is "idea → draft," Figma Make is "design → production code."
+If Stitch is "idea to draft," Figma Make is "design to production code." The May 2026 Git integration is the real watershed — designers can now edit production code directly within Figma, with all changes going through engineering PR review.
 
-### Make's Core Pipeline
+### Make Workflow
 
-\`\`\`
-  Figma Make Workflow
-  ┌─────────────────────────────────────────────────────┐
-  │                                                     │
-  │  Figma Design File                                   │
-  │      ↓                                               │
-  │  Make AI Agent parses layout, components, tokens     │
-  │      ↓                                               │
-  │  Generates code (React / Vue / HTML)                 │
-  │      ↓                                               │
-  │  Connects to your Git repo ← New in May 2026!        │
-  │      ↓                                               │
-  │  AI edits production code: spacing, colors, layout    │
-  │      ↓                                               │
-  │  Creates Branch → Opens PR → CI/CD runs tests        │
-  │                                                     │
-  │  💡 Designers edit production code directly,         │
-  │     but all changes go through engineering review     │
-  └─────────────────────────────────────────────────────┘
-\`\`\`
+| Step | Action |
+|---|---|
+| Step 1 | Figma design is parsed by Make AI Agent — layout, components, tokens extracted |
+| Step 2 | AI generates code (React / Vue / HTML), outputs directly to your Git repository |
+| Step 3 | Designer edits visually: select element → adjust color/spacing/layout → AI modifies source |
+| Step 4 | Auto-create Branch → Submit PR → CI/CD tests → Engineer Code Review |
 
 ### Make Kits — AI Output With Your Design System
 
-Launched April 2026. Pack your npm component library + Figma Variables + Design Tokens into a Kit:
-
-\`\`\`
- Make Kit = npm packages + Figma Library + Design Tokens + Brand Guidelines
-
- Result: Make generates code using YOUR Button, Card, and Modal components,
-        not reinventing them from scratch every time
-\`\`\`
+Launched April 2026. Package your npm component library, Figma Variables, Design Tokens, and brand guidelines into a Kit. Result: Make generates code using YOUR components, not reinventing them from scratch.
 
 ### Pricing
 
-\`\`\`
- Professional: $16/mo  →  3,000 AI credits
- Organization: $55/mo  →  4,250 AI credits
- Enterprise:   $90/mo  →  More credits + private deployment
+| Plan | Monthly | AI Credits |
+|---|---|---|
+| Professional | $16 | 3,000 |
+| Organization | $55 | 4,250 |
+| Enterprise | $90 | More + private deployment |
 
- One screen generation ≈ 5-15 credits
-\`\`\`
+One screen generation uses roughly 5-15 credits.
 
 ## Part 4: v0 by Vercel — Component-Level Code Generation
 
-If Stitch does "whole pages" and Figma Make does "design to code," v0 does **production component generation.**
-
-\`\`\`
- v0's positioning:
- ┌────────────────────────────────────────────┐
- │ "Give me a SaaS pricing page, 3 tiers,     │
- │  middle one recommended"                    │
- │                    ↓                        │
- │  Output: TypeScript + Tailwind + shadcn/ui  │
- │         Copy-paste into project, zero edits │
- │                                             │
- │  Price: $20/mo, saves 30-60 min per component│
- └────────────────────────────────────────────┘
-\`\`\`
-
-v0 generates actual production code — full TypeScript types, accessibility attributes, responsive breakpoints all configured. Not the "looks-like-code" that Stitch outputs. A different tier of quality.
+If Stitch handles whole pages and Figma Make handles design-to-code, v0 handles **production component generation.** Input: "a SaaS pricing page, 3 tiers, middle one recommended." Output: TypeScript + Tailwind + shadcn/ui — production-ready, zero edits needed. $20/month, saves 30-60 minutes per component.
 
 ## Part 5: Cursor + Figma MCP — The Ultimate Designer-to-Code Weapon
 
-Cursor reads Figma files directly via MCP (Model Context Protocol). The most underrated efficiency leap of 2026:
+Cursor reads Figma files directly via MCP (Model Context Protocol). The most underrated efficiency leap of 2026.
 
-\`\`\`
- Cursor's Three Modes               What Figma MCP Reads
- ┌──────────────────────┐    ┌──────────────────────────┐
- │ Ask: understand code  │    │ Layout structure          │
- │ Plan: design approach │    │ Design Tokens (color/spacing)│
- │ Agent: execute edits  │    │ Component names & props   │
- └──────────────────────┘    │ Text content              │
-                              │ Interaction states         │
-                              └──────────────────────────┘
+| Cursor Mode | Function |
+|---|---|
+| Ask | Understand code, ask questions |
+| Plan | Design approach, write specs |
+| Agent | Execute edits directly |
 
- Flow: Figma design → Cursor reads it → AI writes code in your project
-       Designer doesn't need to code. AI handles the translation.
-\`\`\`
+| Figma MCP Reads | Detail |
+|---|---|
+| Layout structure | Full Auto Layout hierarchy |
+| Design Tokens | Colors, spacing, typography |
+| Component names & props | Direct mapping to code components |
+| Text content | No manual copying needed |
+| Interaction states | hover, active, focus, etc. |
+
+Flow: Figma design → Cursor reads it → AI writes code in your project. Designers don't need to code. AI handles the translation.
 
 ## Part 6: Other Notable Tools
 
-\`\`\`
- Tool             Best For                          Price
- ─────────────────────────────────────────────────────────
- Uizard           Sketch → editable wireframes       Freemium
- UX Pilot         AI pages + predictive heatmaps     Free 7 screens / $19/mo
- Framer AI        Marketing sites & landing pages    Free / Pro $20/mo
- Lovable          Full-stack MVP (front+backend)     Freemium
- Bolt.new         In-browser full-stack apps         Freemium
- Replit Agent 4   Multi-agent full-stack builds      Subscription
-\`\`\`
+| Tool | Best For | Price |
+|---|---|---|
+| Uizard | Sketch to editable wireframes | Freemium |
+| UX Pilot | AI pages + predictive heatmaps | Free 7 screens / $19/mo |
+| Framer AI | Marketing sites & landing pages | Free / Pro $20/mo |
+| Lovable | Full-stack MVP (front+backend) | Freemium |
+| Bolt.new | In-browser full-stack apps | Freemium |
+| Replit Agent 4 | Multi-agent full-stack builds | Subscription |
 
-## Part 7: The Production Workflow — From Zero to Deploy
+## Part 7: The Production Workflow — Zero to Deploy
 
 ![AI workflow pipeline](/gifs/a11_flow.gif)
-*▲ The four-layer tool pipeline — Stitch explore → Figma refine → v0 components → Cursor assemble. 60-75% time savings vs. traditional flow.*
+*▲ Four-layer pipeline — Stitch explore to Figma refine to v0 components to Cursor assemble. 60-75% time savings.*
 
-\`\`\`
- Complete AI-Driven Design-to-Deploy Pipeline
-
- Phase 1 ── Explore ── Google Stitch (Free)
- │  Input: requirement brief + competitor URLs
- │  Output: 3-5 interactive prototypes
- │  Time: 20-30 minutes
- │
- Phase 2 ── Refine ── Figma + Figma Make
- │  Input: Stitch-exported Figma file
- │  Actions: bind Design Tokens, adjust interactions, polish
- │  Time: 1-2 hours
- │
- Phase 3 ── Components ── v0 by Vercel
- │  Input: screenshots of key Figma components
- │  Output: TypeScript + Tailwind production components
- │  Time: 5-10 min per component
- │
- Phase 4 ── Assemble ── Cursor + DESIGN.md
- │  Input: v0 components + Figma-exported DESIGN.md
- │  Actions: Cursor Agent assembles pages, wires APIs
- │  Time: 2-4 hours
- │
- ✅ Deliverable: deployable full application
-\`\`\`
+| Phase | Tool | Input | Output | Time |
+|---|---|---|---|---|
+| Phase 1 — Explore | Google Stitch (free) | Brief + competitor URLs | 3-5 interactive prototypes | 20-30 min |
+| Phase 2 — Refine | Figma + Figma Make | Stitch-exported Figma file | Token-bound high-fidelity design | 1-2 hrs |
+| Phase 3 — Components | v0 by Vercel | Key component screenshots | TypeScript + Tailwind components | 5-10 min each |
+| Phase 4 — Assemble | Cursor + DESIGN.md | v0 components + DESIGN.md | Deployable application | 2-4 hrs |
 
 ## Part 8: Pitfalls to Avoid
 
-\`\`\`
- ❌ Don't treat AI output as final
-    → Stitch produces "high-fidelity sketches," not production designs
-    → Colors, spacing, contrast, a11y all need manual review
+**Don't treat AI output as final.** Stitch produces high-fidelity sketches, not production designs. Colors, spacing, contrast, and accessibility all need manual review.
 
- ❌ Don't skip Design Tokens
-    → Without token constraints, AI generates different buttons every time
-    → Make Kits or DESIGN.md are the key to consistency
+**Don't skip Design Tokens.** Without token constraints, AI generates different buttons every time. Make Kits or DESIGN.md are the key to consistency.
 
- ❌ Don't expect one tool to do everything
-    → Stitch explore + Figma refine + v0 components + Cursor assemble
-    → Four layers, independent but connected. No silver bullet.
+**Don't expect one tool to do everything.** Stitch explore + Figma refine + v0 components + Cursor assemble. Four layers, independent but connected. No silver bullet.
 
- ✅ Try free tools first to build intuition
-    → Stitch is free, Cursor base tier is cheap
-    → Understand "what AI is good at" before paying for premium tools
+**Try free tools first to build intuition.** Stitch is free, Cursor base tier is cheap. Understand what AI is good at before paying for premium tools.
 
- ✅ Keep human review gates
-    → AI-generated code may have security holes, perf issues
-    → Code review and design review are still mandatory
-\`\`\`
+**Keep human review gates.** AI-generated code may have security holes or performance issues. Code review and design review are still mandatory.
 
 ## Part 9: The Bottom Line
 
 ![AI empowering designers](/gifs/a11_make.gif)
-*▲ AI isn't here to replace you — it's here to upgrade you from "pixel pusher" to "design director"*
+*▲ AI isn't here to replace you — it's here to upgrade you from pixel pusher to design director*
 
-The core competency for designers in 2026 has shifted. It's no longer "how fast can you work" or "how pixel-perfect are you." It's three things: **knowing which direction is right (judgment), knowing how to steer AI toward that direction (prompt engineering), and knowing where AI output will break (review skills).**
+The core competency for designers in 2026 has shifted. It's no longer about speed or pixel perfection. It's three things: **knowing which direction is right (judgment), knowing how to steer AI toward that direction (prompt engineering), and knowing where AI output will break (review skills).**
 
-Tools change. These three abilities don't. Invest your time there, not in manually adjusting 300 button border-radii.`
+Tools change. These three abilities don't. Invest your time there.`
 };
