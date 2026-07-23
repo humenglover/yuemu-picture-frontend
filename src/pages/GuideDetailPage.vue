@@ -187,7 +187,16 @@
             </ol>
             <blockquote v-else-if="block.type === 'quote'" class="article-quote" v-html="block.html"></blockquote>
             <div v-else-if="block.type === 'image'" class="article-img-container">
-              <img :src="block.src" :alt="block.alt" class="article-img-element" loading="lazy" referrerpolicy="no-referrer" @error="handleImgError" />
+              <!-- GIF → WebM: use <video> for animations, much smaller than GIF -->
+              <video
+                v-if="block.src?.endsWith('.gif')"
+                :src="block.src.replace('.gif', '.webm')"
+                autoplay loop muted playsinline
+                class="article-img-element"
+                :style="{ background: `url(${block.src}) center/contain no-repeat` }"
+                @error="handleVideoFallback($event, block)"
+              />
+              <img v-else :src="block.src" :alt="block.alt" class="article-img-element" loading="lazy" referrerpolicy="no-referrer" @error="handleImgError" />
               <p v-if="block.caption" class="article-img-caption">
                 <i class="fas fa-camera text-blue-500 mr-1.5"></i>{{ block.caption }}
               </p>
@@ -644,6 +653,22 @@ const handleImgError = (evt: Event) => {
   if (target && !target.dataset.fallbackTried) {
     target.dataset.fallbackTried = 'true'
     target.src = 'https://media.tenor.com/images/362a74c42416b772c8428807d9b93223/tenor.gif'
+  }
+}
+
+/** Video WebM fallback: if WebM fails, show original GIF as static background */
+const handleVideoFallback = (evt: Event, block: any) => {
+  const video = evt.target as HTMLVideoElement
+  if (video && block?.src) {
+    // Keep the GIF background visible and hide the broken video
+    video.style.display = 'none'
+    const img = document.createElement('img')
+    img.src = block.src
+    img.alt = block.alt || ''
+    img.className = 'article-img-element'
+    img.loading = 'lazy'
+    img.referrerPolicy = 'no-referrer'
+    video.parentNode?.insertBefore(img, video)
   }
 }
 

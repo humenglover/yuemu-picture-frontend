@@ -92,6 +92,7 @@
     "yumu-picture-frontend": "file:"
   },
   "devDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@tsconfig/node22": "^22.0.0",
     "@types/echarts": "^4.9.22",
     "@types/file-saver": "^2.0.7",
