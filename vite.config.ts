@@ -3,6 +3,7 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
+import compression from 'vite-plugin-compression'
 import Components from 'unplugin-vue-components/vite'
 import { VantResolver } from '@vant/auto-import-resolver'
 
@@ -23,6 +24,8 @@ export default defineConfig(({ command, mode }) => {
         }
       }),
       !isProd && vueDevTools(),
+      isProd && compression({ algorithm: 'brotliCompress', ext: '.br', threshold: 10240 }),
+      isProd && compression({ algorithm: 'gzip', ext: '.gz', threshold: 10240 }),
       AutoImport({
         resolvers: [VantResolver()],
       }),
@@ -71,10 +74,8 @@ export default defineConfig(({ command, mode }) => {
           manualChunks: {
             'vendor-antd': ['ant-design-vue', '@ant-design/icons-vue'],
             'vendor-echarts': ['echarts', 'vue-echarts', 'echarts-wordcloud'],
-            'vendor-three': ['three'],
             'vendor-vant': ['vant'],
             'vendor-markdown': ['bytemd', '@bytemd/vue-next', 'markdown-it', 'markdown-it-image'],
-            'vendor-swiper': ['swiper'],
             'vendor-utils': ['lodash-es', 'date-fns', 'axios', 'file-saver', 'browser-image-compression'],
           },
         },

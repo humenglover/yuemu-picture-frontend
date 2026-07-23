@@ -264,6 +264,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useStructuredData } from '@/composables/useStructuredData'
 
 const route = useRoute()
 const router = useRouter()
@@ -307,6 +308,23 @@ const article = computed(() => {
   }
   return articles.value[0] || null
 })
+
+// ── SEO: Article JSON-LD ──
+useStructuredData(() => ({
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: article.value?.title || t('pageTitles.GuideDetail'),
+  description: article.value?.desc || '',
+  datePublished: article.value?.date || '',
+  url: `https://www.yuemutuku.com${route.path}`,
+  author: { '@type': 'Organization', name: 'yuemutuku' },
+  publisher: {
+    '@type': 'Organization',
+    name: '悦木图库',
+    url: 'https://www.yuemutuku.com',
+    logo: { '@type': 'ImageObject', url: 'https://www.yuemutuku.com/logo.png' },
+  },
+}))
 
 const prevArticle = computed(() => {
   if (articleIndex.value > 0) {

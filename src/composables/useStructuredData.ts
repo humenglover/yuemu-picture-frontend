@@ -2,13 +2,24 @@
  * SEO structured data (JSON-LD) injection composable.
  * Injects <script type="application/ld+json"> into <head> and cleans up on unmount.
  */
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, watchEffect, isReactive, isRef, toValue } from 'vue'
 
-export function useStructuredData(data: Record<string, unknown>) {
+export function useStructuredData(data: Record<string, unknown> | (() => Record<string, unknown>)) {
   let scriptEl: HTMLScriptElement | null = null
 
   onMounted(() => {
-    scriptEl = injectStructuredData(data)
+    const initial = typeof data === 'function' ? data() : data
+    scriptEl = injectStructuredData(initial)
+
+    // If a getter was passed, reactively update on changes
+    if (typeof data === 'function') {
+      watchEffect(() => {
+        const updated = data()
+        if (scriptEl) {
+          scriptEl.textContent = JSON.stringify(updated, null, 2)
+        }
+      })
+    }
   })
 
   onUnmounted(() => {

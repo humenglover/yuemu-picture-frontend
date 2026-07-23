@@ -12,15 +12,13 @@
     "build:seo": "npm run build && npm run prerender && npm run sitemap:static",
     "prerender": "node scripts/prerender.mjs",
     "sitemap:static": "node scripts/generate-sitemap.mjs --static-only",
-    "prerender": "node scripts/prerender.mjs",
     "preview": "vite preview",
     "preview:info": "vite preview --host --port 4173",
     "type-check": "vue-tsc --build",
     "lint": "eslint ../yuemu-version/012 --fix",
     "format": "prettier --write ../yuemu-version/012/src",
     "api:generate": "node scripts/generate-api.mjs",
-    "sitemap:generate": "node scripts/generate-sitemap.mjs",
-    "sitemap:static": "node scripts/generate-sitemap.mjs --static-only"
+    "sitemap:generate": "node scripts/generate-sitemap.mjs"
   },
   "dependencies": {
     "@bytemd/plugin-gfm": "^1.22.0",
@@ -122,6 +120,7 @@
     "unplugin-auto-import": "^0.18.6",
     "unplugin-vue-components": "^0.27.5",
     "vite": "^6.0.1",
+    "vite-plugin-compression": "^0.5.1",
     "vite-plugin-prerender": "^1.0.8",
     "vite-plugin-vue-devtools": "^7.6.5",
     "vue-tsc": "^2.1.10"
