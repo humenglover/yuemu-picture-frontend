@@ -52,6 +52,133 @@
           <template v-for="(block, idx) in formattedBlocksWithId" :key="idx">
             <h2 v-if="block.type === 'h2'" :id="block.id" class="article-h2" v-html="block.html"></h2>
             <h3 v-else-if="block.type === 'h3'" :id="block.id" class="article-h3" v-html="block.html"></h3>
+            
+            <!-- 代码块与 ASCII 架构图支持 -->
+            <div v-else-if="block.type === 'code'" class="code-block-wrapper">
+              <div class="code-block-header">
+                <span class="code-lang-tag">{{ block.lang || 'CODE' }}</span>
+                <button class="copy-code-btn" @click="copyCode(block.code || '')">
+                  <i class="far fa-copy mr-1"></i>
+                  <span>{{ copyStatusMap[block.code || ''] ? 'Copied!' : 'Copy' }}</span>
+                </button>
+              </div>
+              <pre class="article-pre-code"><code>{{ block.code }}</code></pre>
+            </div>
+
+            <!-- Markdown 表格支持 -->
+            <div v-else-if="block.type === 'table'" class="article-table-container">
+              <table class="article-table">
+                <thead v-if="block.headers">
+                  <tr>
+                    <th v-for="(h, hIdx) in block.headers" :key="hIdx" v-html="parseInlineMarkdown(h)"></th>
+                  </tr>
+                </thead>
+                <tbody v-if="block.rows">
+                  <tr v-for="(r, rIdx) in block.rows" :key="rIdx">
+                    <td v-for="(c, cIdx) in r" :key="cIdx" v-html="parseInlineMarkdown(c)"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 实时交互效果演示卡片 (Live Interactive Feature Demo) -->
+            <div v-else-if="block.type === 'demo'" class="article-interactive-demo-card">
+              <!-- Demo 1: Scroll-driven animations -->
+              <div v-if="block.demoId === 'scroll-driven'" class="demo-box scroll-driven-demo">
+                <div class="demo-header">
+                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> 实时交互效果演示：Scroll-driven Animations</span>
+                </div>
+                <div class="demo-scroll-container">
+                  <div class="demo-scroll-content">
+                    <p class="demo-tip"><i class="fas fa-hand-pointer text-blue-500 mr-1.5"></i> 试着在下框中向下滑动，观察滚动时间线驱动的流畅交互：</p>
+                    <div v-for="n in 5" :key="n" class="demo-scroll-card">
+                      <div class="demo-card-icon"><i class="fas fa-cubes text-blue-500"></i></div>
+                      <div class="demo-card-text">
+                        <strong>滚动渲染节点 #{{ n }}</strong>
+                        <p>60fps 合成器线程硬件加速，零 JS 算力依赖</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Demo 2: View transitions -->
+              <div v-else-if="block.demoId === 'view-transitions'" class="demo-box view-transition-demo">
+                <div class="demo-header">
+                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> 实时交互效果演示：View Transitions 视图切换</span>
+                </div>
+                <div class="demo-body">
+                  <div class="demo-actions">
+                    <button class="demo-btn" :class="{ active: demoLayout === 'grid' }" @click="toggleDemoLayout('grid')">
+                      <i class="fas fa-th-large mr-1.5"></i> 网格模式 (Grid)
+                    </button>
+                    <button class="demo-btn" :class="{ active: demoLayout === 'list' }" @click="toggleDemoLayout('list')">
+                      <i class="fas fa-list mr-1.5"></i> 列表模式 (List)
+                    </button>
+                  </div>
+                  <div class="demo-cards-grid" :class="demoLayout">
+                    <div v-for="n in 3" :key="n" class="demo-vt-card">
+                      <div class="demo-vt-img"><i class="fas fa-image"></i></div>
+                      <div class="demo-vt-info">
+                        <h5>组件节点 #{{ n }}</h5>
+                        <p>原生视图快照平滑过渡</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Demo 3: Popover API -->
+              <div v-else-if="block.demoId === 'popover'" class="demo-box popover-demo">
+                <div class="demo-header">
+                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> 实时交互效果演示：Popover API 原生顶层弹窗</span>
+                </div>
+                <div class="demo-body text-center">
+                  <p class="demo-sub-text">点击下方按钮触发原生 Popover 弹出层（位于 Top Layer 隔离层，支持 ESC 与外部点击自动闭合）：</p>
+                  <div class="demo-actions justify-center">
+                    <button class="demo-btn primary-gradient" @click="showDemoPopover = !showDemoPopover">
+                      <i class="fas fa-window-restore mr-1.5"></i> 触发 Popover (Auto 模式)
+                    </button>
+                  </div>
+
+                  <!-- Popover 模拟浮层 -->
+                  <div v-if="showDemoPopover" class="demo-popover-backdrop" @click="showDemoPopover = false">
+                    <div class="demo-popover-content" @click.stop>
+                      <div class="popover-head">
+                        <h4><i class="fas fa-shield-alt text-blue-500 mr-2"></i> 原生 Popover 弹出面板</h4>
+                        <button class="close-icon" @click="showDemoPopover = false"><i class="fas fa-times"></i></button>
+                      </div>
+                      <p class="popover-body-p">此面板直接运行于浏览器 Top Layer，无视父节点 z-index 与 overflow: hidden 约束。</p>
+                      <button class="demo-btn outline mt-3" @click="showDemoPopover = false">关闭窗口 (Esc)</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Demo 4: Anchor Positioning -->
+              <div v-else-if="block.demoId === 'anchor-positioning'" class="demo-box anchor-demo">
+                <div class="demo-header">
+                  <span class="demo-badge"><i class="fas fa-play-circle mr-1.5"></i> 实时交互效果演示：Anchor Positioning 锚点定位与碰撞回退</span>
+                </div>
+                <div class="demo-body text-center">
+                  <p class="demo-sub-text">切换下方定位方向，观察浮层相对于锚点目标的位置追踪：</p>
+                  <div class="demo-actions justify-center mb-4">
+                    <button v-for="pos in ['bottom', 'top', 'right']" :key="pos" class="demo-btn" :class="{ active: demoAnchorPos === pos }" @click="demoAnchorPos = pos">
+                      定位方向: {{ pos }}
+                    </button>
+                  </div>
+                  <div class="demo-anchor-stage">
+                    <div class="demo-anchor-target">
+                      <i class="fas fa-bullseye text-blue-500 mr-1.5"></i> 锚点目标 (#target-btn)
+                      <div class="demo-anchor-tooltip" :class="`pos-${demoAnchorPos}`">
+                        <i class="fas fa-info-circle text-blue-400 mr-1"></i> Tooltip (position-anchor: --target-btn; position-area: {{ demoAnchorPos }})
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <ul v-else-if="block.type === 'ul'" class="article-ul">
               <li v-for="(itemHtml, iIdx) in block.items" :key="iIdx" class="article-li" v-html="itemHtml"></li>
             </ul>
@@ -189,6 +316,25 @@ const nextArticle = computed(() => {
   return null
 })
 
+const copyStatusMap = ref<Record<string, boolean>>({})
+const demoLayout = ref<'grid' | 'list'>('grid')
+const showDemoPopover = ref(false)
+const demoAnchorPos = ref<string>('bottom')
+
+const toggleDemoLayout = (mode: 'grid' | 'list') => {
+  demoLayout.value = mode
+}
+
+const copyCode = (codeText: string) => {
+  if (!codeText) return
+  navigator.clipboard.writeText(codeText).then(() => {
+    copyStatusMap.value[codeText] = true
+    setTimeout(() => {
+      copyStatusMap.value[codeText] = false
+    }, 2000)
+  })
+}
+
 const parseInlineMarkdown = (text: string): string => {
   if (!text) return ''
   let html = text
@@ -197,31 +343,63 @@ const parseInlineMarkdown = (text: string): string => {
     .replace(/>/g, '&gt;')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/__(.*?)__/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code class="inline-code">$1</code>')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener" class="article-inline-link">$1</a>')
   return html
 }
 
 interface MarkdownBlockItem {
   id?: string
-  type: 'h2' | 'h3' | 'ul' | 'ol' | 'quote' | 'image' | 'p'
+  type: 'h2' | 'h3' | 'ul' | 'ol' | 'quote' | 'image' | 'code' | 'p' | 'table' | 'demo'
   text: string
   html?: string
   items?: string[]
   src?: string
   alt?: string
   caption?: string
+  lang?: string
+  code?: string
+  demoId?: string
+  headers?: string[]
+  rows?: string[][]
 }
 
-const formattedBlocks = computed<MarkdownBlockItem[]>(() => {
-  if (!article.value || !article.value.content) return []
-  const rawBlocks = article.value.content.split(/\n\n+/).filter(Boolean)
-  const result: MarkdownBlockItem[] = []
+const parseNormalMarkdownText = (rawText: string, result: MarkdownBlockItem[]) => {
+  const rawBlocks = rawText.split(/\n\n+/).filter(Boolean)
 
   rawBlocks.forEach(rawBlock => {
     const trimmed = rawBlock.trim()
     const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean)
 
-    // 检查是否包含 Markdown 图片块或带有图注的图片块
+    if (lines.length === 0) return
+
+    // 检查 :::demo xxx ::: 演示块
+    const demoMatch = trimmed.match(/^:::demo\s+([\w\-]+)\s*:::$/)
+    if (demoMatch) {
+      result.push({
+        type: 'demo',
+        text: trimmed,
+        demoId: demoMatch[1]
+      })
+      return
+    }
+
+    // 检查 Markdown 表格
+    if (lines.length >= 2 && lines[0].includes('|') && lines[1].includes('|') && /^[\|\s\-\:]+$/.test(lines[1])) {
+      const parseRow = (rowStr: string) => rowStr.split('|').map(c => c.trim()).filter((_, idx, arr) => idx > 0 && idx < arr.length - 1)
+      const headers = parseRow(lines[0])
+      const rows = lines.slice(2).map(parseRow).filter(r => r.length > 0)
+      result.push({
+        type: 'table',
+        text: trimmed,
+        headers,
+        rows
+      })
+      return
+    }
+
+    // 检查图片块
     const firstLine = lines[0] || ''
     const singleImgMatch = firstLine.match(/^!\[(.*?)\]\((.*?)\)$/)
     if (singleImgMatch) {
@@ -243,7 +421,7 @@ const formattedBlocks = computed<MarkdownBlockItem[]>(() => {
       return
     }
 
-    // 检查是否有段落内包含图片的非规整结构
+    // 检查混在段落中的图片
     if (trimmed.includes('![') && trimmed.includes('](')) {
       const parts = trimmed.split(/(!\[.*?\]\(.*?\))/g)
       parts.forEach(part => {
@@ -269,40 +447,32 @@ const formattedBlocks = computed<MarkdownBlockItem[]>(() => {
       return
     }
 
-    // 检查是否全为无序列表 (- item 或 * item)
-    if (lines.length > 0 && lines.every(l => /^[\-\*]\s+/.test(l))) {
+    // 无序列表
+    if (lines.every(l => /^[\-\*]\s+/.test(l))) {
       const items = lines.map(l => parseInlineMarkdown(l.replace(/^[\-\*]\s+/, '')))
-      result.push({
-        type: 'ul',
-        text: trimmed,
-        items
-      })
+      result.push({ type: 'ul', text: trimmed, items })
       return
     }
 
-    // 检查是否全为有序列表 (1. item)
-    if (lines.length > 0 && lines.every(l => /^\d+\.\s+/.test(l))) {
+    // 有序列表
+    if (lines.every(l => /^\d+\.\s+/.test(l))) {
       const items = lines.map(l => parseInlineMarkdown(l.replace(/^\d+\.\s+/, '')))
-      result.push({
-        type: 'ol',
-        text: trimmed,
-        items
-      })
+      result.push({ type: 'ol', text: trimmed, items })
       return
     }
 
-    // 优先匹配 Level 1 标题 (## 开头 或 Chapter/一、二开头短句)
+    // H2 标题
     if (trimmed.startsWith('## ')) {
       const cleanText = trimmed.replace(/^##\s*/, '')
       result.push({ type: 'h2', text: cleanText, html: parseInlineMarkdown(cleanText) })
       return
     }
-    if (trimmed.length < 60 && /^(Chapter\s+[I|V|X\d]+|[一二三四五六七八九十]+)\s*[\.\、\:]?/.test(trimmed)) {
+    if (trimmed.length < 60 && /^(Chapter\s+[I|V|X\d]+|[一二三四五六七八九十]+|Part\s+\d+)\s*[\.\、\:]?/.test(trimmed)) {
       result.push({ type: 'h2', text: trimmed, html: parseInlineMarkdown(trimmed) })
       return
     }
 
-    // 优先匹配 Level 2 标题 (### 开头)
+    // H3 标题
     if (trimmed.startsWith('### ')) {
       const cleanText = trimmed.replace(/^###\s*/, '')
       result.push({ type: 'h3', text: cleanText, html: parseInlineMarkdown(cleanText) })
@@ -320,7 +490,7 @@ const formattedBlocks = computed<MarkdownBlockItem[]>(() => {
       return
     }
 
-    // 如果当前段落混入了无序列表
+    // 混入无序列表的处理
     if (lines.some(l => /^[\-\*]\s+/.test(l))) {
       let currentUlItems: string[] = []
       lines.forEach(l => {
@@ -340,9 +510,45 @@ const formattedBlocks = computed<MarkdownBlockItem[]>(() => {
       return
     }
 
-    // 其余全为正文段落
+    // 普通段落
     result.push({ type: 'p', text: trimmed, html: parseInlineMarkdown(trimmed) })
   })
+}
+
+const formattedBlocks = computed<MarkdownBlockItem[]>(() => {
+  if (!article.value || !article.value.content) return []
+
+  const content = article.value.content
+  const result: MarkdownBlockItem[] = []
+
+  const codeBlockRegex = /(?:```|\\`\\`\\`)(\w*)\r?\n([\s\S]*?)(?:```|\\`\\`\\`)/g
+
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    const textBefore = content.substring(lastIndex, match.index)
+    if (textBefore.trim()) {
+      parseNormalMarkdownText(textBefore, result)
+    }
+
+    const lang = match[1] ? match[1].trim() : 'code'
+    const code = match[2]
+
+    result.push({
+      type: 'code',
+      text: code,
+      lang: lang || 'code',
+      code: code
+    })
+
+    lastIndex = match.index + match[0].length
+  }
+
+  const textAfter = content.substring(lastIndex)
+  if (textAfter.trim()) {
+    parseNormalMarkdownText(textAfter, result)
+  }
 
   return result
 })
@@ -640,6 +846,106 @@ const goArticle = (id: string) => {
   font-size: 15px;
   color: var(--text-secondary, #475569);
   line-height: 1.7;
+}
+
+/* 代码块与 ASCII 架构图的高级视觉排版 */
+.code-block-wrapper {
+  margin: 28px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.code-lang-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.copy-code-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.copy-code-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.article-pre-code {
+  margin: 0;
+  padding: 20px 24px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #f1f5f9;
+  white-space: pre;
+  tab-size: 2;
+}
+
+.article-pre-code code {
+  font-family: inherit;
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* Markdown 表格排版 */
+.article-table-container {
+  margin: 28px 0;
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.article-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  text-align: left;
+}
+
+.article-table th {
+  background: var(--hover-background, #f8fafc);
+  padding: 12px 18px;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.article-table td {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+  color: var(--text-primary, #334155);
+}
+
+.article-table tr:last-child td {
+  border-bottom: none;
 }
 
 /* 动图与图片卡片容器 */
