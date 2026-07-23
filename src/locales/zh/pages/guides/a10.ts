@@ -36,11 +36,11 @@ export default {
 
 ### Token 命名规范
 
-- `color.brand.primary`：以语义命名，换了颜色名不变
-- 不要用 `color.blue.500`：以值命名，换颜色名就得全局搜索替换
-- `spacing.section.xl`：表达用途
-- 不要用 `spacing.48px`：绑定具体值
-- 推荐结构：`{类别}.{属性}.{变体}.{状态}`，例如 `color.text.primary.hover`
+- \`color.brand.primary\`：以语义命名，换了颜色名不变
+- 不要用 \`color.blue.500\`：以值命名，换颜色名就得全局搜索替换
+- \`spacing.section.xl\`：表达用途
+- 不要用 \`spacing.48px\`：绑定具体值
+- 推荐结构：\`{类别}.{属性}.{变体}.{状态}\`，例如 \`color.text.primary.hover\`
 
 ## 二、Figma Variables —— 把 Token 落到设计工具里
 
@@ -56,7 +56,7 @@ Figma Variables 是 Figma 原生实现 Design Tokens 的机制。2026 年支持�
 
 ### Modes 做主题切换
 
-同一个 Semantic Token，在不同 Mode 下映射到不同的 Primitive 值。以 `color/bg/primary` 为例：
+同一个 Semantic Token，在不同 Mode 下映射到不同的 Primitive 值。以 \`color/bg/primary\` 为例：
 
 | Mode | 映射值 |
 |---|---|
@@ -64,7 +64,7 @@ Figma Variables 是 Figma 原生实现 Design Tokens 的机制。2026 年支持�
 | Dark | neutral/900 |
 | High Contrast | #000000 |
 
-设计师在 Figma 里切换 Mode，整页自动换肤。前端在代码里切换 `data-theme`，CSS 变量自动换值。做到这一步，设计稿和代码共享同一套变量体系了。
+设计师在 Figma 里切换 Mode，整页自动换肤。前端在代码里切换 \`data-theme\`，CSS 变量自动换值。做到这一步，设计稿和代码共享同一套变量体系了。
 
 ## 三、组件库搭建 —— 先做 10 个核心组件
 
@@ -72,11 +72,11 @@ Figma Variables 是 Figma 原生实现 Design Tokens 的机制。2026 年支持�
 
 ### 组件构建原则
 
-**第一，所有视觉属性引用 Token，禁止硬编码。** 用 `var(--color-brand-primary)` 而不是 `#2563eb`。
+**第一，所有视觉属性引用 Token，禁止硬编码。** 用 \`var(--color-brand-primary)\` 而不是 \`#2563eb\`。
 
 **第二，先定义所有状态，再设计默认状态。** 覆盖 default → hover → active → focus → disabled → loading → error，七种状态一个不能少。
 
-**第三，Figma 组件命名和代码组件命名保持一致。** 比如 Figma 中 `Type=Primary, Size=Medium, State=Hover` 应对应代码中 `<Button variant="primary" size="md" />`。
+**第三，Figma 组件命名和代码组件命名保持一致。** 比如 Figma 中 \`Type=Primary, Size=Medium, State=Hover\` 应对应代码中 \`<Button variant="primary" size="md" />\`。
 
 **第四，用 Auto Layout 做间距。** 别手动拖像素。
 

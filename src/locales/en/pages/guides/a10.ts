@@ -36,11 +36,11 @@ Components reference this layer directly. Examples: button.primary.bg references
 
 ### Naming Conventions
 
-- `color.brand.primary` — named by semantics, survives rebrands
-- Never use `color.blue.500` — named by value, breaks on any color change
-- `spacing.section.xl` — expresses purpose
-- Never use `spacing.48px` — hardcodes the value
-- Recommended structure: `{category}.{property}.{variant}.{state}`, e.g. `color.text.primary.hover`
+- \`color.brand.primary\` — named by semantics, survives rebrands
+- Never use \`color.blue.500\` — named by value, breaks on any color change
+- \`spacing.section.xl\` — expresses purpose
+- Never use \`spacing.48px\` — hardcodes the value
+- Recommended structure: \`{category}.{property}.{variant}.{state}\`, e.g. \`color.text.primary.hover\`
 
 ## Part 2: Figma Variables — Implementing Tokens in Your Design Tool
 
@@ -56,7 +56,7 @@ Figma Variables is the native mechanism for Design Tokens inside Figma. 2026 sup
 
 ### Modes for Theming
 
-The same Semantic Token maps to different Primitive values per Mode. For `color/bg/primary`:
+The same Semantic Token maps to different Primitive values per Mode. For \`color/bg/primary\`:
 
 | Mode | Mapped Value |
 |---|---|
@@ -64,19 +64,19 @@ The same Semantic Token maps to different Primitive values per Mode. For `color/
 | Dark | neutral/900 |
 | High Contrast | #000000 |
 
-Designers switch Modes in Figma — the entire page re-themes instantly. Developers switch `data-theme` in code — CSS variables swap values. At this point, your design file and codebase share the same variable system.
+Designers switch Modes in Figma — the entire page re-themes instantly. Developers switch \`data-theme\` in code — CSS variables swap values. At this point, your design file and codebase share the same variable system.
 
-## Part 3: Building the Component Library — Start With 10
+## Part 3: Component Library Architecture — Start With 10 Core Components
 
-Don't try to build 50 components for v1. Ship these 10 first: Button, Input, Select, Modal, Card, Badge, Avatar, Toast, Tabs, Table. Iterate from real usage.
+Don't build 50 components on day one. Start with these 10 core primitives: Button, Input, Select, Modal, Card, Badge, Avatar, Toast, Tabs, Table. Iterate after real usage.
 
-### Component Building Principles
+### Component Design Principles
 
-**First, every visual property references a Token. Never hardcode.** Use `var(--color-brand-primary)`, not `#2563eb`.
+**First, every visual property references a Token. Never hardcode.** Use \`var(--color-brand-primary)\`, not \`#2563eb\`.
 
 **Second, define all states before designing the default state.** Cover default → hover → active → focus → disabled → loading → error. All seven states, no exceptions.
 
-**Third, Figma component names must match code component names.** Figma: `Type=Primary, Size=Medium, State=Hover`. Code: `<Button variant="primary" size="md" />`.
+**Third, Figma component names must match code component names.** Figma: \`Type=Primary, Size=Medium, State=Hover\`. Code: <Button variant="primary" size="md" />.
 
 **Fourth, use Auto Layout for spacing.** Never drag pixels manually.
 

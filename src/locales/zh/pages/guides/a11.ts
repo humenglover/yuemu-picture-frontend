@@ -48,7 +48,7 @@ Vibe Design：描述你想要的感觉和目的，比如"一个暗色模式的 S
 
 ### DESIGN.md —— 连接设计到代码的桥梁
 
-这是 Stitch 最被低估的功能。生成设计后导出一个 `DESIGN.md` 文件：
+这是 Stitch 最被低估的功能。生成设计后导出一个 \`DESIGN.md\` 文件：
 
 \`\`\`markdown
 # Design System

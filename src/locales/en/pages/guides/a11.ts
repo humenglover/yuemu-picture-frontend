@@ -48,7 +48,7 @@ Vibe Design: describe the feeling and intent — "a dark-mode SaaS dashboard, da
 
 ### DESIGN.md — The Bridge from Design to Code
 
-Stitch's most underrated feature. Export a `DESIGN.md` file:
+Stitch's most underrated feature. Export a \`DESIGN.md\` file:
 
 \`\`\`markdown
 # Design System
