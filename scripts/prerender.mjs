@@ -26,7 +26,7 @@ const DIST_INDEX = resolve(DIST, 'index.html')
 
 // Safety checks
 if (!existsSync(DIST_INDEX)) {
-  console.error(`❌ dist/index.html not found at ${DIST_INDEX}. Run "npm run build" first.`)
+  console.error(`dist/index.html not found at ${DIST_INDEX}. Run "npm run build" first.`)
   process.exit(1)
 }
 console.log(`  Dist: ${DIST}`)
@@ -34,7 +34,7 @@ console.log(`  Dist: ${DIST}`)
 // ── Auto-discover guide articles ──
 const guideArticles = discoverArticles()
 const guideRoutes = guideArticles.map(a => `/guides/${a.id}`)
-console.log(`  🧭 Auto-discovered ${guideRoutes.length} guide routes\n`)
+console.log(`  Auto-discovered ${guideRoutes.length} guide routes\n`)
 
 // ── Config ──
 const STATIC_ROUTES = [
@@ -116,7 +116,7 @@ function getContentType(file) {
 
 // ── Main ──
 async function main() {
-  console.log('🚀 Starting prerender...\n')
+  console.log('Starting prerender...\n')
 
   // Find browser
   const browserPath = await findBrowser()
@@ -138,17 +138,41 @@ async function main() {
   try {
     for (const route of ROUTES) {
       const url = `${BASE}${route}`
-      console.log(`  📄 ${route}`)
+      console.log(`  ${route}`)
       const page = await browser.newPage()
 
       try {
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 })
-        // Wait a bit for Vue to render
-        await new Promise(r => setTimeout(r, 2000))
+
+        // Wait for Vue to actually render content before capturing
+        const isGuidePage = route.startsWith('/guides/') && route !== '/guides'
+        if (isGuidePage) {
+          try {
+            await page.waitForSelector('.article-body-content, .article-p, .not-found-card', { timeout: 10000 })
+          } catch {
+            console.error(`    Vue render timeout for ${route}, capturing anyway`)
+          }
+        } else {
+          try {
+            await page.waitForSelector('#app > div, .home-page, .page-wrapper', { timeout: 8000 })
+          } catch {
+            // Some pages might render differently, proceed anyway
+          }
+        }
+        // Extra 500ms grace for async sub-components
+        await new Promise(r => setTimeout(r, 500))
 
         const html = await page.content()
         // Inject prerender signal meta so Google knows this is static
         const finalHtml = html.replace('</head>', '<meta name="prerender-status" content="true">\n</head>')
+
+        // Verify content was actually rendered for guide pages
+        if (isGuidePage) {
+          const hasContent = html.includes('article-body-content') || html.includes('article-p') || html.includes('not-found-card')
+          if (!hasContent) {
+            console.error(`    Content not rendered for ${route} — page may be empty`)
+          }
+        }
 
         // Write to dist/{route}/index.html
         const dir = resolve(DIST, route.replace(/^\//, ''))
@@ -156,7 +180,7 @@ async function main() {
         await fs.writeFile(resolve(dir, 'index.html'), finalHtml, 'utf-8')
         count++
       } catch (err) {
-        console.error(`    ⚠ Failed: ${err.message}`)
+        console.error(`    Failed: ${err.message}`)
       } finally {
         await page.close()
       }
@@ -166,11 +190,11 @@ async function main() {
     server.close()
   }
 
-  console.log(`\n✅ Prerendered ${count}/${ROUTES.length} routes → dist/`)
+  console.log(`\nPrerendered ${count}/${ROUTES.length} routes -> dist/`)
   console.log('   Googlebot / Bing / Baidu can now index each page as static HTML.')
 }
 
 main().catch(err => {
-  console.error('❌', err.message)
+  console.error('', err.message)
   process.exit(1)
 })

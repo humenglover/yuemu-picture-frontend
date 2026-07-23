@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   id: 'a12',
   categoryKey: 'design',
   tag: '视觉设计',
@@ -55,10 +55,10 @@
 
 | 曲线名 | cubic-bezier 值 | 适用场景 |
 |---|---|---|
-| ease-out-expo | `(0.16, 1, 0.3, 1)` | 入场动画：快速进入，缓缓停稳 |
-| ease-out-quart | `(0.25, 1, 0.5, 1)` | 日常默认：比 expo 略柔和 |
-| ease-in | `(0.5, 0, 0.75, 0)` | 退出动画：加速离开 |
-| ease-in-out | `(0.65, 0, 0.35, 1)` | 状态切换：来回对称 |
+| ease-out-expo | \`(0.16, 1, 0.3, 1)\` | 入场动画：快速进入，缓缓停稳 |
+| ease-out-quart | \`(0.25, 1, 0.5, 1)\` | 日常默认：比 expo 略柔和 |
+| ease-in | \`(0.5, 0, 0.75, 0)\` | 退出动画：加速离开 |
+| ease-in-out | \`(0.65, 0, 0.35, 1)\` | 状态切换：来回对称 |
 
 ![缓动曲线对比](/gifs/a12_easing.gif)
 *▲ 图：同一位移、不同缓动——linear 像机器人，ease-out 像呼吸，bounce 像十年前的网页*

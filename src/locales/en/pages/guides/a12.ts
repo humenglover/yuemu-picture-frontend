@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   id: 'a12',
   categoryKey: 'design',
   tag: 'Visual Design',
@@ -55,10 +55,10 @@ When list items appear sequentially, delay each item by 40-80ms. Cap total stagg
 
 | Curve | cubic-bezier | Use Case |
 |---|---|---|
-| ease-out-expo | `(0.16, 1, 0.3, 1)` | Entrances: arrive fast, settle gently |
-| ease-out-quart | `(0.25, 1, 0.5, 1)` | Daily default: slightly softer than expo |
-| ease-in | `(0.5, 0, 0.75, 0)` | Exits: accelerate away |
-| ease-in-out | `(0.65, 0, 0.35, 1)` | State toggles: symmetric back-and-forth |
+| ease-out-expo | \`(0.16, 1, 0.3, 1)\` | Entrances: arrive fast, settle gently |
+| ease-out-quart | \`(0.25, 1, 0.5, 1)\` | Daily default: slightly softer than expo |
+| ease-in | \`(0.5, 0, 0.75, 0)\` | Exits: accelerate away |
+| ease-in-out | \`(0.65, 0, 0.35, 1)\` | State toggles: symmetric back-and-forth |
 
 ![Easing comparison](/gifs/a12_easing.gif)
 *▲ Same displacement, different easing — linear feels robotic, ease-out breathes, bounce screams 2015*
