@@ -76,13 +76,7 @@ export default defineConfig(({ command, mode }) => {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            // ── 框架核心（vue + 路由 + 状态 + i18n） ──
-            if (id.includes('node_modules/vue') || id.includes('node_modules/@vue')) {
-              return 'vendor-vue'
-            }
-            if (id.includes('node_modules/vue-router')) return 'vendor-vue'
-            if (id.includes('node_modules/pinia')) return 'vendor-vue'
-            if (id.includes('node_modules/vue-i18n') || id.includes('node_modules/@intlify')) return 'vendor-vue'
+            // ── Vue 全家桶留在主 bundle —— Antd/Vant 等 UI 库启动时依赖它，拆出去会加载顺序错乱 ──
 
             // ── UI 库 ──
             if (id.includes('node_modules/ant-design-vue') || id.includes('node_modules/@ant-design')) {
