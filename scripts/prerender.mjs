@@ -218,6 +218,13 @@ for (const locale of LOCALES) {
   }
 }
 
-console.log(`\nGenerated ${count} static HTML files -> dist/`)
+// Also fix root index.html (SPA fallback for URLs without locale prefix)
+// Use zh default since zh is the default locale
+const rootHtml = generateHTML('zh', '/')
+  .replace(`<link rel="canonical" href="${BASE_URL}/zh">`, `<link rel="canonical" href="${BASE_URL}">`)
+writeFileSync(DIST_INDEX, rootHtml, 'utf-8')
+console.log(`  /index.html (root fallback)`)
+
+console.log(`\nGenerated ${count} static HTML files + root fallback -> dist/`)
 console.log('Each has proper <title>, <meta>, hreflang, canonical for its locale.')
 console.log('Google / Baidu / Bing all see correct TDK without executing JS.')

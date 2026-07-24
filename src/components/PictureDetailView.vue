@@ -1,6 +1,6 @@
-﻿<template>
+<template>
   <Teleport to="body">
-    <div class="yuemu-picture-modal-overlay" style="background-color: transparent;" @click.self="handleClose" ref="overlayRef">
+    <div class="yuemu-picture-modal-overlay" @click.self="handleClose" @wheel.self.prevent @touchmove.self.prevent ref="overlayRef">
       <div class="yuemu-modal-container" :class="{ 'yuemu-is-mobile': isMobile }">
         <button class="yuemu-modal-close-btn" @click="handleClose" :title="t('components.pictureDetailView.close')">
           <i class="fas fa-times"></i>
@@ -327,6 +327,7 @@ const startEnterAnimation = () => {
     }
     el.style.transition = 'background-color 0.3s ease'
     el.style.backgroundColor = 'rgba(0, 0, 0, 0.65)'
+    isAnimating.value = false
     return
   }
   originImageEl.value = originEl
@@ -334,7 +335,10 @@ const startEnterAnimation = () => {
   const firstRect = originEl.getBoundingClientRect()
   nextTick(() => {
     const finalImageEl = (mainImageRef.value || el.querySelector('.yuemu-main-image')) as HTMLImageElement
-    if (!finalImageEl) return
+    if (!finalImageEl) {
+      isAnimating.value = false
+      return
+    }
     const lastRect = finalImageEl.getBoundingClientRect()
     const lastWidth = lastRect.width || window.innerWidth * 0.5
     const lastHeight = lastRect.height || window.innerHeight * 0.5
@@ -420,6 +424,8 @@ const handleClose = () => {
   window.removeEventListener('touchmove', preventScroll)
   window.removeEventListener('keydown', handleKeydown)
   document.removeEventListener('click', handleClickOutside)
+  document.body.style.overflow = ''
+  document.documentElement.style.overflow = ''
   const el = overlayRef.value
   if (!el) {
     emit('close')
@@ -538,7 +544,7 @@ const shareLink = computed(() => {
 })
 const isAnimating = ref(true)
 const showImagePreview = () => {
-  if (isAnimating.value || isClosing.value) return
+  if (isClosing.value) return
   showPreview.value = true
 }
 const handlePreviewChange = (visible: boolean) => {
@@ -574,6 +580,9 @@ onMounted(async () => {
   loadCopyrightInfo()
   window.addEventListener('keydown', handleKeydown)
   document.addEventListener('click', handleClickOutside)
+  // 保持主页面原本位置不触顶，锁定 Body 滚动
+  document.body.style.overflow = 'hidden'
+  document.documentElement.style.overflow = 'hidden'
   // 零排版副作用滚动锁定：通过原生事件劫持，允许内部滚动区正常工作，彻底封死其余区域穿透。
   window.addEventListener('wheel', preventScroll, { passive: false })
   window.addEventListener('touchmove', preventScroll, { passive: false })
@@ -595,6 +604,8 @@ onUnmounted(() => {
   if (originImageEl.value) {
     originImageEl.value.style.visibility = 'visible'
   }
+  document.body.style.overflow = ''
+  document.documentElement.style.overflow = ''
   window.removeEventListener('keydown', handleKeydown)
   document.removeEventListener('click', handleClickOutside)
   window.removeEventListener('wheel', preventScroll)
@@ -1147,6 +1158,7 @@ onUnmounted(() => {
   display: flex; align-items: center; justify-content: center;
   background: rgba(0, 0, 0, 0.65);
   overflow: hidden;
+  overscroll-behavior: contain;
 }
 .yuemu-modal-container {
   width: 94vw; height: 94vh; max-width: 1300px;
@@ -1288,7 +1300,7 @@ onUnmounted(() => {
 .guess-like-bottom { text-align: center; padding: 30px 0; font-size: 14px; color: var(--text-secondary); }
 .load-more-btn { display: inline-block; padding: 8px 16px; border-radius: 20px; background: var(--hover-background); cursor: pointer; transition: all 0.2s; }
 .load-more-btn:hover { background: var(--border-color); color: var(--text-primary); }
-.yuemu-main-image { max-width: 90%; max-height: 90%; object-fit: contain; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-radius: 4px; cursor: zoom-in; z-index: 2; }
+.yuemu-main-image { max-width: 90%; max-height: 90%; object-fit: contain; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-radius: 4px; cursor: pointer; z-index: 2; }
 .yuemu-details-section { flex: 3; background: var(--card-background); display: flex; flex-direction: column; position: relative; border-left: 1px solid var(--border-color); overflow: hidden; }
 .yuemu-details-header { flex-shrink: 0; padding: 24px; padding-bottom: 16px; background: var(--card-background); border-bottom: 1px solid var(--border-color); z-index: 2; }
 .yuemu-details-inner { flex: 1; overflow-y: auto; padding: 24px; padding-bottom: 40px; overscroll-behavior: contain; }
