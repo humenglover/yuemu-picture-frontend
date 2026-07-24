@@ -71,16 +71,63 @@ export default defineConfig(({ command, mode }) => {
       },
       rollupOptions: {
         output: {
-          manualChunks: {
-            'vendor-antd': ['ant-design-vue', '@ant-design/icons-vue'],
-            'vendor-echarts': ['echarts', 'vue-echarts', 'echarts-wordcloud'],
-            'vendor-vant': ['vant'],
-            'vendor-markdown': ['bytemd', '@bytemd/vue-next', 'markdown-it', 'markdown-it-image'],
-            'vendor-utils': ['lodash-es', 'date-fns', 'axios', 'file-saver', 'browser-image-compression'],
+          manualChunks(id) {
+            // ── 框架核心（vue + 路由 + 状态 + i18n） ──
+            if (id.includes('node_modules/vue') || id.includes('node_modules/@vue')) {
+              return 'vendor-vue'
+            }
+            if (id.includes('node_modules/vue-router')) return 'vendor-vue'
+            if (id.includes('node_modules/pinia')) return 'vendor-vue'
+            if (id.includes('node_modules/vue-i18n') || id.includes('node_modules/@intlify')) return 'vendor-vue'
+
+            // ── UI 库 ──
+            if (id.includes('node_modules/ant-design-vue') || id.includes('node_modules/@ant-design')) {
+              return 'vendor-antd'
+            }
+            if (id.includes('node_modules/vant')) return 'vendor-vant'
+
+            // ── 图表 ──
+            if (id.includes('node_modules/echarts') || id.includes('node_modules/vue-echarts') || id.includes('node_modules/echarts-wordcloud')) {
+              return 'vendor-echarts'
+            }
+            if (id.includes('node_modules/zrender')) return 'vendor-echarts'
+
+            // ── Markdown 编辑器 ──
+            if (id.includes('node_modules/bytemd') || id.includes('node_modules/markdown-it') || id.includes('node_modules/@bytemd')) {
+              return 'vendor-markdown'
+            }
+
+            // ── 3D / 动画 / 音频 ──
+            if (id.includes('node_modules/three')) return 'vendor-three'
+            if (id.includes('node_modules/swiper')) return 'vendor-swiper'
+            if (id.includes('node_modules/lottie')) return 'vendor-lottie'
+            if (id.includes('node_modules/wavesurfer')) return 'vendor-audio'
+
+            // ── 图像处理 ──
+            if (id.includes('node_modules/html2canvas')) return 'vendor-image'
+            if (id.includes('node_modules/dom-to-image')) return 'vendor-image'
+            if (id.includes('node_modules/compressorjs')) return 'vendor-image'
+            if (id.includes('node_modules/colorthief')) return 'vendor-image'
+            if (id.includes('node_modules/browser-image-compression')) return 'vendor-image'
+            if (id.includes('node_modules/tui-image-editor')) return 'vendor-image'
+
+            // ── 工具库 ──
+            if (id.includes('node_modules/lodash-es') || id.includes('node_modules/lodash/')) return 'vendor-utils'
+            if (id.includes('node_modules/date-fns')) return 'vendor-utils'
+            if (id.includes('node_modules/axios')) return 'vendor-utils'
+            if (id.includes('node_modules/file-saver')) return 'vendor-utils'
+            if (id.includes('node_modules/qrcode') || id.includes('node_modules/qrcodejs2') || id.includes('node_modules/jsqr')) return 'vendor-qr'
+
+            // ── VueUse ──
+            if (id.includes('node_modules/@vueuse')) return 'vendor-vueuse'
+
+            // ── 音频处理 ──
+            if (id.includes('node_modules/lamejs') || id.includes('node_modules/music-metadata')) return 'vendor-audio'
+            if (id.includes('node_modules/recorder')) return 'vendor-audio'
           },
         },
       },
-      chunkSizeWarningLimit: 1000,
+      chunkSizeWarningLimit: 500,
     },
     define: {
       // 开启/关闭全局广告
