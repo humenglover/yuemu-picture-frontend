@@ -6,6 +6,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import compression from 'vite-plugin-compression'
 import Components from 'unplugin-vue-components/vite'
 import { VantResolver } from '@vant/auto-import-resolver'
+import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -28,9 +29,12 @@ export default defineConfig(({ command, mode }) => {
       isProd && compression({ algorithm: 'gzip', ext: '.gz', threshold: 10240 }),
       AutoImport({
         resolvers: [VantResolver()],
+        imports: [
+          { 'ant-design-vue': ['message', 'notification', 'Modal'] },
+        ],
       }),
       Components({
-        resolvers: [VantResolver()],
+        resolvers: [VantResolver(), AntDesignVueResolver({ importStyle: false })],
       }),
     ].filter(Boolean),
     resolve: {

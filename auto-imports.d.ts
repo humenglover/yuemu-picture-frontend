@@ -6,7 +6,10 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const Modal: typeof import('ant-design-vue')['Modal']
   const VanDialog: typeof import('vant/es')['Dialog']
+  const message: typeof import('ant-design-vue')['message']
+  const notification: typeof import('ant-design-vue')['notification']
   const showFailToast: typeof import('vant/es')['showFailToast']
   const showSuccessToast: typeof import('vant/es')['showSuccessToast']
   const showToast: typeof import('vant/es')['showToast']

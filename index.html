@@ -41,8 +41,8 @@
   </script>
 
   <style>
-    #app-loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000 }
-    #app-loading h1 { font-size: 20px; font-weight: 600; color: #1e293b; margin: 0 0 32px 0; text-align: center; max-width: 80vw; line-height: 1.4; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif }
+    h1 { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0 }
+    #app-loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: flex; align-items: center; justify-content: center; z-index: 10000 }
     .loader-orb { width: 80px; height: 80px; background: radial-gradient(circle at 30% 30%, #f0f9ff, #7dd3fc, #38bdf8); border-radius: 50%; filter: blur(10px); box-shadow: 0 0 50px rgba(56, 189, 248, .25); animation: orb-breathe 2.8s ease-in-out infinite; opacity: .8 }
     @keyframes orb-breathe { 0%, 100% { transform: scale(.9); opacity: .6; filter: blur(8px) } 50% { transform: scale(1.1); opacity: .9; filter: blur(12px) } }
     @media (prefers-color-scheme: dark) { #app-loading:not(.light-theme-forced) { background: #121212 } #app-loading:not(.light-theme-forced) .loader-orb { background: radial-gradient(circle at 30% 30%, #0f172a, #0369a1, #0ea5e9); box-shadow: 0 0 50px rgba(14, 165, 233, .2) } }
@@ -52,8 +52,8 @@
 </head>
 
 <body>
+  <h1></h1>
   <div id="app-loading">
-    <h1></h1>
     <div class="loader-orb"></div>
   </div>
 
@@ -64,18 +64,10 @@
     setTimeout(function () { var l = document.getElementById('app-loading'); if (l) l.remove() }, 999);
   </script>
 
-  <!-- Pre-boot: set <html lang> + <h1> from URL locale prefix -->
+  <!-- Pre-boot: set <html lang> from URL locale prefix -->
   <script>
-    (function(){try{
-      var m=window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
-      // ── 语言配置（加语言只改这两个对象） ──
-      var L={zh:'zh-CN'};
-      var H={zh:'悦木图库 - 发现、分享、创造美好瞬间',en:'yuemutuku - Discover, Share, Create Beautiful Moments'};
-      var loc=m?L[m[1]]||m[1]:'zh-CN';
-      document.documentElement.lang=loc;
-      var h1=document.querySelector('#app-loading h1');
-      if(h1) h1.textContent=H[loc.substring(0,2)]||H.zh;
-    }catch(e){}})();
+    (function(){try{var m=window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);var L={zh:'zh-CN'};document.documentElement.lang=m?L[m[1]]||m[1]:'zh-CN'}catch(e){}})();
   </script>
 </body>
 </html>
+

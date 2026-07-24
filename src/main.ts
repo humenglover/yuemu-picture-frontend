@@ -3,7 +3,6 @@ import { createPinia } from 'pinia'
 import { handleBackButton } from '@/utils/back.ts'
 import App from './App.vue'
 import router from './router'
-import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/reset.css'
 import '@/access.ts'
 import VueCropper from 'vue-cropper'
@@ -22,7 +21,6 @@ const pinia = createPinia()
 // 2. 先 use 所有插件（包括 router），确保路由初始化完成
 app.use(pinia)
 app.use(router) // 关键：必须在 router.isReady() 之前执行
-app.use(Antd)
 app.use(VueCropper)
 app.use(i18n)
 
