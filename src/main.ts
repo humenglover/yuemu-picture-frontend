@@ -1,3 +1,12 @@
+// 静默 ant-design-vue 内部的 Popover/Tooltip `visible` → `open` 弃用警告
+// 等 antd 官方修复后删除这段即可
+const _warn = console.warn
+console.warn = (...a: any[]) => {
+  const m = String(a[0] || '')
+  if (m.includes('ant-design-vue') && (m.includes('visible') || m.includes('Tooltip'))) return
+  _warn.apply(console, a)
+}
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { handleBackButton } from '@/utils/back.ts'
