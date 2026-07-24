@@ -140,10 +140,14 @@ function generateHTML(locale, path) {
   const zhPath = `${BASE_URL}/zh${cleanPath}`
   const enPath = `${BASE_URL}/en${cleanPath}`
 
-  // Replace existing title + description + inject SEO block before </head>
+  // Extract h1 text from title: "首页 - 发现美好瞬间" → "首页"
+  const h1Text = escapeXml(title.includes(' - ') ? title.split(' - ')[0].trim() : title)
+
+  // Replace existing title + description + h1 + inject SEO block before </head>
   let html = TEMPLATE
     .replace(/<title>[^<]*<\/title>/, `<title>${escapeXml(title)}</title>`)
     .replace(/<meta name="description" content="[^"]*"\s*\/?>/, `<meta name="description" content="${escapeXml(desc)}">`)
+    .replace(/<h1>[^<]*<\/h1>/, `<h1>${h1Text}</h1>`)
 
   const seoBlock = [
     `<meta name="keywords" content="${escapeXml(seo.keywords)}">`,
